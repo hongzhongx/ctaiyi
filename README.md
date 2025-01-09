@@ -1,5 +1,5 @@
 
-# [ctaiyi](https://github.com/hongzhongx/ctaiyi) [![Build Status](https://img.shields.io/circleci/project/github/hongzhongx/ctaiyi.svg?style=flat-square)](https://circleci.com/gh/hongzhong/workflows/ctaiyi) [![Coverage Status](https://img.shields.io/coveralls/hongzhongx/ctaiyi.svg?style=flat-square)](https://coveralls.io/github/hongzhongx/ctaiyi?branch=master) [![Package Version](https://img.shields.io/npm/v/@taiyinet/ctaiyi.svg?style=flat-square)](https://www.npmjs.com/package/@taiyinet/ctaiyi)
+# [ctaiyi](https://github.com/hongzhongx/ctaiyi) [![Build Status](https://img.shields.io/circleci/project/github/hongzhongx/ctaiyi.svg?style=flat-square)](https://circleci.com/gh/hongzhongx/workflows/ctaiyi) [![Coverage Status](https://img.shields.io/coveralls/hongzhongx/ctaiyi.svg?style=flat-square)](https://coveralls.io/github/hongzhongx/ctaiyi?branch=master) [![Package Version](https://img.shields.io/npm/v/@taiyinet/ctaiyi.svg?style=flat-square)](https://www.npmjs.com/package/@taiyinet/ctaiyi)
 
 Robust [taiyi blockchain](https://github.com/hongzhongx/taiyi) client library that runs in both node.js and the browser.
 
