@@ -5,4 +5,3 @@ coverage/
 .testnetrc
 .idea
 .vscode
-yarn.lock
