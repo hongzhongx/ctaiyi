@@ -13,8 +13,6 @@ import {
   Types,
 } from './../src'
 
-import 'mocha'
-
 describe('crypto', () => {
   const testnetPrefix = 'TAI'
   const testnetPair = {

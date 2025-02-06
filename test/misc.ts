@@ -2,8 +2,6 @@ import * as assert from 'assert'
 import * as stream from 'stream'
 import { utils } from './../src'
 
-import 'mocha'
-
 describe('misc', () => {
   describe('iteratorStream', () => {
     async function *counter(to: number) {

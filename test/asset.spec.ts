@@ -1,7 +1,4 @@
-import * as assert from 'assert'
 import { Asset, getQiPrice, Price } from './../src'
-
-import 'mocha'
 
 describe('asset', () => {
   it('should create from string', () => {

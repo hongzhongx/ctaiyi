@@ -1,15 +1,12 @@
 import type { Serializer } from './../src'
-import * as assert from 'assert'
-import * as ByteBuffer from 'bytebuffer'
+import ByteBuffer from 'bytebuffer'
 import { HexBuffer, Types } from './../src'
 
 /*
  Serializer tests in the format:
  [{"name": "Type[::Subtype]", "values": [["expected output as hex string", <value>]]}]
 */
-const serializerTests = require('./serializer-tests.json')
-
-import 'mocha'
+import serializerTests from './serializer-tests.json'
 
 function serialize(serializer: Serializer, data: any) {
   const buffer = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.LITTLE_ENDIAN)

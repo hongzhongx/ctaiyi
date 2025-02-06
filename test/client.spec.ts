@@ -1,8 +1,5 @@
-import * as assert from 'assert'
 import { VError } from 'verror'
 import { Client } from './../src'
-
-import 'mocha'
 
 describe('client', function () {
   this.slow(200)

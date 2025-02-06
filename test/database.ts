@@ -3,8 +3,6 @@ import * as assert from 'assert'
 import { Asset, Client, PrivateKey } from './../src'
 
 import { agent, getTestnetAccounts, TEST_NODE } from './common'
-// TODO：还没有实现，等待实现账号创建Web服务
-import 'mocha'
 
 describe('database api', function () {
   this.slow(500)

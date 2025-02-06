@@ -1,10 +1,7 @@
 import type { AppliedOperation, SignedBlock } from './../src'
-import * as assert from 'assert'
 import { BlockchainMode, Client } from './../src'
 
 import { agent, TEST_NODE } from './common'
-
-import 'mocha'
 
 describe('blockchain', function () {
   this.slow(5 * 1000)

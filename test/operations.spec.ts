@@ -1,23 +1,20 @@
-import * as assert from 'assert'
+import type { ChangeRecoveryAccountOperation, CustomOperation } from './../src'
 import { randomBytes } from 'crypto'
-import * as ds from './../src'
+import { Asset, Client, HexBuffer, PrivateKey } from './../src'
 
 import { agent, getTestnetAccounts, randomString } from './common'
 
-// TODO：还没有实现，等待实现账号创建Web服务
-import 'mocha'
-
-const { Asset, PrivateKey, Client, HexBuffer } = ds
-
-describe('operations', function () {
-  this.slow(20 * 1000)
-  this.timeout(60 * 1000)
+describe('operations', () => {
+  vi.setConfig({
+    testTimeout: 60 * 1000,
+  })
 
   const client = Client.testnet({ agent })
 
   let acc1: { username: string, password: string }, acc2: { username: string, password: string }
-  let acc1Key: ds.PrivateKey
-  before(async () => {
+  let acc1Key: PrivateKey
+
+  beforeAll(async () => {
     [acc1, acc2] = await getTestnetAccounts()
     acc1Key = PrivateKey.fromLogin(acc1.username, acc1.password, 'active')
   })
@@ -40,7 +37,7 @@ describe('operations', function () {
 
   it('should send custom', async () => {
     const props = await client.database.getDynamicGlobalProperties()
-    const op: ds.CustomOperation = ['custom', {
+    const op: CustomOperation = ['custom', {
       required_auths: [acc1.username],
       id: ~~(Math.random() * 65535),
       data: randomBytes(512),
@@ -197,7 +194,7 @@ describe('operations', function () {
   })
 
   it('should change recovery account', async () => {
-    const op: ds.ChangeRecoveryAccountOperation = ['change_recovery_account', {
+    const op: ChangeRecoveryAccountOperation = ['change_recovery_account', {
       account_to_recover: acc1.username,
       new_recovery_account: acc2.username,
       extensions: [],
