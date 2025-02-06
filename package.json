@@ -28,6 +28,7 @@
     "dist"
   ],
   "scripts": {
+    "build": "unbuild",
     "test": "make ci-test",
     "prepublishOnly": "make all"
   },
