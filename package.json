@@ -29,7 +29,11 @@
   ],
   "scripts": {
     "build": "unbuild",
+    "prepack": "unbuild",
     "test": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "prepare": "simple-git-hooks && pnpm build",
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
@@ -46,9 +50,17 @@
     "@types/bytebuffer": "^5.0.33",
     "@types/node": "^22.13.1",
     "eslint": "^9.19.0",
+    "lint-staged": "^15.4.3",
     "regenerator-runtime": "^0.13.1",
+    "simple-git-hooks": "^2.11.1",
     "typescript": "^5.7.3",
     "unbuild": "^3.3.1",
     "vitest": "^3.0.5"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
   }
 }
