@@ -36,29 +36,37 @@ export class HexBuffer {
 }
 
 export interface ChainProperties {
+  /**
+   * 这笔费用以 YANG 支付，会为新账户兑换成 QI。
+   * 没有 QI 的账户无法获得使用配额，因此毫无影响力。
+   * 这笔最低费用要求所有账户对网络做出一定的投入，其中包括投票及进行交易的能力。
+   */
   account_creation_fee: string | Asset
+  /**
+   * 司命投票针对的是最大区块大小，网络利用该参数来调整速率限制和容量。
+   */
   maximum_block_size: number // uint32_t
 }
 
 export interface QiDelegation {
   /**
-   * Delegation id.
+   * 委托 ID。
    */
   id: number // id_type
   /**
-   * Account that is delegating qi to delegatee.
+   * 向受托人（接受委托者）委托 QI 的账户。
    */
   delegator: string // account_name_type
   /**
-   * Account that is receiving qi from delegator.
+   * 从委托者处接收 QI 的账户
    */
   delegatee: string // account_name_type
   /**
-   * Amount of QI delegated.
+   * 委托的 QI 数量。
    */
   qi: Asset | string
   /**
-   * Earliest date delegation can be removed.
+   * 最早可以移除委托的时间。
    */
   min_delegation_time: string // time_point_sec
 }
@@ -113,7 +121,9 @@ export function getQiPrice(): Price {
 }
 
 /**
- * Returns the qi of specified account. Default: Subtract delegated & add received
+ * 返回指定账户的 QI 余额。
+ * @param subtract_delegated 是否减去委托出去的
+ * @param add_received 是否加上接收到的
  */
 export function getQi(account: Account, subtract_delegated: boolean = true, add_received: boolean = true) {
   let qi: Asset = Asset.from(account.qi)
