@@ -1,5 +1,5 @@
 import type { PublicKey } from '../crypto'
-import type { Authority } from './account'
+import type { AuthorityType } from './account'
 import type { Asset } from './asset'
 import type { ChainProperties, HexBuffer } from './misc'
 
@@ -91,9 +91,9 @@ export interface AccountCreateOperation extends Operation {
     fee: Asset | string
     creator: string
     new_account_name: string
-    owner: Authority
-    active: Authority
-    posting: Authority
+    owner: AuthorityType
+    active: AuthorityType
+    posting: AuthorityType
     memo_key: PublicKey | string
     json_metadata: string
   }
@@ -103,9 +103,9 @@ export interface AccountUpdateOperation extends Operation {
   0: 'account_update'
   1: {
     account: string
-    owner?: Authority
-    active?: Authority
-    posting?: Authority
+    owner?: AuthorityType
+    active?: AuthorityType
+    posting?: AuthorityType
     memo_key?: PublicKey | string
     json_metadata?: string
   }
@@ -229,7 +229,7 @@ export interface RequestAccountRecoveryOperation extends Operation {
   1: {
     recovery_account: string
     account_to_recover: string
-    new_owner_authority: Authority
+    new_owner_authority: AuthorityType
     extensions: Array<unknown>
   }
 }
@@ -238,8 +238,8 @@ export interface RecoverAccountOperation extends Operation {
   0: 'recover_account'
   1: {
     account_to_recover: string
-    new_owner_authority: Authority
-    recent_owner_authority: Authority
+    new_owner_authority: AuthorityType
+    recent_owner_authority: AuthorityType
     extensions: Array<unknown>
   }
 }
