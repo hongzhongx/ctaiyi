@@ -1,6 +1,6 @@
-import type { Client } from './../client'
+import type { Client } from '../client'
 
-import type { AuthorityType } from './../taiyi/account'
+import type { AuthorityType } from '../taiyi/account'
 import type {
   AccountCreateOperation,
   AccountUpdateOperation,
@@ -8,25 +8,27 @@ import type {
   DelegateQiOperation,
   Operation,
   TransferOperation,
-} from './../taiyi/operation'
-import type { SignedTransaction, Transaction, TransactionConfirmation } from './../taiyi/transaction'
-import * as assert from 'assert'
-import { cryptoUtils, PrivateKey, PublicKey } from './../crypto'
-import { Authority } from './../taiyi/account'
-import { Asset } from './../taiyi/asset'
+} from '../taiyi/operation'
+import type { SignedTransaction, Transaction, TransactionConfirmation } from '../taiyi/transaction'
+import { hexToBytes } from '@noble/hashes/utils'
+
+import assert from 'tiny-invariant'
+import { cryptoUtils, PrivateKey, PublicKey } from '../crypto'
+import { Authority } from '../taiyi/account'
+import { Asset } from '../taiyi/asset'
 
 export interface CreateAccountOptions {
   /**
-   * Username for the new account.
+   * 新账户的用户名
    */
   username: string
   /**
-   * Password for the new account, if set, all keys will be derived from this.
+   * 新账户的密码，如果设置了密码，所有密钥都将从此密码派生
    */
   password?: string
   /**
-   * Account authorities, used to manually set account keys.
-   * Can not be used together with the password option.
+   * 账户权限，用于手动设置账户密钥
+   * 不能与密码选项一起使用
    */
   auths?: {
     owner: AuthorityType | string | PublicKey
@@ -35,33 +37,33 @@ export interface CreateAccountOptions {
     memoKey: PublicKey | string
   }
   /**
-   * Creator account, fee will be deducted from this and the key to sign
-   * the transaction must be the creators active key.
+   * 创建者账户，费用将从此账户扣除
+   * 签署交易的密钥必须是创建者的活动密钥
    */
   creator: string
   /**
-   * Account creation fee. If omitted fee will be set to lowest possible.
+   * 账户创建费用。如果省略，费用将设置为最低可能值
    */
   fee?: string | Asset | number
   /**
-   * Optional account meta-data.
+   * 可选的账户元数据
    */
   metadata?: { [key: string]: any }
 }
 
 export class BroadcastAPI {
   /**
-   * How many milliseconds in the future to set the expiry time to when
-   * broadcasting a transaction, defaults to 1 minute.
+   * 广播交易时将到期时间设置为未来多少毫秒
+   * @default 60000
    */
   public expireTime = 60 * 1000
 
-  constructor(readonly client: Client) {}
+  constructor(readonly client: Client) { }
 
   /**
-   * Broadcast a transfer.
-   * @param data The transfer operation payload.
-   * @param key Private active key of sender.
+   * 广播转账操作
+   * @param data 转账操作的内容
+   * @param key 发送者的私有活动密钥
    */
   public async transfer(data: TransferOperation[1], key: PrivateKey) {
     const op: Operation = ['transfer', data]
@@ -69,9 +71,9 @@ export class BroadcastAPI {
   }
 
   /**
-   * Broadcast custom JSON.
-   * @param data The custom_json operation payload.
-   * @param key Private posting or active key.
+   * 广播自定义JSON
+   * @param data custom_json 操作的内容
+   * @param key 私有发布密钥或活动密钥
    */
   public async json(data: CustomJsonOperation[1], key: PrivateKey) {
     const op: Operation = ['custom_json', data]
@@ -79,12 +81,12 @@ export class BroadcastAPI {
   }
 
   /**
-   * Create a new account on testnet.
-   * @param options New account options.
-   * @param key Private active key of account creator.
+   * 在测试网络上创建新账户
+   * @param options 新账户选项
+   * @param key 账户创建者的私钥
    */
   public async createTestAccount(options: CreateAccountOptions, key: PrivateKey) {
-    assert(global.hasOwnProperty('it'), 'helper to be used only for mocha tests')
+    assert(Object.prototype.hasOwnProperty.call(globalThis, 'it'), 'helper to be used only for mocha tests')
 
     const { username, metadata, creator } = options
 
@@ -114,7 +116,7 @@ export class BroadcastAPI {
     fee = Asset.from(fee || 0, 'YANG')
 
     if (fee.amount > 0) {
-      const chainProps = await this.client.database.getChainProperties()
+      const chainProps = await this.client.baiyujing.getChainProperties()
       const creationFee = Asset.from(chainProps.account_creation_fee)
       if (fee.amount !== creationFee.amount) {
         throw new Error(`Fee must be exactly ${creationFee.toString()}`)
@@ -141,10 +143,9 @@ export class BroadcastAPI {
   }
 
   /**
-   * Update account.
-   * @param data The account_update payload.
-   * @param key The private key of the account affected, should be the corresponding
-   *            key level or higher for updating account authorities.
+   * 更新账户
+   * @param data account_update的载荷
+   * @param key 受影响账户的私钥，应该是相应的密钥级别或更高级别以更新账户权限
    */
   public async updateAccount(data: AccountUpdateOperation[1], key: PrivateKey) {
     const op: Operation = ['account_update', data]
@@ -152,16 +153,15 @@ export class BroadcastAPI {
   }
 
   /**
-   * Delegate qi from one account to the other. The qi are still owned
-   * by the original account, but siming adore rights and bandwidth allocation are transferred
-   * to the receiving account. This sets the delegation to `qi`, increasing it or
-   * decreasing it as needed. (i.e. a delegation of 0 removes the delegation)
+   * 将气从一个账户委托给另一个账户。气仍由原始账户拥有，
+   * 但司命崇拜权和带宽分配将转移到接收账户。
+   * 这将委托设置为`qi`，根据需要增加或减少它。
+   * (即委托为0时会移除委托)
    *
-   * When a delegation is removed the qi are placed in limbo for a week to prevent a satoshi
-   * of QI from adoring on the same siming twice.
+   * 当委托被移除时，气会被置于一周的清算期，以防止同一个司命被重复投票。
    *
-   * @param options Delegation options.
-   * @param key Private active key of the delegator.
+   * @param options 委托选项
+   * @param key 委托人的私有活动密钥
    */
   public async delegateQi(options: DelegateQiOperation[1], key: PrivateKey) {
     const op: Operation = ['delegate_qi', options]
@@ -169,17 +169,40 @@ export class BroadcastAPI {
   }
 
   /**
-   * Sign and broadcast transaction with operations to the network. Throws if the transaction expires.
-   * @param operations List of operations to send.
-   * @param key Private key(s) used to sign transaction.
+   * 补全交易中的必要字段
+   * @param transaction 交易
    */
-  public async sendOperations(operations: Operation[], key: PrivateKey | PrivateKey[]): Promise<TransactionConfirmation> {
-    const props = await this.client.database.getDynamicGlobalProperties()
+  public async prepareTransaction(transaction: Pick<Transaction, 'operations'> & Partial<Transaction>): Promise<Transaction> {
+    const props = await this.client.baiyujing.getDynamicGlobalProperties()
 
     const ref_block_num = props.head_block_number & 0xFFFF
-    const ref_block_prefix = Buffer.from(props.head_block_id, 'hex').readUInt32LE(4)
+    const ref_block_prefix = new DataView(hexToBytes(props.head_block_id).buffer).getUint32(4, true)
     const expiration = new Date(new Date(`${props.time}Z`).getTime() + this.expireTime).toISOString().slice(0, -5)
-    const extensions = []
+    const extensions: unknown[] = []
+
+    return Object.assign(
+      {
+        expiration,
+        extensions,
+        ref_block_num,
+        ref_block_prefix,
+      },
+      transaction,
+    )
+  }
+
+  /**
+   * 签名并向网络广播带有操作的交易。如果交易过期则抛出异常。
+   * @param operations 要发送的操作列表
+   * @param key 用于签名交易的私钥
+   */
+  public async sendOperations(operations: Operation[], key: PrivateKey | PrivateKey[]): Promise<TransactionConfirmation> {
+    const props = await this.client.baiyujing.getDynamicGlobalProperties()
+
+    const ref_block_num = props.head_block_number & 0xFFFF
+    const ref_block_prefix = new DataView(hexToBytes(props.head_block_id).buffer).getUint32(4, true)
+    const expiration = new Date(new Date(`${props.time}Z`).getTime() + this.expireTime).toISOString().slice(0, -5)
+    const extensions: unknown[] = []
 
     const tx: Transaction = {
       expiration,
@@ -196,21 +219,21 @@ export class BroadcastAPI {
   }
 
   /**
-   * Sign a transaction with key(s).
+   * 使用密钥签署交易
    */
   public sign(transaction: Transaction, key: PrivateKey | PrivateKey[]): SignedTransaction {
     return cryptoUtils.signTransaction(transaction, key, this.client.chainId)
   }
 
   /**
-   * Broadcast a signed transaction to the network.
+   * 向网络广播已签署的交易
    */
   public async send(transaction: SignedTransaction): Promise<TransactionConfirmation> {
     return this.call('broadcast_transaction_synchronous', [transaction])
   }
 
   /**
-   * Convenience for calling `baiyujing_api`.
+   * 调用`baiyujing_api`的便捷方法
    */
   public call(method: string, params?: any[]) {
     return this.client.call('baiyujing_api', method, params)

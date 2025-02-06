@@ -1,5 +1,6 @@
-import type { Asset } from './asset'
+import type { Account } from './account'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
+import { Asset, Price } from './asset'
 
 /**
  * 一个包装器，用于将数据序列化为十六进制编码的字符串。
@@ -37,6 +38,29 @@ export class HexBuffer {
 export interface ChainProperties {
   account_creation_fee: string | Asset
   maximum_block_size: number // uint32_t
+}
+
+export interface QiDelegation {
+  /**
+   * Delegation id.
+   */
+  id: number // id_type
+  /**
+   * Account that is delegating qi to delegatee.
+   */
+  delegator: string // account_name_type
+  /**
+   * Account that is receiving qi from delegator.
+   */
+  delegatee: string // account_name_type
+  /**
+   * Amount of QI delegated.
+   */
+  qi: Asset | string
+  /**
+   * Earliest date delegation can be removed.
+   */
+  min_delegation_time: string // time_point_sec
 }
 
 /**
@@ -79,12 +103,33 @@ export interface DynamicGlobalProperties {
   participation_count: number
   /** 最后一个不可逆区块号 */
   last_irreversible_block_num: number
+}
 
-  /** 委托返回周期 */
-  delegation_return_period: number
-  /** 内容奖励阳百分比 */
-  content_reward_yang_percent: number
-  /** 内容奖励气基金百分比 */
-  content_reward_qi_fund_percent: number
+/**
+ * Return the qi price.
+ */
+export function getQiPrice(): Price {
+  return new Price(new Asset(1, 'YANG'), new Asset(1, 'QI'))
+}
 
+/**
+ * Returns the qi of specified account. Default: Subtract delegated & add received
+ */
+export function getQi(account: Account, subtract_delegated: boolean = true, add_received: boolean = true) {
+  let qi: Asset = Asset.from(account.qi)
+  const qi_delegated: Asset = Asset.from(account.delegated_qi)
+  const qi_received: Asset = Asset.from(account.received_qi)
+  const withdraw_rate: Asset = Asset.from(account.qi_withdraw_rate)
+  const already_withdrawn = (Number(account.to_withdraw) - Number(account.withdrawn)) / 1000000
+  const withdraw_qi = Math.min(withdraw_rate.amount, already_withdrawn)
+  qi = qi.subtract(withdraw_qi)
+
+  if (subtract_delegated) {
+    qi = qi.subtract(qi_delegated)
+  }
+  if (add_received) {
+    qi = qi.add(qi_received)
+  }
+
+  return qi.amount
 }

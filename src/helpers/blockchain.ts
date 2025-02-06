@@ -1,41 +1,41 @@
-import type { Client } from './../client'
-import { iteratorStream, sleep } from './../utils'
+import type { Client } from '../client'
+import { iteratorStream, sleep } from '../utils'
 
 export enum BlockchainMode {
   /**
-   * Only get irreversible blocks.
+   * 仅获取不可逆区块。
    */
   Irreversible,
   /**
-   * Get all blocks.
+   * 获取所有区块。
    */
   Latest,
 }
 
 export interface BlockchainStreamOptions {
   /**
-   * Start block number, inclusive. If omitted generation will start from current block height.
+   * 开始块高，包含。如果未指定，生成将从当前块高开始。
    */
   from?: number
   /**
-   * End block number, inclusive. If omitted stream will continue indefinitely.
+   * 结束块高，包含。如果未指定，流将继续无限期地进行。
    */
   to?: number
   /**
-   * Streaming mode, if set to `Latest` may include blocks that are not applied to the final chain.
-   * Defaults to `Irreversible`.
+   * 流模式，如果设置为 `Latest` 可能会包含未最终应用到链中的区块。
+   * 默认值为 `Irreversible`。
    */
   mode?: BlockchainMode
 }
 
 export class Blockchain {
-  constructor(readonly client: Client) {}
+  constructor(readonly client: Client) { }
 
   /**
-   * Get latest block number.
+   * 获取当前块高
    */
   public async getCurrentBlockNum(mode = BlockchainMode.Irreversible) {
-    const props = await this.client.database.getDynamicGlobalProperties()
+    const props = await this.client.baiyujing.getDynamicGlobalProperties()
     switch (mode) {
       case BlockchainMode.Irreversible:
         return props.last_irreversible_block_num
@@ -45,22 +45,22 @@ export class Blockchain {
   }
 
   /**
-   * Get latest block header.
+   * 获取最新区块头
    */
   public async getCurrentBlockHeader(mode?: BlockchainMode) {
-    return this.client.database.getBlockHeader(await this.getCurrentBlockNum(mode))
+    return this.client.baiyujing.getBlockHeader(await this.getCurrentBlockNum(mode))
   }
 
   /**
-   * Get latest block.
+   * 获取最新区块
    */
   public async getCurrentBlock(mode?: BlockchainMode) {
-    return this.client.database.getBlock(await this.getCurrentBlockNum(mode))
+    return this.client.baiyujing.getBlock(await this.getCurrentBlockNum(mode))
   }
 
   /**
-   * Return a asynchronous block number iterator.
-   * @param options Feed options, can also be a block number to start from.
+   * 返回一个异步块高迭代器。
+   * @param options 迭代器选项，也可以是一个区块编号。
    */
   public async *getBlockNumbers(options?: BlockchainStreamOptions | number) {
     // const config = await this.client.database.getConfig()
@@ -90,34 +90,34 @@ export class Blockchain {
   }
 
   /**
-   * Return a stream of block numbers, accepts same parameters as {@link getBlockNumbers}.
+   * 返回一个块高流，接受与 {@link getBlockNumbers} 相同的参数。
    */
   public getBlockNumberStream(options?: BlockchainStreamOptions | number) {
     return iteratorStream(this.getBlockNumbers(options))
   }
 
   /**
-   * Return a asynchronous block iterator, accepts same parameters as {@link getBlockNumbers}.
+   * 返回一个异步块迭代器，接受与 {@link getBlockNumbers} 相同的参数。
    */
   public async *getBlocks(options?: BlockchainStreamOptions | number) {
     for await (const num of this.getBlockNumbers(options)) {
-      yield await this.client.database.getBlock(num)
+      yield await this.client.baiyujing.getBlock(num)
     }
   }
 
   /**
-   * Return a stream of blocks, accepts same parameters as {@link getBlockNumbers}.
+   * 返回一个区块流，接受与 {@link getBlockNumbers} 相同的参数。
    */
   public getBlockStream(options?: BlockchainStreamOptions | number) {
     return iteratorStream(this.getBlocks(options))
   }
 
   /**
-   * Return a asynchronous operation iterator, accepts same parameters as {@link getBlockNumbers}.
+   * 返回一个异步 Operation 迭代器，接受与 {@link getBlockNumbers} 相同的参数。
    */
   public async *getOperations(options?: BlockchainStreamOptions | number) {
     for await (const num of this.getBlockNumbers(options)) {
-      const operations = await this.client.database.getOperations(num)
+      const operations = await this.client.baiyujing.getOperations(num)
       for (const operation of operations) {
         yield operation
       }
@@ -125,7 +125,7 @@ export class Blockchain {
   }
 
   /**
-   * Return a stream of operations, accepts same parameters as {@link getBlockNumbers}.
+   * 返回一个 Operation 流，接受与 {@link getBlockNumbers} 相同的参数。
    */
   public getOperationsStream(options?: BlockchainStreamOptions | number) {
     return iteratorStream(this.getOperations(options))

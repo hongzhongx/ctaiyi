@@ -9,10 +9,13 @@ export { utils }
 export * from './client'
 export * from './crypto'
 
-export * from './helpers/blockchain'
-export * from './helpers/database'
+// 依赖注入的类 仅导出类型
+export type * from './helpers/baiyujing'
+export type * from './helpers/blockchain'
+export type * from './helpers/broadcast'
 
 export * from './taiyi/account'
+export * from './taiyi/actor'
 export * from './taiyi/asset'
 export * from './taiyi/block'
 export * from './taiyi/misc'
