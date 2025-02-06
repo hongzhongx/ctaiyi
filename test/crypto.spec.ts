@@ -1,17 +1,18 @@
-import type {
-  Transaction,
-} from './../src'
-import * as assert from 'assert'
-import { createHash, randomBytes } from 'crypto'
-import * as ByteBuffer from 'bytebuffer'
+import type { Transaction } from '../src'
+import { inspect } from 'util'
+
+import { concatBytes, hexToBytes, randomBytes } from '@noble/hashes/utils'
+import ByteBuffer from 'bytebuffer'
 import {
   cryptoUtils,
   DEFAULT_CHAIN_ID,
   PrivateKey,
   PublicKey,
+  sha256,
   Signature,
+
   Types,
-} from './../src'
+} from '../src'
 
 describe('crypto', () => {
   const testnetPrefix = 'TAI'
@@ -23,7 +24,7 @@ describe('crypto', () => {
     private: '5K2yDAd9KAZ3ZitBsAPyRka9PLFemUrbcL6UziZiPaw2c6jCeLH',
     public: 'TAI8QykigLRi9ZUcNy1iXGY3KjRuCiLM8Ga49LHti1F8hgawKFc3K',
   }
-  const mainPairPub = Buffer.from('03d0519ddad62bd2a833bee5dc04011c08f77f66338c38d99c685dee1f454cd1b8', 'hex')
+  const mainPairPub = hexToBytes('03d0519ddad62bd2a833bee5dc04011c08f77f66338c38d99c685dee1f454cd1b8')
 
   const testSig = '202c52188b0ecbc26c766fe6d3ec68dac58644f43f43fc7d97da122f76fa028f98691dd48b44394bdd8cecbbe66e94795dcf53291a1ef7c16b49658621273ea68e'
   const testKey = PrivateKey.from(randomBytes(32))
@@ -60,20 +61,21 @@ describe('crypto', () => {
 
   it('should conceal private key when inspecting', () => {
     const key = PrivateKey.fromString(testnetPair.private)
-    assert.equal(key.inspect(), 'PrivateKey: 5JQy7m...z3fQR8')
-    assert.equal(key.createPublic(testnetPrefix).inspect(), 'PublicKey: TAI8FiV6v7yqYWTZz8WuFDckWr62L9X34hCy6koe8vd2cDJHimtgM')
+    assert.equal(inspect(key), 'PrivateKey: 5JQy7m...z3fQR8')
+    assert.equal(inspect(key.createPublic(testnetPrefix)), 'PublicKey <TAI8FiV6v7yqYWTZz8WuFDckWr62L9X34hCy6koe8vd2cDJHimtgM>')
   })
 
   it('should sign and verify', () => {
     const message = randomBytes(32)
     const signature = testKey.sign(message)
+
     assert(testKey.createPublic().verify(message, signature))
-    signature.data.writeUInt8(0x42, 3)
+    signature.data[3] = 0x42
     assert(!testKey.createPublic().verify(message, signature))
   })
 
   it('should de/encode signatures', () => {
-    const signature = Signature.fromString(testSig)
+    const signature = Signature.fromUint8Array(hexToBytes(testSig))
     assert.equal(signature.toString(), testSig)
   })
 
@@ -81,7 +83,10 @@ describe('crypto', () => {
     const key = PrivateKey.fromString(testnetPair.private)
     const msg = randomBytes(32)
     const signature = key.sign(msg)
-    assert.equal(signature.recover(msg).toString(), key.createPublic().toString())
+    assert.equal(
+      signature.recover(msg).toString(),
+      key.createPublic().toString(),
+    )
   })
 
   it('should create key from login', () => {
@@ -99,14 +104,15 @@ describe('crypto', () => {
       ],
       operations: [
         ['account_siming_proxy', { account: 'foo', proxy: 'bar' }],
+        // ['transfer', { from: 'foo', to: 'bar', amount: 10000, memo: 'memo' }],
       ],
     }
     const key = PrivateKey.fromSeed('hello')
     const buffer = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.LITTLE_ENDIAN)
     Types.Transaction(buffer, tx)
     buffer.flip()
-    const data = Buffer.from(buffer.toBuffer())
-    const digest = createHash('sha256').update(Buffer.concat([DEFAULT_CHAIN_ID, data])).digest()
+    const data = new Uint8Array(buffer.toArrayBuffer())
+    const digest = sha256(concatBytes(DEFAULT_CHAIN_ID, data))
     const signed = cryptoUtils.signTransaction(tx, key)
     const pkey = key.createPublic()
     const sig = Signature.fromString(signed.signatures[0])
@@ -124,12 +130,9 @@ describe('crypto', () => {
         ['shutdown_network', {}],
       ],
     }
-    try {
-      cryptoUtils.signTransaction(tx, testKey)
-      assert(false, 'should not be reached')
-    }
-    catch (error) {
-      assert.equal(error.name, 'SerializationError')
-    }
+    assert.throws(
+      () => cryptoUtils.signTransaction(tx, testKey),
+      'Unable to serialize transaction',
+    )
   })
 })

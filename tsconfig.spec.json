@@ -23,6 +23,7 @@
   },
   "include": [
     "src/**/*.ts",
+    "test/common.ts",
     "test/**/*.spec.ts"
   ],
   "exclude": [

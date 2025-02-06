@@ -11,7 +11,7 @@ export * from './crypto'
 
 // 依赖注入的类 仅导出类型
 export type * from './helpers/baiyujing'
-export type * from './helpers/blockchain'
+export * from './helpers/blockchain'
 export type * from './helpers/broadcast'
 
 export * from './taiyi/account'

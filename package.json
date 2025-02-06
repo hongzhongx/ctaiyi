@@ -29,8 +29,8 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "test": "make ci-test",
-    "prepublishOnly": "make all"
+    "test": "vitest",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "@noble/hashes": "^1.7.1",
@@ -44,6 +44,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.1.1",
     "@types/bytebuffer": "^5.0.33",
+    "@types/node": "^22.13.1",
     "eslint": "^9.19.0",
     "regenerator-runtime": "^0.13.1",
     "typescript": "^5.7.3",
