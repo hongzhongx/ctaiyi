@@ -162,7 +162,7 @@ export class PublicKey {
    * 用于 node.js 中的 `utils.inspect` 和 `console.log`。
    */
   public [Symbol.for('nodejs.util.inspect.custom')]() {
-    return `PublicKey <${this.toString()}>`
+    return `PublicKey: ${this.toString()}`
   }
 }
 

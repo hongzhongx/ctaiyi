@@ -62,7 +62,7 @@ describe('crypto', () => {
   it('should conceal private key when inspecting', () => {
     const key = PrivateKey.fromString(testnetPair.private)
     assert.equal(inspect(key), 'PrivateKey: 5JQy7m...z3fQR8')
-    assert.equal(inspect(key.createPublic(testnetPrefix)), 'PublicKey <TAI8FiV6v7yqYWTZz8WuFDckWr62L9X34hCy6koe8vd2cDJHimtgM>')
+    assert.equal(inspect(key.createPublic(testnetPrefix)), 'PublicKey: TAI8FiV6v7yqYWTZz8WuFDckWr62L9X34hCy6koe8vd2cDJHimtgM')
   })
 
   it('should sign and verify', () => {
