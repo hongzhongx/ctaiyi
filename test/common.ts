@@ -1,79 +1,84 @@
+import { randomBytes } from 'crypto'
 // TODO：还没有实现，等待实现账号创建Web服务
 import * as fs from 'fs'
 import * as https from 'https'
-import {randomBytes} from 'crypto'
 
 export const NUM_TEST_ACCOUNTS = 2
-export const IS_BROWSER = global['isBrowser'] === true
-export const TEST_NODE = process.env['TEST_NODE'] || 'http://127.0.0.1:8091'
+export const IS_BROWSER = global.isBrowser === true
+export const TEST_NODE = process.env.TEST_NODE || 'http://127.0.0.1:8091'
 
-export const agent = IS_BROWSER ? undefined : new https.Agent({keepAlive: true})
+export const agent = IS_BROWSER ? undefined : new https.Agent({ keepAlive: true })
 
-const fetch = global['fetch']
+const fetch = global.fetch
 
 async function readFile(filename: string) {
-    return new Promise<Buffer>((resolve, reject) => {
-        fs.readFile(filename, (error, result) => {
-            if (error) { reject(error) } else { resolve(result) }
-        })
+  return new Promise<Buffer>((resolve, reject) => {
+    fs.readFile(filename, (error, result) => {
+      if (error) { reject(error) }
+      else { resolve(result) }
     })
+  })
 }
 
 async function writeFile(filename: string, data: Buffer) {
-    return new Promise<void>((resolve, reject) => {
-        fs.writeFile(filename, data, (error) => {
-            if (error) { reject(error) } else { resolve() }
-        })
+  return new Promise<void>((resolve, reject) => {
+    fs.writeFile(filename, data, (error) => {
+      if (error) { reject(error) }
+      else { resolve() }
     })
+  })
 }
 
 export function randomString(length: number) {
-    return randomBytes(length*2)
-        .toString('base64')
-        .replace(/[^0-9a-z]+/gi, '')
-        .slice(0, length)
-        .toLowerCase()
+  return randomBytes(length * 2)
+    .toString('base64')
+    .replace(/[^0-9a-z]+/gi, '')
+    .slice(0, length)
+    .toLowerCase()
 }
 
-export async function createAccount(): Promise<{username: string, password: string}> {
-    const password = randomString(32)
-    const username = `ctaiyi-${ randomString(9) }`
-    const response = await fetch('https://testnet.taiyi.com/create', {
-        method: 'POST',
-        body: `username=${ username }&password=${ password }`,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-    })
-    const text = await response.text()
-    if (response.status !== 200) {
-        throw new Error(`Unable to create user: ${ text }`)
-    }
-    return {username, password}
+export async function createAccount(): Promise<{ username: string, password: string }> {
+  const password = randomString(32)
+  const username = `ctaiyi-${randomString(9)}`
+  const response = await fetch('https://testnet.taiyi.com/create', {
+    method: 'POST',
+    body: `username=${username}&password=${password}`,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  })
+  const text = await response.text()
+  if (response.status !== 200) {
+    throw new Error(`Unable to create user: ${text}`)
+  }
+  return { username, password }
 }
 
-export async function getTestnetAccounts(): Promise<{username: string, password: string}[]> {
-    if (!IS_BROWSER) {
-        try {
-            const data = await readFile('.testnetrc')
-            return JSON.parse(data.toString())
-        } catch (error) {
-            if (error.code !== 'ENOENT') {
-                throw error
-            }
-        }
-    } else if (global['__testnet_accounts']) {
-        return global['__testnet_accounts']
+export async function getTestnetAccounts(): Promise<{ username: string, password: string }[]> {
+  if (!IS_BROWSER) {
+    try {
+      const data = await readFile('.testnetrc')
+      return JSON.parse(data.toString())
     }
-    let rv: {username: string, password: string}[] = []
-    while (rv.length < NUM_TEST_ACCOUNTS) {
-        rv.push(await createAccount())
+    catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error
+      }
     }
-    if (console && console.log) {
-        console.log(`CREATED TESTNET ACCOUNTS: ${ rv.map((i)=>i.username) }`)
-    }
-    if (!IS_BROWSER) {
-        await writeFile('.testnetrc', Buffer.from(JSON.stringify(rv)))
-    } else {
-        global['__testnet_accounts'] = rv
-    }
-    return rv
+  }
+  else if (global.__testnet_accounts) {
+    return global.__testnet_accounts
+  }
+  const rv: { username: string, password: string }[] = []
+  while (rv.length < NUM_TEST_ACCOUNTS) {
+    rv.push(await createAccount())
+  }
+  if (console && console.log) {
+    console.log(`CREATED TESTNET ACCOUNTS: ${rv.map(i => i.username)}`)
+  }
+  if (!IS_BROWSER) {
+    await writeFile('.testnetrc', Buffer.from(JSON.stringify(rv)))
+  }
+  else {
+    global.__testnet_accounts = rv
+  }
+  return rv
 }

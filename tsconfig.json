@@ -1,16 +1,25 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "lib": ["es2015", "esnext.asynciterable"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noImplicitThis": true,
-    "outDir": "lib",
-    "strictNullChecks": true,
-    "target": "es6",
-    "types" : ["node", "verror"]
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "allowJs": true,
+    "checkJs": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": false,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true
   },
-  "include": [
-    "src/**/*.ts"
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.spec.ts"
   ]
 }

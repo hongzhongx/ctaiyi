@@ -1,4 +1,3 @@
-
 # [ctaiyi](https://github.com/hongzhongx/ctaiyi) [![Build Status](https://img.shields.io/circleci/project/github/hongzhongx/ctaiyi.svg?style=flat-square)](https://circleci.com/gh/hongzhongx/workflows/ctaiyi) [![Coverage Status](https://img.shields.io/coveralls/hongzhongx/ctaiyi.svg?style=flat-square)](https://coveralls.io/github/hongzhongx/ctaiyi?branch=main) [![Package Version](https://img.shields.io/npm/v/@taiyinet/ctaiyi.svg?style=flat-square)](https://www.npmjs.com/package/@taiyinet/ctaiyi)
 
 Robust [taiyi blockchain](https://github.com/hongzhongx/taiyi) client library that runs in both node.js and the browser.
@@ -34,7 +33,6 @@ Or from the [unpkg](https://unpkg.com) cdn:
 
 Make sure to set the version you want when including from the cdn, you can also use `ctaiyi@latest` but that is not always desirable. See [unpkg.com](https://unpkg.com) for more information.
 
-
 Usage
 -----
 
@@ -59,46 +57,46 @@ See the [demo source](https://github.com/hongzhongx/ctaiyi/tree/main/examples/??
 With TypeScript:
 
 ```typescript
-import {Client} from '@taiyinet/ctaiyi'
+import { Client } from '@taiyinet/ctaiyi'
 
 const client = new Client('https://api.taiyi.com')
 
 for await (const block of client.blockchain.getBlocks()) {
-    console.log(`New block, id: ${ block.block_id }`)
+  console.log(`New block, id: ${block.block_id}`)
 }
 ```
 
 With JavaScript:
 
 ```javascript
-var ctaiyi = require('@taiyinet/ctaiyi')
+const ctaiyi = require('@taiyinet/ctaiyi')
 
-var client = new ctaiyi.Client('https://api.taiyi.com')
-var key = ctaiyi.PrivateKey.fromLogin('username', 'password', 'posting')
+const client = new ctaiyi.Client('https://api.taiyi.com')
+const key = ctaiyi.PrivateKey.fromLogin('username', 'password', 'posting')
 
 client.broadcast.vote({
-    voter: 'username',
-    author: 'almost-digital',
-    permlink: 'ctaiyi-is-the-best',
-    weight: 10000
-}, key).then(function(result){
-   console.log('Included in block: ' + result.block_num)
-}, function(error) {
-   console.error(error)
+  voter: 'username',
+  author: 'almost-digital',
+  permlink: 'ctaiyi-is-the-best',
+  weight: 10000
+}, key).then((result) => {
+  console.log(`Included in block: ${result.block_num}`)
+}, (error) => {
+  console.error(error)
 })
 ```
 
 With ES2016 (node.js 7+):
 
 ```javascript
-const {Client} = require('@taiyinet/ctaiyi')
+const { Client } = require('@taiyinet/ctaiyi')
 
 const client = new Client('https://api.taiyi.com')
 
 async function main() {
-    const props = await client.database.getChainProperties()
-    console.log(`Maximum blocksize consensus: ${ props.maximum_block_size } bytes`)
-    client.disconnect()
+  const props = await client.database.getChainProperties()
+  console.log(`Maximum blocksize consensus: ${props.maximum_block_size} bytes`)
+  client.disconnect()
 }
 
 main().catch(console.error)
@@ -107,19 +105,18 @@ main().catch(console.error)
 With node.js streams:
 
 ```javascript
-var ctaiyi = require('@taiyinet/ctaiyi')
-var es = require('event-stream') // npm install event-stream
-var util = require('util')
+const util = require('util')
+const ctaiyi = require('@taiyinet/ctaiyi')
+const es = require('event-stream') // npm install event-stream
 
-var client = new ctaiyi.Client('https://api.taiyi.com')
+const client = new ctaiyi.Client('https://api.taiyi.com')
 
-var stream = client.blockchain.getBlockStream()
+const stream = client.blockchain.getBlockStream()
 
-stream.pipe(es.map(function(block, callback) {
-    callback(null, util.inspect(block, {colors: true, depth: null}) + '\n')
+stream.pipe(es.map((block, callback) => {
+  callback(null, `${util.inspect(block, { colors: true, depth: null })}\n`)
 })).pipe(process.stdout)
 ```
-
 
 Bundling
 --------

@@ -138,8 +138,11 @@
       [
         "0203666f6f03626172e8030000000000000359414e470000000f77656464696e672070726573656e74",
         ["transfer", {
-            "amount": 1, "from": "foo", "memo": "wedding present", "to": "bar"
-          }]
+          "amount": 1,
+          "from": "foo",
+          "memo": "wedding present",
+          "to": "bar"
+        }]
       ]
     ]
   },
@@ -153,7 +156,10 @@
           "extensions": ["long-pants"],
           "operations": [
             ["transfer", {
-              "amount": 1, "from": "foo", "memo": "wedding present", "to": "bar"
+              "amount": 1,
+              "from": "foo",
+              "memo": "wedding present",
+              "to": "bar"
             }]
           ],
           "ref_block_num": 1234,
@@ -173,7 +179,7 @@
   {
     "name": "Price",
     "values": [
-      ["e8030000000000000359414e470000000b020000000000000359494e00000000", {"base": "1.000 YANG", "quote": "0.523 YIN"}]
+      ["e8030000000000000359414e470000000b020000000000000359494e00000000", { "base": "1.000 YANG", "quote": "0.523 YIN" }]
     ]
   },
   {
