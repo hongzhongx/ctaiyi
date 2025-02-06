@@ -1,0 +1,18 @@
+{
+  "name": "ndanuo-cli",
+  "version": "1.0.0",
+  "description": "simple danuo cli",
+  "author": "enpitsulin <enpitsulin@gmail.com>",
+  "keywords": [],
+  "main": "src/index.ts",
+  "scripts": {
+    "run": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@taiyinet/ctaiyi": "workspace:*",
+    "tsx": "^4.19.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
