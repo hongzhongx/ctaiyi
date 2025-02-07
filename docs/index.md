@@ -15,10 +15,10 @@ hero:
   actions:
     - theme: brand
       text: 快速上手
-      link: /guide/
+      link: /guide/getting-started
     - theme: alt
-      text: 特性
-      link: /guide/features
+      text: API 参考
+      link: /reference/overview
     - theme: alt
       text: 在 GitHub 上查看
       link: https://github.com/hongzhongx/ctaiyi
