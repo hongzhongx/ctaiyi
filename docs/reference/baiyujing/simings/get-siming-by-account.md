@@ -9,12 +9,11 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const siming = await client.baiyujing.getSimingByAccount('alice')
-//    ^?
 ```
 
 ## 返回值
 
-`Siming | null`
+[`Siming`](/reference/types#siming) | `null`
 
 返回司命节点对象。如果账户没有司命则返回 null。
 

@@ -9,12 +9,11 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const simings = await client.baiyujing.getSimings([0])
-//    ^?
 ```
 
 ## 返回值
 
-`Siming[]`
+[`Siming[]`](/reference/types#siming)
 
 返回司命对象数组。每个对象包含司命的详细信息。
 

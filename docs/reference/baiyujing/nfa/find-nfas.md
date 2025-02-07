@@ -14,7 +14,7 @@ const nfas = await client.baiyujing.findNfas([1, 2, 3])
 
 ## 返回值
 
-`Nfa[]`
+[`Nfa[]`](/reference/types#nfa)
 
 返回 NFA 对象数组。每个对象包含 NFA 的详细信息。
 

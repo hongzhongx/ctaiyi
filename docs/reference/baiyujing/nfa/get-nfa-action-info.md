@@ -18,6 +18,13 @@ const info = await client.baiyujing.getNfaActionInfo(22, 'short')
 
 返回 NFA 动作的详细信息对象，包含动作的参数、效果等信息。
 
+```ts twoslash
+declare interface NfaActionInfo {
+  exist: boolean
+  consequence: boolean
+}
+```
+
 ## 参数
 
 ### nfaId
