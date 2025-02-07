@@ -1,17 +1,6 @@
 # getSimingsByAdore
 
-获取指定崇拜值的司命列表。
-
-## 参数
-
-| 名称 | 类型 | 描述 |
-|------|------|------|
-| account | string | 账户名 |
-| limit | number | 返回的最大数量（可选，默认: 100） |
-
-## 返回值
-
-返回指定崇拜值的司命对象数组。
+获取指定账户信仰的司命列表。
 
 ## 示例
 
@@ -22,3 +11,23 @@ declare const client: Client
 const simings = await client.baiyujing.getSimingsByAdore('initminer', 10)
 //    ^?
 ```
+
+## 返回值
+
+`Siming[]`
+
+返回账户所信仰的司命对象数组。
+
+## 参数
+
+### account
+
+- 类型: `string`
+
+账户名
+
+### limit
+
+- 类型: `number`
+
+返回的最大数量（可选，默认: 100）

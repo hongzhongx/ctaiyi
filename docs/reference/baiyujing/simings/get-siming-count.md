@@ -2,14 +2,6 @@
 
 获取链上的总司命数量。
 
-## 参数
-
-无
-
-## 返回值
-
-返回司命总数（number 类型）。
-
 ## 示例
 
 ```ts twoslash
@@ -19,3 +11,13 @@ declare const client: Client
 const count = await client.baiyujing.getSimingCount()
 //    ^?
 ```
+
+## 返回值
+
+`number`
+
+返回司命总数。
+
+## 参数
+
+此方法不需要参数。

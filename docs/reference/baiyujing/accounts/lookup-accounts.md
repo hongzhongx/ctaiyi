@@ -1,6 +1,6 @@
 # lookupAccounts
 
-按前缀搜索账户名。
+模糊搜索账户名。
 
 ## 示例
 
@@ -16,7 +16,7 @@ const accounts = await client.baiyujing.lookupAccounts('ali', 10)
 
 `string[]`
 
-返回匹配前缀的账户名数组。
+返回匹配的账户名数组。
 
 ## 参数
 
@@ -24,7 +24,7 @@ const accounts = await client.baiyujing.lookupAccounts('ali', 10)
 
 - 类型: `string`
 
-账户名搜索的下界（前缀）
+模糊搜索的账户名
 
 ### limit
 
