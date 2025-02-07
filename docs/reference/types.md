@@ -188,6 +188,8 @@ declare interface ExtendedAccount extends Account {
 ## Authority
 
 ```ts twoslash
+import { PublicKey } from '@taiyinet/ctaiyi'
+// ---cut---
 declare interface AuthorityType {
   weight_threshold: number
   account_auths: Array<[string, number]>
