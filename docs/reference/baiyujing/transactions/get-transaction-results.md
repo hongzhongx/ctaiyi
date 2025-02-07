@@ -9,7 +9,6 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const results = await client.baiyujing.getTransactionResults('abcd1234...')
-//    ^?
 ```
 
 ## 返回值

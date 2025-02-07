@@ -9,7 +9,6 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const hex = await client.baiyujing.getTransactionHex({
-//    ^?
   expiration: '2025-02-04T16:05:57',
   extensions: [],
   operations: [

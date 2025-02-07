@@ -9,7 +9,6 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const authority = await client.baiyujing.verifyAccountAuthority('temp', [])
-//    ^?
 ```
 
 ## 返回值

@@ -9,7 +9,6 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const history = await client.baiyujing.getNfaHistory(1, 20, 10)
-//    ^?
 ```
 
 ## 返回值

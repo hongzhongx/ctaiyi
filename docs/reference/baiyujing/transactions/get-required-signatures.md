@@ -9,7 +9,6 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const requiredKeys = await client.baiyujing.getRequiredSignatures(
-//    ^?
   {
     expiration: '2025-02-04T16:05:57',
     extensions: [],

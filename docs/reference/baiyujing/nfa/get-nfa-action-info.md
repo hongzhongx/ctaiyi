@@ -9,7 +9,6 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const info = await client.baiyujing.getNfaActionInfo(22, 'short')
-//    ^?
 ```
 
 ## 返回值

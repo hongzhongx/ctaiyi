@@ -9,7 +9,6 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const count = await client.baiyujing.getAccountsCount()
-//    ^?
 ```
 
 ## 返回值

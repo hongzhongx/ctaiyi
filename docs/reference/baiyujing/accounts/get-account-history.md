@@ -9,7 +9,6 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const history = await client.baiyujing.getAccountHistory('initminer', 10, 1)
-//    ^?
 ```
 
 ## 返回值

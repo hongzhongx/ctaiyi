@@ -9,7 +9,6 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const code = await client.baiyujing.getContractSourceCode('contract.cmds.std.look')
-//    ^?
 ```
 
 ## 参数

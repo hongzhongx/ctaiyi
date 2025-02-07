@@ -9,7 +9,6 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const nfas = await client.baiyujing.findNfas([1, 2, 3])
-//    ^?
 ```
 
 ## 返回值
