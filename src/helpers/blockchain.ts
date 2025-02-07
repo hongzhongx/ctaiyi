@@ -1,16 +1,13 @@
 import type { Client } from '../client'
 import { iteratorStream, sleep } from '../utils'
 
-export enum BlockchainMode {
-  /**
-   * 仅获取不可逆区块。
-   */
-  Irreversible,
-  /**
-   * 获取所有区块。
-   */
-  Latest,
-}
+/**
+ * 区块链模式
+ *
+ * - 'irreversible' - 仅获取不可逆区块。
+ * - 'latest' - 获取所有区块。
+ */
+export type BlockchainMode = 'irreversible' | 'latest'
 
 export interface BlockchainStreamOptions {
   /**
@@ -34,12 +31,12 @@ export class Blockchain {
   /**
    * 获取当前块高
    */
-  public async getCurrentBlockNum(mode = BlockchainMode.Irreversible) {
+  public async getCurrentBlockNum(mode: BlockchainMode = 'irreversible') {
     const props = await this.client.baiyujing.getDynamicGlobalProperties()
     switch (mode) {
-      case BlockchainMode.Irreversible:
+      case 'irreversible':
         return props.last_irreversible_block_num
-      case BlockchainMode.Latest:
+      case 'latest':
         return props.head_block_number
     }
   }

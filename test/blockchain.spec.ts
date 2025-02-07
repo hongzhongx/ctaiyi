@@ -1,4 +1,4 @@
-import { BlockchainMode, Client } from '../src'
+import { Client } from '../src'
 
 describe('blockchain', () => {
   vi.setConfig({
@@ -89,8 +89,8 @@ describe('blockchain', () => {
   })
 
   it('should yield latest blocks', async () => {
-    const latest = await client.blockchain.getCurrentBlock(BlockchainMode.Latest)
-    for await (const block of client.blockchain.getBlocks({ mode: BlockchainMode.Latest })) {
+    const latest = await client.blockchain.getCurrentBlock('latest')
+    for await (const block of client.blockchain.getBlocks({ mode: 'latest' })) {
       if (block.block_id === latest.block_id) {
         continue
       }
