@@ -15,6 +15,10 @@
 
 ## 示例
 
-```ts
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
 const accounts = await client.baiyujing.lookupAccounts('ali', 10)
+//    ^?
 ```

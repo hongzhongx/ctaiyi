@@ -15,6 +15,10 @@
 
 ## 示例
 
-```ts
-const isValid = await client.baiyujing.verifyAccountAuthority('alice', ['PUBLIC_KEY_1'])
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const authority = await client.baiyujing.verifyAccountAuthority('temp', [])
+//    ^?
 ```

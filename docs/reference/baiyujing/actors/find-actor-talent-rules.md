@@ -6,7 +6,7 @@
 
 | 名称 | 类型 | 描述 |
 |------|------|------|
-| actorId | number | 角色 ID |
+| actorIds | number[] | 角色 ID 数组 |
 
 ## 返回值
 
@@ -14,6 +14,10 @@
 
 ## 示例
 
-```ts
-const rules = await client.baiyujing.findActorTalentRules(1)
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const rules = await client.baiyujing.findActorTalentRules([0, 1])
+//    ^?
 ```

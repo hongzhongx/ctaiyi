@@ -8,7 +8,7 @@
 |------|------|------|
 | nfaId | number | NFA ID |
 | actionName | string | 动作名称 |
-| args | string[] | 字符串格式的动作参数数组 |
+| args | string | 字符串格式的动作参数 |
 
 ## 返回值
 
@@ -16,6 +16,10 @@
 
 ## 示例
 
-```ts
-const result = await client.baiyujing.evalNfaActionWithStringArgs(1, 'attack', ['100'])
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const result = await client.baiyujing.evalNfaActionWithStringArgs(1, 'read', '["1"]')
+//    ^?
 ```

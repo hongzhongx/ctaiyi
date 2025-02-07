@@ -6,14 +6,18 @@
 
 | 名称 | 类型 | 描述 |
 |------|------|------|
-| account | string | 账户名 |
+| accounts | string[] | 账户名数组 |
 
 ## 返回值
 
-返回账户资源使用情况对象，包含气力值、带宽等信息。
+返回账户资源使用情况对象数组，每个对象包含气力值、带宽等信息。
 
 ## 示例
 
-```ts
-const resources = await client.baiyujing.getAccountResources('alice')
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const resources = await client.baiyujing.getAccountResources(['sifu'])
+//    ^?
 ```

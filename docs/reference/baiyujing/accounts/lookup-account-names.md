@@ -14,6 +14,10 @@
 
 ## 示例
 
-```ts
-const accounts = await client.baiyujing.lookupAccountNames(['alice', 'bob'])
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const accounts = await client.baiyujing.lookupAccountNames(['sifu'])
+//    ^?
 ```

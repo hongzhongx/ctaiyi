@@ -6,8 +6,7 @@
 
 | 名称 | 类型 | 描述 |
 |------|------|------|
-| adore | number | 崇拜值 |
-| from | number | 起始索引（可选） |
+| account | string | 账户名 |
 | limit | number | 返回的最大数量（可选，默认: 100） |
 
 ## 返回值
@@ -16,6 +15,10 @@
 
 ## 示例
 
-```ts
-const simings = await client.baiyujing.getSimingsByAdore(100, { limit: 10 })
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const simings = await client.baiyujing.getSimingsByAdore('initminer', 10)
+//    ^?
 ```

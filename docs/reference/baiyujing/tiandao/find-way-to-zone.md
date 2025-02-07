@@ -6,15 +6,19 @@
 
 | 名称 | 类型 | 描述 |
 |------|------|------|
-| fromZoneId | number | 起始区域 ID |
-| toZoneId | number | 目标区域 ID |
+| fromZone | string | 起始区域名称 |
+| toZone | string | 目标区域名称 |
 
 ## 返回值
 
-返回路径对象数组，表示从起始区域到目标区域的可行路径。
+返回路径对象，包含从起始区域到目标区域的可行路径。
 
 ## 示例
 
-```ts
-const path = await client.baiyujing.findWayToZone(1, 2)
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const zones = await client.baiyujing.findWayToZone('牛心村', '大梁')
+//    ^?
 ```

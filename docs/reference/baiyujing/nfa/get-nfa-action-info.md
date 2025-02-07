@@ -15,6 +15,10 @@
 
 ## 示例
 
-```ts
-const actionInfo = await client.baiyujing.getNfaActionInfo(1, 'attack')
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const info = await client.baiyujing.getNfaActionInfo(22, 'short')
+//    ^?
 ```

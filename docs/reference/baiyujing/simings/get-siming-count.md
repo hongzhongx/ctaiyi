@@ -12,6 +12,10 @@
 
 ## 示例
 
-```ts
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
 const count = await client.baiyujing.getSimingCount()
+//    ^?
 ```

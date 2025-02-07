@@ -7,7 +7,7 @@
 | 名称 | 类型 | 描述 |
 |------|------|------|
 | account | string | 账户名 |
-| withdrawRouteType | 'incoming' \| 'outgoing' | 提现路由类型 |
+| withdrawRouteType | 'incoming' \| 'outgoing' \| 'all' | 提现路由类型 |
 
 ## 返回值
 
@@ -15,6 +15,10 @@
 
 ## 示例
 
-```ts
-const routes = await client.baiyujing.getWithdrawRoutes('alice', 'outgoing')
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const routes = await client.baiyujing.getWithdrawRoutes('sifu', 'all')
+//    ^?
 ```

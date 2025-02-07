@@ -14,6 +14,10 @@
 
 ## 示例
 
-```ts
-const transaction = await client.baiyujing.getTransaction('abcd1234...')
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const transaction = await client.baiyujing.getTransaction('903430761b97a2ce7be79b578700ebc1598c05c9')
+//    ^?
 ```

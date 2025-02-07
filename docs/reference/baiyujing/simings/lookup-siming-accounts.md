@@ -15,6 +15,10 @@
 
 ## 示例
 
-```ts
-const accounts = await client.baiyujing.lookupSimingAccounts('ali', 10)
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const accounts = await client.baiyujing.lookupSimingAccounts('initminer', 10)
+//    ^?
 ```

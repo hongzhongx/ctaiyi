@@ -14,6 +14,10 @@
 
 ## 示例
 
-```ts
-const sourceCode = await client.baiyujing.getContractSourceCode('nfa')
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const code = await client.baiyujing.getContractSourceCode('contract.cmds.std.look')
+//    ^?
 ```

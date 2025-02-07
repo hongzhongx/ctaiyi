@@ -6,7 +6,7 @@
 
 | 名称 | 类型 | 描述 |
 |------|------|------|
-| actorId | number | 角色 ID |
+| name | string | 角色名称 |
 
 ## 返回值
 
@@ -14,6 +14,10 @@
 
 ## 示例
 
-```ts
-const actor = await client.baiyujing.findActor(1)
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const actor = await client.baiyujing.findActor('李火旺')
+//    ^?
 ```

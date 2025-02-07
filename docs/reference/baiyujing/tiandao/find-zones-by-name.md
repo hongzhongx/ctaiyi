@@ -14,6 +14,10 @@
 
 ## 示例
 
-```ts
-const zones = await client.baiyujing.findZonesByName(['洛阳', '长安'])
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const zones = await client.baiyujing.findZonesByName(['牛心村'])
+//    ^?
 ```

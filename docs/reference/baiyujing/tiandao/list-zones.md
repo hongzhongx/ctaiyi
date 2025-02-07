@@ -6,9 +6,8 @@
 
 | 名称 | 类型 | 描述 |
 |------|------|------|
-| from | number | 起始索引（可选） |
+| account | string | 账户名 |
 | limit | number | 返回的最大数量（可选，默认: 100） |
-| order | 'by_id' \| 'by_name' | 排序方式（可选，默认: 'by_id'） |
 
 ## 返回值
 
@@ -16,9 +15,10 @@
 
 ## 示例
 
-```ts
-const zones = await client.baiyujing.listZones({
-  limit: 10,
-  order: 'by_name'
-})
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const zones = await client.baiyujing.listZones('sifu', 10)
+//    ^?
 ```
