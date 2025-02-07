@@ -341,4 +341,5 @@ export default defineConfig({
     ],
     codeCopyButtonTitle: '复制代码',
   },
+  cleanUrls: true,
 })
