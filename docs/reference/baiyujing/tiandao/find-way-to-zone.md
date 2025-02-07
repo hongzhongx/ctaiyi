@@ -9,7 +9,6 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const zones = await client.baiyujing.findWayToZone('牛心村', '大梁')
-//    ^?
 ```
 
 ## 返回值
@@ -17,6 +16,12 @@ const zones = await client.baiyujing.findWayToZone('牛心村', '大梁')
 `ZonePath`
 
 返回路径对象，包含从起始区域到目标区域的可行路径。
+
+```ts twoslash
+declare interface ZonePath {
+  way_points: string[]
+}
+```
 
 ## 参数
 

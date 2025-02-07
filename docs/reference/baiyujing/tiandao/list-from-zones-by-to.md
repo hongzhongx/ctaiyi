@@ -9,12 +9,11 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const zones = await client.baiyujing.listFromZonesByTo('牛心村', 10)
-//    ^?
 ```
 
 ## 返回值
 
-`Zone[]`
+[`Zone[]`](/reference/types#zone)
 
 返回可到达目标区域的起始区域对象数组。
 

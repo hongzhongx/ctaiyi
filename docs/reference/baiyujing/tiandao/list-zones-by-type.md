@@ -9,12 +9,11 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const zones = await client.baiyujing.listZonesByType('XUKONG', 10)
-//    ^?
 ```
 
 ## 返回值
 
-`Zone[]`
+[`Zone[]`](/reference/types#zone)
 
 返回指定类型的区域对象数组。
 
@@ -22,7 +21,7 @@ const zones = await client.baiyujing.listZonesByType('XUKONG', 10)
 
 ### type
 
-- 类型: `string`
+- 类型: [`ZoneType`](/reference/types#zonetype)
 
 区域类型
 

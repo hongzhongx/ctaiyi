@@ -2,16 +2,6 @@
 
 获取智能合约的源代码。
 
-## 参数
-
-| 名称 | 类型 | 描述 |
-|------|------|------|
-| contractName | string | 合约名称 |
-
-## 返回值
-
-返回合约源代码字符串。
-
 ## 示例
 
 ```ts twoslash
@@ -21,3 +11,17 @@ declare const client: Client
 const code = await client.baiyujing.getContractSourceCode('contract.cmds.std.look')
 //    ^?
 ```
+
+## 参数
+
+### contractName
+
+- 类型: `string`
+
+合约名称
+
+## 返回值
+
+`string`
+
+返回合约 lua 源代码字符串。
