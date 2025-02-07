@@ -1,14 +1,6 @@
 # getAccountsCount
 
-获取链上的总账户数量。
-
-## 参数
-
-无
-
-## 返回值
-
-返回账户总数（number 类型）。
+获取系统中的账户总数。
 
 ## 示例
 
@@ -19,3 +11,13 @@ declare const client: Client
 const count = await client.baiyujing.getAccountsCount()
 //    ^?
 ```
+
+## 返回值
+
+`number`
+
+系统中的账户总数。
+
+## 参数
+
+此方法不需要参数。

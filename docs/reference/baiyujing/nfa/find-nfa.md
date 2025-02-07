@@ -2,16 +2,6 @@
 
 查找指定的 NFA。
 
-## 参数
-
-| 名称 | 类型 | 描述 |
-|------|------|------|
-| nfaId | number | NFA ID |
-
-## 返回值
-
-返回 NFA 对象。
-
 ## 示例
 
 ```ts twoslash
@@ -21,3 +11,17 @@ declare const client: Client
 const nfa = await client.baiyujing.findNfa(1)
 //    ^?
 ```
+
+## 返回值
+
+`Nfa`
+
+返回 NFA 对象。
+
+## 参数
+
+### nfaId
+
+- 类型: `number`
+
+NFA ID

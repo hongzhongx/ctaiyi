@@ -2,18 +2,26 @@
 
 获取交易执行结果。
 
-## 参数
+## 示例
 
-| 名称 | 类型 | 描述 |
-|------|------|------|
-| transactionId | string | 交易 ID |
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const results = await client.baiyujing.getTransactionResults('abcd1234...')
+//    ^?
+```
 
 ## 返回值
 
-返回交易执行结果对象，包含执行状态、日志等信息。
+`unknown`
 
-## 示例
+*TODO*
 
-```ts
-const results = await client.baiyujing.getTransactionResults('abcd1234...')
-```
+## 参数
+
+### transactionId
+
+- 类型: `string`
+
+交易 ID

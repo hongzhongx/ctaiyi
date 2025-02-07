@@ -2,16 +2,22 @@
 
 获取天道系统属性。
 
-## 参数
+## 示例
 
-无
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const properties = await client.baiyujing.getTiandaoProperties()
+//    ^?
+```
 
 ## 返回值
 
+`TiandaoProperties`
+
 返回天道系统属性对象。
 
-## 示例
+## 参数
 
-```ts
-const properties = await client.baiyujing.getTiandaoProperties()
-```
+此方法不需要参数。

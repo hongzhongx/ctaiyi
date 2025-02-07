@@ -2,17 +2,6 @@
 
 获取区域列表。
 
-## 参数
-
-| 名称 | 类型 | 描述 |
-|------|------|------|
-| account | string | 账户名 |
-| limit | number | 返回的最大数量（可选，默认: 100） |
-
-## 返回值
-
-返回区域对象数组。每个对象包含区域的详细信息。
-
 ## 示例
 
 ```ts twoslash
@@ -22,3 +11,23 @@ declare const client: Client
 const zones = await client.baiyujing.listZones('sifu', 10)
 //    ^?
 ```
+
+## 返回值
+
+`Zone[]`
+
+返回区域对象数组。每个对象包含区域的详细信息。
+
+## 参数
+
+### account
+
+- 类型: `string`
+
+账户名
+
+### limit
+
+- 类型: `number`
+
+返回的最大数量（可选，默认: 100）

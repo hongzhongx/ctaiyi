@@ -1,17 +1,6 @@
 # getExpiringQiDelegations
 
-获取即将到期的「QI」委托信息。
-
-## 参数
-
-| 名称 | 类型 | 描述 |
-|------|------|------|
-| account | string | 账户名 |
-| days | number | 未来几天内到期（可选，默认: 7） |
-
-## 返回值
-
-返回即将到期的 「QI」委托信息数组，包含委托人、被委托人、委托数量、到期时间等信息。
+获取即将到期的气力委托信息。
 
 ## 示例
 
@@ -22,3 +11,23 @@ declare const client: Client
 const expiringDelegations = await client.baiyujing.getExpiringQiDelegations('alice', 3)
 //    ^?
 ```
+
+## 返回值
+
+`QiDelegation[]`
+
+即将到期的气力委托信息数组。
+
+## 参数
+
+### account
+
+- 类型: `string`
+
+要查询的账户名
+
+### days
+
+- 类型: `number`
+
+查询未来几天内到期的委托（可选，默认: 7）

@@ -2,17 +2,6 @@
 
 获取账户的提现路由设置。
 
-## 参数
-
-| 名称 | 类型 | 描述 |
-|------|------|------|
-| account | string | 账户名 |
-| withdrawRouteType | 'incoming' \| 'outgoing' \| 'all' | 提现路由类型 |
-
-## 返回值
-
-返回提现路由设置数组。
-
 ## 示例
 
 ```ts twoslash
@@ -22,3 +11,23 @@ declare const client: Client
 const routes = await client.baiyujing.getWithdrawRoutes('sifu', 'all')
 //    ^?
 ```
+
+## 返回值
+
+`WithdrawRoute[]`
+
+返回提现路由设置数组。
+
+## 参数
+
+### account
+
+- 类型: `string`
+
+账户名
+
+### withdrawRouteType
+
+- 类型: `'incoming' | 'outgoing' | 'all'`
+
+提现路由类型

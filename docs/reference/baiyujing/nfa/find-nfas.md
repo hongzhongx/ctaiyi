@@ -2,18 +2,26 @@
 
 批量查找 NFA 信息。
 
-## 参数
+## 示例
 
-| 名称 | 类型 | 描述 |
-|------|------|------|
-| nfaIds | number[] | NFA ID 数组 |
+```ts twoslash
+import { Client } from '@taiyinet/ctaiyi'
+declare const client: Client
+// ---cut---
+const nfas = await client.baiyujing.findNfas([1, 2, 3])
+//    ^?
+```
 
 ## 返回值
 
+`Nfa[]`
+
 返回 NFA 对象数组。每个对象包含 NFA 的详细信息。
 
-## 示例
+## 参数
 
-```ts
-const nfas = await client.baiyujing.findNfas([1, 2, 3])
-```
+### nfaIds
+
+- 类型: `number[]`
+
+NFA ID 数组

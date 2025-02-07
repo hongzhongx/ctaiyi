@@ -2,16 +2,6 @@
 
 获取交易的十六进制表示。
 
-## 参数
-
-| 名称 | 类型 | 描述 |
-|------|------|------|
-| transaction | object | 交易对象 |
-
-## 返回值
-
-返回交易的十六进制字符串。
-
 ## 示例
 
 ```ts twoslash
@@ -19,6 +9,7 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const hex = await client.baiyujing.getTransactionHex({
+//    ^?
   expiration: '2025-02-04T16:05:57',
   extensions: [],
   operations: [
@@ -37,5 +28,18 @@ const hex = await client.baiyujing.getTransactionHex({
     '2040d2b937d51ff4c4ac08bbd6c5df5f4bfcb3973ab8aeafe229845e0ff3c5f6a629f4dbe96633abd377fdc5521947b64ae4a41faecffbc5a4d1fe0cd49f0bcf7e',
   ],
 })
-//    ^?
 ```
+
+## 返回值
+
+`string`
+
+返回交易的十六进制字符串。
+
+## 参数
+
+### transaction
+
+- 类型: `object`
+
+交易对象
