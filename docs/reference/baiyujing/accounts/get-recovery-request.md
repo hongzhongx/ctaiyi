@@ -9,14 +9,13 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const recoveryRequest = await client.baiyujing.getRecoveryRequest('alice')
-//    ^?
 ```
 
 ## 返回值
 
-`RecoveryRequest | null`
+[`RecoveryRequest`](/reference/types#recoveryrequest) | `null`
 
-返回账户恢复请求对象，如果没有恢复请求则返回 null。
+返回账户恢复请求对象，如果没有恢复请求则返回 `null`。
 
 ## 参数
 

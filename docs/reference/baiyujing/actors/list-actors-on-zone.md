@@ -9,12 +9,11 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const actors = await client.baiyujing.listActorsOnZone(0, 10)
-//    ^?
 ```
 
 ## 返回值
 
-`Actor[]`
+[`Actor[]`](/reference/types#actor)
 
 返回在指定区域中的角色对象数组。
 

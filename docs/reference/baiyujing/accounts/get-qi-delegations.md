@@ -14,7 +14,7 @@ const delegations = await client.baiyujing.getQiDelegations('sifu', 10, 10)
 
 ## 返回值
 
-`QiDelegation[]`
+[`QiDelegation[]`](/reference/types#qidelegation)
 
 返回 「QI」 委托信息数组，包含委托人、被委托人、委托数量等信息。
 

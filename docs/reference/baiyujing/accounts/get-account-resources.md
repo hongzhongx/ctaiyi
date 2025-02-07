@@ -14,7 +14,7 @@ const resources = await client.baiyujing.getAccountResources(['sifu'])
 
 ## 返回值
 
-`AccountResources[]`
+[`MaterialAssets[]`](/reference/types#materialassets)
 
 返回账户资源使用情况对象数组。
 

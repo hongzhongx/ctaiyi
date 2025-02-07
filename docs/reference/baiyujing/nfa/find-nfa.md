@@ -9,12 +9,11 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const nfa = await client.baiyujing.findNfa(1)
-//    ^?
 ```
 
 ## 返回值
 
-`Nfa`
+[`Nfa`](/reference/types#nfa)
 
 返回 NFA 对象。
 

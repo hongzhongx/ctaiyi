@@ -9,12 +9,11 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const actor = await client.baiyujing.findActor('李火旺')
-//    ^?
 ```
 
 ## 返回值
 
-`Actor`
+[`Actor`](/reference/types#actor)
 
 返回角色对象。
 

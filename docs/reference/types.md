@@ -172,3 +172,378 @@ declare interface Account extends MaterialAssets {
   qi_balance: Asset | string
 }
 ```
+
+## ExtendedAccount
+
+```ts twoslash
+import { Account, AppliedOperation } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface ExtendedAccount extends Account {
+  transfer_history: [nonce: number, operation: AppliedOperation][]
+  other_history: [nonce: number, operation: AppliedOperation][]
+  siming_adores: [nonce: number, operation: AppliedOperation][]
+}
+```
+
+## Authority
+
+```ts twoslash
+declare interface AuthorityType {
+  weight_threshold: number
+  account_auths: Array<[string, number]>
+  key_auths: Array<[string | PublicKey, number]>
+}
+```
+
+## MaterialAssets
+
+```ts twoslash
+import { Asset } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface MaterialAssets {
+  gold: Asset | string
+  food: Asset | string
+  wood: Asset | string
+  fabric: Asset | string
+  herb: Asset | string
+}
+```
+
+## ChainProperties
+
+```ts twoslash
+import { Asset } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface ChainProperties {
+  /**
+   * 这笔费用以 YANG 支付，会为新账户兑换成 QI。
+   * 没有 QI 的账户无法获得使用配额，因此毫无影响力。
+   * 这笔最低费用要求所有账户对网络做出一定的投入，其中包括投票及进行交易的能力。
+   */
+  account_creation_fee: string | Asset
+  /**
+   * 司命投票针对的是最大区块大小，网络利用该参数来调整速率限制和容量。
+   */
+  maximum_block_size: number
+}
+```
+
+## DynamicGlobalProperties
+
+```ts twoslash
+import { Asset } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface DynamicGlobalProperties {
+  id: number
+  head_block_number: number
+  head_block_id: string
+  time: string
+  /** 当前总等价阳寿供应量（包含真气、物质所有的等价阳寿总量） */
+  current_supply: Asset | string
+  /** 当前总的真气（自由真气） */
+  total_qi: Asset | string
+  /** 当前总的真气（自由真气） */
+  pending_rewarded_qi: Asset | string
+  pending_rewarded_feigang: Asset | string
+  pending_cultivation_qi: Asset | string
+  /** 当前总的金石（包括NFA内含物质） */
+  total_gold: Asset | string
+  /** 当前总的食物（包括NFA内含物质） */
+  total_food: Asset | string
+  /** 当前总的木材（包括NFA内含物质） */
+  total_wood: Asset | string
+  /** 当前总的织物（包括NFA内含物质） */
+  total_fabric: Asset | string
+  /** 当前总的药材（包括NFA内含物质） */
+  total_herb: Asset | string
+  /** 最大区块大小 */
+  maximum_block_size: number
+  /** 当前绝对槽位号 */
+  current_aslot: number
+  /** 最近槽位填充情况 */
+  recent_slots_filled: string
+  /** 参与度计数（除以128得到参与百分比） */
+  participation_count: number
+  /** 最后一个不可逆区块号 */
+  last_irreversible_block_num: number
+}
+```
+
+## QiDelegation
+
+```ts twoslash
+import { Asset } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface QiDelegation {
+  /**
+   * 委托 ID。
+   */
+  id: number
+  /**
+   * 向受托人（接受委托者）委托 QI 的账户。
+   */
+  delegator: string
+  /**
+   * 从委托者处接收 QI 的账户
+   */
+  delegatee: string
+  /**
+   * 委托的 QI 数量。
+   */
+  qi: Asset | string
+  /**
+   * 最早可以移除委托的时间。
+   */
+  min_delegation_time: string
+}
+```
+
+## Siming
+
+```ts twoslash
+declare interface Siming {
+  adores: number
+  created: string
+  hardfork_time_vote: string
+  hardfork_version_vote: string
+  id: number
+  last_aslot: number
+  last_confirmed_block_num: number
+  owner: string
+  props: {
+    account_creation_fee: string
+    maximum_block_size: number
+  }
+  running_version: string
+  signing_key: string
+  total_missed: number
+  url: string
+  virtual_last_update: string
+  virtual_position: string
+  virtual_scheduled_time: string
+}
+```
+
+## ScheduleSiming
+
+```ts twoslash
+declare interface ScheduleSiming {
+  current_shuffled_simings: string[]
+  current_virtual_time: string
+  elected_weight: number
+  hardfork_required_simings: number
+  id: number
+  majority_version: string
+  max_adored_simings: number
+  median_props: {
+    account_creation_fee: string
+    maximum_block_size: number
+  }
+  miner_weight: number
+  next_shuffle_block_num: number
+  num_scheduled_simings: number
+  siming_pay_normalization_factor: number
+  timeshare_weight: number
+}
+```
+
+## RewardFund
+
+```ts twoslash
+declare interface RewardFund {
+  id: number
+  name: string
+  reward_balance: string
+  reward_qi_balance: string
+  percent_content_rewards: number
+  last_update: string
+}
+```
+
+## Actor
+
+```ts twoslash
+declare interface Actor {
+  age: number
+  agility: number
+  agility_max: number
+  base_name: string
+  born: boolean
+  born_time: string
+  born_vmonths: number
+  born_vtimes: number
+  born_vyears: number
+  charm: number
+  charm_max: number
+  comprehension: number
+  comprehension_max: number
+  fertility: number
+  five_phase: number
+  gender: number
+  health: number
+  health_max: number
+  id: number
+  init_attribute_amount_max: number
+  last_update: string
+  location: string
+  loyalty: number
+  mood: number
+  mood_max: number
+  name: string
+  next_tick_time: string
+  nfa_id: number
+  physique: number
+  physique_max: number
+  sexuality: number
+  standpoint: number
+  standpoint_type: string
+  strength: number
+  strength_max: number
+  talents: [number, number][]
+  vitality: number
+  vitality_max: number
+  willpower: number
+  willpower_max: number
+}
+```
+
+## ActorTalentRule
+
+```ts twoslash
+declare interface ActorTalentRule {
+  id: number
+  title: string
+  description: string
+  removed: boolean
+  init_attribute_amount_modifier: number
+  max_triggers: number
+  main_contract: number
+  created: string
+  last_update: string
+}
+```
+
+## Nfa
+
+```ts twoslash
+import { Asset, LuaValue } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface Nfa {
+  id: number
+  symbol: string
+  main_contract: string
+  children: number[]
+  contract_data: [ { key: LuaValue }, LuaValue ][]
+  created_time: string
+  next_tick_time: string
+  creator_account: string
+  owner_account: string
+  active_account: string
+  parent: string
+  cultivation_value: number
+  debt_contract: string
+  debt_value: number
+  qi: Asset | string
+  fabric: Asset | string
+  food: Asset | string
+  gold: Asset | string
+  herb: Asset | string
+  wood: Asset | string
+  material_fabric: Asset | string
+  material_food: Asset | string
+  material_gold: Asset | string
+  material_herb: Asset | string
+  material_wood: Asset | string
+  five_phase: number
+}
+```
+
+## Zone
+
+```ts twoslash
+import { ZoneType } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface Zone {
+  id: number
+  last_grow_vmonth: number
+  name: string
+  nfa_id: number
+  type: ZoneType
+}
+```
+
+## ZoneType
+
+```ts twoslash
+type ZoneType = 'XUKONG' | 'YUANYE' | 'HUPO' | 'NONGTIAN' | 'LINDI' | 'MILIN' | 'YUANLIN' | 'SHANYUE' | 'DONGXUE' | 'SHILIN' | 'QIULIN' | 'TAOYUAN' | 'SANGYUAN' | 'XIAGU' | 'ZAOZE' | 'YAOYUAN' | 'HAIYANG' | 'SHAMO' | 'HUANGYE' | 'ANYUAN' | 'DUHUI' | 'MENPAI' | 'SHIZHEN' | 'GUANSAI' | 'CUNZHUANG'
+```
+
+## TianDaoProperties
+
+```ts twoslash
+import { ZoneType } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface TianDaoProperties {
+  id: number
+  v_years: number
+  v_months: number
+  v_times: number
+  amount_actor_last_vyear: number
+  dead_actor_last_vyear: number
+  next_npc_born_time: string
+  cruelty: number
+  decay: number
+  enjoyment: number
+  falsity: number
+  zone_fabric_max_map: number[]
+  zone_food_max_map: number[]
+  zone_gold_max_map: number[]
+  zone_herb_max_map: number[]
+  zone_wood_max_map: number[]
+  zone_grow_fabric_speed_map: number[]
+  zone_grow_food_speed_map: number[]
+  zone_grow_gold_speed_map: number[]
+  zone_grow_herb_speed_map: number[]
+  zone_grow_wood_speed_map: number[]
+  zone_moving_difficulty_map: number[]
+  zone_type_connection_max_num_map: [string, ZoneType][]
+}
+```
+
+## OwnerHistory
+
+```ts twoslash
+import { AuthorityType } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface OwnerHistory {
+  id: number
+  account: string
+  previous_owner_authority: AuthorityType
+  last_valid_time: number
+}
+```
+
+## RecoveryRequest
+
+```ts twoslash
+import { AuthorityType } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface RecoveryRequest {
+  id: number
+  account_to_recover: string
+  new_owner_authority: AuthorityType
+  expires: number
+}
+```
+
+## NfaActionEvalResult
+
+```ts twoslash
+import { LuaValue } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface NfaActionEvalResult {
+  eval_result: LuaValue[]
+  narrate_logs: string[]
+  err: string
+}
+```

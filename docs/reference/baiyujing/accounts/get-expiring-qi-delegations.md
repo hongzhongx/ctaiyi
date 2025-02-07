@@ -9,14 +9,22 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const expiringDelegations = await client.baiyujing.getExpiringQiDelegations('alice', 3)
-//    ^?
 ```
 
 ## 返回值
 
-`QiDelegation[]`
+`ExpiringQiDelegation[]`
 
 即将到期的气力委托信息数组。
+
+```ts twoslash
+declare interface ExpiringQiDelegation {
+  id: string
+  delegator: string
+  qi: string
+  expiration: number
+}
+```
 
 ## 参数
 

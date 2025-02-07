@@ -9,7 +9,6 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const history = await client.baiyujing.getActorHistory('李火旺', 10, 10)
-//    ^?
 ```
 
 ## 返回值
@@ -17,6 +16,12 @@ const history = await client.baiyujing.getActorHistory('李火旺', 10, 10)
 `ActorHistory[]`
 
 返回角色历史记录数组。每条记录包含操作类型、时间戳、变更详情等信息。
+
+```ts twoslash
+import { AppliedOperation } from '@taiyinet/ctaiyi'
+// ---cut---
+declare type ActorHistory = [nonce: number, op: AppliedOperation]
+```
 
 ## 参数
 

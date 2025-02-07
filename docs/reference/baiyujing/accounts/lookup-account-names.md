@@ -14,7 +14,7 @@ const accounts = await client.baiyujing.lookupAccountNames(['sifu'])
 
 ## 返回值
 
-`Account[]`
+[`Account[]`](/reference/types#account)
 
 返回账户对象数组。
 

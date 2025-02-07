@@ -18,6 +18,12 @@ const history = await client.baiyujing.getAccountHistory('initminer', 10, 1)
 
 返回账户历史操作记录数组。每条记录包含操作类型、时间戳、交易ID等信息。
 
+```ts twoslash
+import { AppliedOperation } from '@taiyinet/ctaiyi'
+// ---cut---
+declare type AccountHistory = [nonce: number, op: AppliedOperation]
+```
+
 ## 参数
 
 ### account

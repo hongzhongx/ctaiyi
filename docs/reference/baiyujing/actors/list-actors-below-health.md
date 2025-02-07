@@ -9,12 +9,11 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const actors = await client.baiyujing.listActorsBelowHealth(0, 1)
-//    ^?
 ```
 
 ## 返回值
 
-`Actor[]`
+[`Actor[]`](/reference/types#actor)
 
 返回健康值低于指定值的角色对象数组。
 

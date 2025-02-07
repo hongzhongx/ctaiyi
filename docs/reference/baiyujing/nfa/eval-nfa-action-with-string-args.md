@@ -9,12 +9,11 @@ import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
 const result = await client.baiyujing.evalNfaActionWithStringArgs(1, 'read', '["1"]')
-//    ^?
 ```
 
 ## 返回值
 
-`NfaActionEvalResult`
+[`NfaActionEvalResult`](/reference/types#nfaactionevalresult)
 
 返回动作评估结果对象，包含执行效果、消耗等信息。
 
@@ -36,4 +35,4 @@ NFA ID
 
 - 类型: `string`
 
-字符串格式的动作参数
+JSON 字符串格式的动作参数
