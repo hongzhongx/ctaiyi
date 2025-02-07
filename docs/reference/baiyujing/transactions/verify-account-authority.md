@@ -26,7 +26,7 @@ const authority = await client.baiyujing.verifyAccountAuthority('temp', [])
 
 账户名
 
-### keys
+### signers
 
 - 类型: `string[]`
 

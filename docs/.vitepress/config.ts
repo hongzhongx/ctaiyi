@@ -45,7 +45,7 @@ const referenceSidebar: DefaultTheme.SidebarMulti['/reference/'] = {
     {
       text: '白玉京 API',
       base: '/reference/baiyujing/',
-      collapsed: false,
+      collapsed: true,
       items: [
         { text: '介绍', link: '/intro' },
         {
@@ -134,30 +134,39 @@ const referenceSidebar: DefaultTheme.SidebarMulti['/reference/'] = {
             },
           ],
         },
+
         {
-          text: '司命',
-          base: '/reference/baiyujing/simings',
+          text: 'NFA',
+          base: '/reference/baiyujing/nfa',
           collapsed: false,
           items: [
             {
-              text: 'getSimings',
-              link: '/get-simings',
+              text: 'findNfa',
+              link: '/find-nfa',
             },
             {
-              text: 'getSimingByAccount',
-              link: '/get-siming-by-account',
+              text: 'findNfas',
+              link: '/find-nfas',
             },
             {
-              text: 'getSimingsByAdore',
-              link: '/get-simings-by-adore',
+              text: 'listNfas',
+              link: '/list-nfas',
             },
             {
-              text: 'lookupSimingAccounts',
-              link: '/lookup-siming-accounts',
+              text: 'getNfaHistory',
+              link: '/get-nfa-history',
             },
             {
-              text: 'getSimingCount',
-              link: '/get-siming-count',
+              text: 'getNfaActionInfo',
+              link: '/get-nfa-action-info',
+            },
+            {
+              text: 'evalNfaAction',
+              link: '/eval-nfa-action',
+            },
+            {
+              text: 'evalNfaActionWithStringArgs',
+              link: '/eval-nfa-action-with-string-args',
             },
           ],
         },
@@ -196,38 +205,31 @@ const referenceSidebar: DefaultTheme.SidebarMulti['/reference/'] = {
             },
           ],
         },
+
         {
-          text: 'NFA',
-          base: '/reference/baiyujing/nfa',
+          text: '司命',
+          base: '/reference/baiyujing/simings',
           collapsed: true,
           items: [
             {
-              text: 'findNfa',
-              link: '/find-nfa',
+              text: 'getSimings',
+              link: '/get-simings',
             },
             {
-              text: 'findNfas',
-              link: '/find-nfas',
+              text: 'getSimingByAccount',
+              link: '/get-siming-by-account',
             },
             {
-              text: 'listNfas',
-              link: '/list-nfas',
+              text: 'getSimingsByAdore',
+              link: '/get-simings-by-adore',
             },
             {
-              text: 'getNfaHistory',
-              link: '/get-nfa-history',
+              text: 'lookupSimingAccounts',
+              link: '/lookup-siming-accounts',
             },
             {
-              text: 'getNfaActionInfo',
-              link: '/get-nfa-action-info',
-            },
-            {
-              text: 'evalNfaAction',
-              link: '/eval-nfa-action',
-            },
-            {
-              text: 'evalNfaActionWithStringArgs',
-              link: '/eval-nfa-action-with-string-args',
+              text: 'getSimingCount',
+              link: '/get-siming-count',
             },
           ],
         },
@@ -292,6 +294,19 @@ const referenceSidebar: DefaultTheme.SidebarMulti['/reference/'] = {
         { text: '介绍', link: '/intro' },
       ],
     },
+    {
+      text: '工具函数 & 类',
+      base: '/reference/utilities/',
+      collapsed: true,
+      items: [
+        { text: 'PublicKey', link: '/public-key' },
+      ],
+    },
+    {
+      text: '类型',
+      link: '/types',
+      collapsed: true,
+    },
   ],
 }
 
@@ -324,5 +339,6 @@ export default defineConfig({
         typesCache: createFileSystemTypesCache(),
       }),
     ],
+    codeCopyButtonTitle: '复制代码',
   },
 })

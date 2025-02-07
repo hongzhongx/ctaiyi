@@ -14,9 +14,9 @@ const results = await client.baiyujing.getTransactionResults('abcd1234...')
 
 ## 返回值
 
-`unknown`
+[`AppliedOperation`](/reference/types#appliedoperation)
 
-*TODO*
+交易成功执行的操作数组
 
 ## 参数
 

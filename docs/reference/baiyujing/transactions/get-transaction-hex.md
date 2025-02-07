@@ -40,6 +40,6 @@ const hex = await client.baiyujing.getTransactionHex({
 
 ### transaction
 
-- 类型: `object`
+- 类型: [`Transaction`](/reference/types#transaction)
 
 交易对象

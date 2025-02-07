@@ -38,8 +38,8 @@ const authority = await client.baiyujing.verifyAuthority({
 
 ## 参数
 
-### transaction
+### trx
 
-- 类型: `object`
+- 类型: [`SignedTransaction`](/reference/types#signedtransaction)
 
 交易对象
