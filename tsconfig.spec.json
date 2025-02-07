@@ -1,15 +1,19 @@
 {
   "compilerOptions": {
+    "composite": true,
     "target": "ESNext",
     "module": "Preserve",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
+    "types": [
+      "vitest/globals"
+    ],
     "allowImportingTsExtensions": true,
     "allowJs": true,
     "checkJs": true,
     "strict": true,
     "noImplicitOverride": true,
-    "noEmit": true,
+    "emitDeclarationOnly": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": false,
     "forceConsistentCasingInFileNames": true,
@@ -17,14 +21,13 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true
   },
-  "references": [
-    {
-      "path": "./tsconfig.spec.json"
-    }
+  "include": [
+    "src/**/*.ts",
+    "test/common.ts",
+    "test/**/*.spec.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "**/*.spec.ts"
+    "dist"
   ]
 }

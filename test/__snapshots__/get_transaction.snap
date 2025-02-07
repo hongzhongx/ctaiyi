@@ -1,0 +1,23 @@
+{
+  "block_num": 414918,
+  "expiration": "2025-02-04T16:05:57",
+  "extensions": [],
+  "operation_results": [],
+  "operations": [
+    [
+      "transfer_to_qi",
+      {
+        "amount": "10.000 YANG",
+        "from": "initminer",
+        "to": "dage",
+      },
+    ],
+  ],
+  "ref_block_num": 21701,
+  "ref_block_prefix": 1734260487,
+  "signatures": [
+    "2040d2b937d51ff4c4ac08bbd6c5df5f4bfcb3973ab8aeafe229845e0ff3c5f6a629f4dbe96633abd377fdc5521947b64ae4a41faecffbc5a4d1fe0cd49f0bcf7e",
+  ],
+  "transaction_id": "903430761b97a2ce7be79b578700ebc1598c05c9",
+  "transaction_num": 0,
+}

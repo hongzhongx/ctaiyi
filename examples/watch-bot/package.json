@@ -1,6 +1,14 @@
 {
-  "private": true,
+  "name": "watch-bot",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
-    "@taiyinet/ctaiyi": "^1.0.0"
+    "@taiyinet/ctaiyi": "workspace:*"
   }
 }

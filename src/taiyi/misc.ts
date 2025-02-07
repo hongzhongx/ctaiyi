@@ -1,167 +1,145 @@
-import { Account } from './account'
-import {Asset, Price} from './asset'
+import type { Account } from './account'
+import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
+import { Asset, Price } from './asset'
 
 /**
- * Large number that may be unsafe to represent natively in JavaScript.
- */
-export type Bignum = string
-
-/**
- * Buffer wrapper that serializes to a hex-encoded string.
+ * 一个包装器，用于将数据序列化为十六进制编码的字符串。
  */
 export class HexBuffer {
-
-    /**
-     * Convenience to create a new HexBuffer, does not copy data if value passed is already a buffer.
-     */
-    public static from(value: Buffer | HexBuffer | number[] | string) {
-        if (value instanceof HexBuffer) {
-            return value
-        } else if (value instanceof Buffer) {
-            return new HexBuffer(value)
-        } else if (typeof value === 'string') {
-            return new HexBuffer(Buffer.from(value, 'hex'))
-        } else {
-            return new HexBuffer(Buffer.from(value))
-        }
+  /**
+   * 创建一个新的 {@link HexBuffer}，如果传递的值已经是 {@link HexBuffer} 实例，则不复制数据。
+   */
+  public static from(value: Uint8Array | HexBuffer | number[] | string) {
+    if (value instanceof HexBuffer) {
+      return value
     }
-
-    constructor(public buffer: Buffer) {}
-
-    public toString(encoding = 'hex') {
-        return this.buffer.toString(encoding)
+    else if (value instanceof Uint8Array) {
+      return new HexBuffer(value)
     }
-
-    public toJSON() {
-        return this.toString()
+    else if (typeof value === 'string') {
+      return new HexBuffer(hexToBytes(value))
     }
+    else {
+      return new HexBuffer(Uint8Array.from(value))
+    }
+  }
 
+  constructor(public buffer: Uint8Array) { }
+
+  public toString() {
+    return bytesToHex(this.buffer)
+  }
+
+  public toJSON() {
+    return this.toString()
+  }
 }
 
-/**
- * Chain roperties that are decided by the simings.
- */
 export interface ChainProperties {
-    /**
-     * This fee, paid in YANG, is converted into QI for the new account. Accounts
-     * without qi cannot earn usage rations and therefore are powerless. This minimum
-     * fee requires all accounts to have some kind of commitment to the network that includes the
-     * ability to vote and make transactions.
-     */
-    account_creation_fee: string | Asset
-    /**
-     * This simings vote for the maximum_block_size which is used by the network
-     * to tune rate limiting and capacity.
-     */
-    maximum_block_size: number // uint32_t
+  /**
+   * 这笔费用以 YANG 支付，会为新账户兑换成 QI。
+   * 没有 QI 的账户无法获得使用配额，因此毫无影响力。
+   * 这笔最低费用要求所有账户对网络做出一定的投入，其中包括投票及进行交易的能力。
+   */
+  account_creation_fee: string | Asset
+  /**
+   * 司命投票针对的是最大区块大小，网络利用该参数来调整速率限制和容量。
+   */
+  maximum_block_size: number // uint32_t
 }
 
 export interface QiDelegation {
-    /**
-     * Delegation id.
-     */
-    id: number // id_type
-    /**
-     * Account that is delegating qi to delegatee.
-     */
-    delegator: string // account_name_type
-    /**
-     * Account that is receiving qi from delegator.
-     */
-    delegatee: string // account_name_type
-    /**
-     * Amount of QI delegated.
-     */
-    qi: Asset | string
-    /**
-     * Earliest date delegation can be removed.
-     */
-    min_delegation_time: string // time_point_sec
+  /**
+   * 委托 ID。
+   */
+  id: number // id_type
+  /**
+   * 向受托人（接受委托者）委托 QI 的账户。
+   */
+  delegator: string // account_name_type
+  /**
+   * 从委托者处接收 QI 的账户
+   */
+  delegatee: string // account_name_type
+  /**
+   * 委托的 QI 数量。
+   */
+  qi: Asset | string
+  /**
+   * 最早可以移除委托的时间。
+   */
+  min_delegation_time: string // time_point_sec
 }
 
 /**
- * Node state.
+ * 节点状态
  */
 export interface DynamicGlobalProperties {
-    id: number
-    /**
-     * Current block height.
-     */
-    head_block_number: number
-    head_block_id: string
-    /**
-     * UTC Server time, e.g. 2020-01-15T00:42:00
-     */
-    time: string
-    /**
-     * Currently elected siming.
-     */
-    current_siming: string
+  id: number
+  head_block_number: number
+  head_block_id: string
+  time: string
 
-    current_supply: Asset | string
+  /** 当前总等价阳寿供应量（包含真气、物质所有的等价阳寿总量） */
+  current_supply: Asset | string
 
-    /**
-     * Total asset held in confidential balances.
-     */
-    total_qi: Asset | string
-    pending_rewarded_qi: Asset | string
-    pending_rewarded_feigang: Asset | string
-    pending_cultivation_qi: Asset | string
+  /** 当前总的真气（自由真气） */
+  total_qi: Asset | string
+  /** 当前总的真气（自由真气） */
+  pending_rewarded_qi: Asset | string
+  pending_rewarded_feigang: Asset | string
+  pending_cultivation_qi: Asset | string
 
-    total_gold: Asset | string
-    total_food: Asset | string
-    total_wood: Asset | string
-    total_fabric: Asset | string
-    total_herb: Asset | string
+  /** 当前总的金石（包括NFA内含物质） */
+  total_gold: Asset | string
+  /** 当前总的食物（包括NFA内含物质） */
+  total_food: Asset | string
+  /** 当前总的木材（包括NFA内含物质） */
+  total_wood: Asset | string
+  /** 当前总的织物（包括NFA内含物质） */
+  total_fabric: Asset | string
+  /** 当前总的药材（包括NFA内含物质） */
+  total_herb: Asset | string
 
-    /**
-     * Maximum block size is decided by the set of active simings which change every round.
-     * Each siming posts what they think the maximum size should be as part of their siming
-     * properties, the median size is chosen to be the maximum block size for the round.
-     *
-     * @note the minimum value for maximum_block_size is defined by the protocol to prevent the
-     * network from getting stuck by simings attempting to set this too low.
-     */
-    maximum_block_size: number
-    /**
-     * The current absolute slot number. Equal to the total
-     * number of slots since genesis. Also equal to the total
-     * number of missed slots plus head_block_number.
-     */
-    current_aslot: number
-    /**
-     * Used to compute siming participation.
-     */
-    recent_slots_filled: Bignum
-    participation_count: number
-    last_irreversible_block_num: number
+  /** 最大区块大小 */
+  maximum_block_size: number
+  /** 当前绝对槽位号 */
+  current_aslot: number
+  /** 最近槽位填充情况 */
+  recent_slots_filled: string
+  /** 参与度计数（除以128得到参与百分比） */
+  participation_count: number
+  /** 最后一个不可逆区块号 */
+  last_irreversible_block_num: number
 }
 
 /**
  * Return the qi price.
  */
 export function getQiPrice(): Price {
-    return new Price(new Asset(1, 'YANG'), new Asset(1, 'QI'))
+  return new Price(new Asset(1, 'YANG'), new Asset(1, 'QI'))
 }
 
 /**
- * Returns the qi of specified account. Default: Subtract delegated & add received
+ * 返回指定账户的 QI 余额。
+ * @param subtract_delegated 是否减去委托出去的
+ * @param add_received 是否加上接收到的
  */
 export function getQi(account: Account, subtract_delegated: boolean = true, add_received: boolean = true) {
-    let qi: Asset = Asset.from(account.qi)
-    const qi_delegated: Asset = Asset.from(account.delegated_qi)
-    const qi_received: Asset = Asset.from(account.received_qi)
-    const withdraw_rate: Asset = Asset.from(account.qi_withdraw_rate)
-    const already_withdrawn = (Number(account.to_withdraw) - Number(account.withdrawn)) / 1000000
-    const withdraw_qi = Math.min(withdraw_rate.amount, already_withdrawn)
-    qi = qi.subtract(withdraw_qi)
+  let qi: Asset = Asset.from(account.qi)
+  const qi_delegated: Asset = Asset.from(account.delegated_qi)
+  const qi_received: Asset = Asset.from(account.received_qi)
+  const withdraw_rate: Asset = Asset.from(account.qi_withdraw_rate)
+  const already_withdrawn = (Number(account.to_withdraw) - Number(account.withdrawn)) / 1000000
+  const withdraw_qi = Math.min(withdraw_rate.amount, already_withdrawn)
+  qi = qi.subtract(withdraw_qi)
 
-    if (subtract_delegated) {
-        qi = qi.subtract(qi_delegated)
-    }
-    if (add_received) {
-        qi = qi.add(qi_received)
-    }
+  if (subtract_delegated) {
+    qi = qi.subtract(qi_delegated)
+  }
+  if (add_received) {
+    qi = qi.add(qi_received)
+  }
 
-    return qi.amount
+  return qi.amount
 }

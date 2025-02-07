@@ -1,334 +1,353 @@
-import * as assert from 'assert'
-import * as bs58 from 'bs58'
-import * as ByteBuffer from 'bytebuffer'
-import {createHash} from 'crypto'
-import * as secp256k1 from 'secp256k1'
-import {VError} from 'verror'
+import type { SignedTransaction, Transaction } from './taiyi/transaction'
+import { hmac } from '@noble/hashes/hmac'
+import { ripemd160 as nobleRipemd160 } from '@noble/hashes/ripemd160'
+import { sha256 as nobleSha256 } from '@noble/hashes/sha2'
+import { bytesToHex, concatBytes, hexToBytes } from '@noble/hashes/utils'
+import * as secp from '@noble/secp256k1'
+import bs58 from 'bs58'
+import ByteBuffer from 'bytebuffer'
+import invariant from 'tiny-invariant'
+import { DEFAULT_ADDRESS_PREFIX, DEFAULT_CHAIN_ID } from './client'
+import { Types } from './taiyi/serializer'
 
-import {DEFAULT_ADDRESS_PREFIX, DEFAULT_CHAIN_ID} from './client'
-import {Types} from './taiyi/serializer'
-import {SignedTransaction, Transaction} from './taiyi/transaction'
-import {copy} from './utils'
-
-/**
- * Network id used in WIF-encoding.
- */
-export const NETWORK_ID = Buffer.from([0x80])
+secp.etc.hmacSha256Sync = (k, ...m) => hmac(nobleSha256, k, secp.etc.concatBytes(...m))
 
 /**
- * Return ripemd160 hash of input.
+ * WIF 编码的 Network ID。
  */
-function ripemd160(input: Buffer | string): Buffer {
-    return createHash('ripemd160').update(input).digest()
+export const NETWORK_ID = new Uint8Array([0x80])
+
+/**
+ * 返回输入的 ripemd160 哈希值。
+ */
+export function ripemd160(input: Uint8Array | string): Uint8Array {
+  return nobleRipemd160(input)
 }
 
 /**
- * Return sha256 hash of input.
+ * 返回输入的 sha256 哈希值。
  */
-function sha256(input: Buffer | string): Buffer {
-    return createHash('sha256').update(input).digest()
+export function sha256(input: Uint8Array | string): Uint8Array {
+  return nobleSha256(input)
 }
 
 /**
- * Return 2-round sha256 hash of input.
+ * 返回输入的 2 轮 sha256 哈希值。
  */
-function doubleSha256(input: Buffer | string): Buffer {
-    return sha256(sha256(input))
+export function doubleSha256(input: Uint8Array | string): Uint8Array {
+  return sha256(sha256(input))
 }
 
 /**
- * Encode public key with bs58+ripemd160-checksum.
+ * 使用 `bs58 + ripemd160 - checksum` 编码公钥。
  */
-function encodePublic(key: Buffer, prefix: string): string {
-    const checksum = ripemd160(key)
-    return prefix + bs58.encode(Buffer.concat([key, checksum.slice(0, 4)]))
+export function encodePublic(key: Uint8Array | string, prefix: string): string {
+  const msg = typeof key === 'string' ? new TextEncoder().encode(key) : key
+  const checksum = ripemd160(msg)
+
+  const combined = concatBytes(msg, checksum.slice(0, 4))
+  return prefix + bs58.encode(combined)
 }
 
 /**
- * Decode bs58+ripemd160-checksum encoded public key.
+ * 解码 `bs58 + ripemd160 - checksum` 编码的公钥。
  */
-function decodePublic(encodedKey: string): {key: Buffer, prefix: string} {
-    const prefix = encodedKey.slice(0, 3)
-    assert.equal(prefix.length, 3, 'public key invalid prefix')
-    encodedKey = encodedKey.slice(3)
-    const buffer: Buffer = bs58.decode(encodedKey)
-    const checksum = buffer.slice(-4)
-    const key = buffer.slice(0, -4)
-    const checksumVerify = ripemd160(key).slice(0, 4)
-    assert.deepEqual(checksumVerify, checksum, 'public key checksum mismatch')
-    return {key, prefix}
+export function decodePublic(encodedKey: string): { key: Uint8Array, prefix: string } {
+  const prefix = encodedKey.slice(0, 3)
+  invariant(prefix.length === 3, 'public key invalid prefix')
+  encodedKey = encodedKey.slice(3)
+  const buffer = bs58.decode(encodedKey)
+  const checksum = buffer.slice(-4)
+  const key = buffer.slice(0, -4)
+  const checksumVerify = ripemd160(key).slice(0, 4)
+  invariant(bytesToHex(checksumVerify) === bytesToHex(checksum), 'public key checksum mismatch')
+  return { key, prefix }
 }
 
 /**
- * Encode bs58+doubleSha256-checksum private key.
+ * 使用 `bs58 + doubleSha256 - checksum` 编码私钥。
  */
-function encodePrivate(key: Buffer): string {
-    assert.equal(key.readUInt8(0), 0x80, 'private key network id mismatch')
-    const checksum = doubleSha256(key)
-    return bs58.encode(Buffer.concat([key, checksum.slice(0, 4)]))
+export function encodePrivate(key: Uint8Array | string): string {
+  const msg = typeof key === 'string' ? new TextEncoder().encode(key) : key
+  invariant(msg.at(0) === 0x80, 'private key network id mismatch')
+  const checksum = doubleSha256(msg)
+
+  const combined = concatBytes(msg, checksum.slice(0, 4))
+  return bs58.encode(combined)
 }
 
 /**
- * Decode bs58+doubleSha256-checksum encoded private key.
+ * 解码 `bs58 + doubleSha256 - checksum` 编码的私钥。
  */
-function decodePrivate(encodedKey: string): Buffer {
-    const buffer: Buffer = bs58.decode(encodedKey)
-    assert.deepEqual(buffer.slice(0, 1), NETWORK_ID, 'private key network id mismatch')
-    const checksum = buffer.slice(-4)
-    const key = buffer.slice(0, -4)
-    const checksumVerify = doubleSha256(key).slice(0, 4)
-    assert.deepEqual(checksumVerify, checksum, 'private key checksum mismatch')
-    return key
+export function decodePrivate(encodedKey: string): Uint8Array {
+  const buffer = bs58.decode(encodedKey)
+  invariant(bytesToHex(buffer.slice(0, 1)) === bytesToHex(NETWORK_ID), 'private key network id mismatch')
+  const checksum = buffer.slice(-4)
+  const key = buffer.slice(0, -4)
+  const checksumVerify = doubleSha256(key).slice(0, 4)
+  invariant(bytesToHex(checksumVerify) === bytesToHex(checksum), 'private key checksum mismatch')
+  return key
 }
 
 /**
- * Return true if signature is canonical, otherwise false.
+ * 如果签名是规范的，则返回 true，否则返回 false。
  */
-function isCanonicalSignature(signature: Buffer): boolean {
-    return (
-        !(signature[0] & 0x80) &&
-        !(signature[0] === 0 && !(signature[1] & 0x80)) &&
-        !(signature[32] & 0x80) &&
-        !(signature[32] === 0 && !(signature[33] & 0x80))
-    )
+function isCanonicalSignature(signature: Uint8Array): boolean {
+  return (
+    !(signature[0] & 0x80)
+    && !(signature[0] === 0 && !(signature[1] & 0x80))
+    && !(signature[32] & 0x80)
+    && !(signature[32] === 0 && !(signature[33] & 0x80))
+  )
 }
 
 /**
- * ECDSA (secp256k1) public key.
+ * ECDSA (secp256k1) 公钥。
  */
 export class PublicKey {
+  /**
+   * 从 WIF 编码的字符串创建公钥。
+   */
+  public static fromString(wif: string): PublicKey {
+    const { key, prefix } = decodePublic(wif)
+    return new PublicKey(key, prefix)
+  }
 
-    /**
-     * Create a new instance from a WIF-encoded key.
-     */
-    public static fromString(wif: string) {
-        const {key, prefix} = decodePublic(wif)
-        return new PublicKey(key, prefix)
+  /**
+   * 从字符串或公钥实例创建公钥。
+   */
+  public static from(value: string | PublicKey) {
+    if (value instanceof PublicKey) {
+      return value
     }
-
-    /**
-     * Create a new instance.
-     */
-    public static from(value: string | PublicKey) {
-        if (value instanceof PublicKey) {
-            return value
-        } else {
-            return PublicKey.fromString(value)
-        }
+    else {
+      return PublicKey.fromString(value)
     }
+  }
 
-    constructor(public readonly key: Buffer, public readonly prefix = DEFAULT_ADDRESS_PREFIX) {
-        assert(secp256k1.publicKeyVerify(key), 'invalid public key')
-    }
+  constructor(
+    public readonly key: Uint8Array,
+    public readonly prefix: string = DEFAULT_ADDRESS_PREFIX,
+  ) {
+    invariant(
+      secp.ProjectivePoint.fromHex(key).assertValidity(),
+      'invalid public key',
+    )
+  }
 
-    /**
-     * Verify a 32-byte signature.
-     * @param message 32-byte message to verify.
-     * @param signature Signature to verify.
-     */
-    public verify(message: Buffer, signature: Signature): boolean {
-        return secp256k1.verify(message, signature.data, this.key)
-    }
+  /**
+   * 验证 32 字节的签名。
+   * @param message 要验证的 32 字节消息。
+   * @param signature 要验证的签名。
+   */
+  public verify(message: Uint8Array, signature: Signature): boolean {
+    return secp.verify(signature.data, message, this.key)
+  }
 
-    /**
-     * Return a WIF-encoded representation of the key.
-     */
-    public toString() {
-        return encodePublic(this.key, this.prefix)
-    }
+  /**
+   * 返回一个 WIF 编码的密钥。
+   */
+  public toString() {
+    return encodePublic(this.key, this.prefix)
+  }
 
-    /**
-     * Return JSON representation of this key, same as toString().
-     */
-    public toJSON() {
-        return this.toString()
-    }
+  /**
+   * 返回一个 JSON 编码的密钥。
+   */
+  public toJSON() {
+    return this.toString()
+  }
 
-    /**
-     * Used by `utils.inspect` and `console.log` in node.js.
-     */
-    public inspect() {
-        return `PublicKey: ${ this.toString() }`
-    }
-
+  /**
+   * 用于 node.js 中的 `utils.inspect` 和 `console.log`。
+   */
+  public [Symbol.for('nodejs.util.inspect.custom')]() {
+    return `PublicKey: ${this.toString()}`
+  }
 }
 
 export type KeyRole = 'owner' | 'active' | 'posting' | 'memo'
 
 /**
- * ECDSA (secp256k1) private key.
+ * ECDSA (secp256k1) 私钥。
  */
 export class PrivateKey {
-
-    /**
-     * Convenience to create a new instance from WIF string or buffer.
-     */
-    public static from(value: string | Buffer) {
-        if (typeof value === 'string') {
-            return PrivateKey.fromString(value)
-        } else {
-            return new PrivateKey(value)
-        }
+  /**
+   * 通过 WIF 编码的字符串或 Uint8Array 实例创建私钥。
+   */
+  public static from(value: string | Uint8Array) {
+    if (typeof value === 'string') {
+      return PrivateKey.fromString(value)
     }
-
-    /**
-     * Create a new instance from a WIF-encoded key.
-     */
-    public static fromString(wif: string) {
-        return new PrivateKey(decodePrivate(wif).slice(1))
+    else {
+      return new PrivateKey(value)
     }
+  }
 
-    /**
-     * Create a new instance from a seed.
-     */
-    public static fromSeed(seed: string) {
-        return new PrivateKey(sha256(seed))
-    }
+  /**
+   * 通过 WIF 编码的字符串创建私钥。
+   */
+  public static fromString(wif: string) {
+    return new PrivateKey(decodePrivate(wif).slice(1))
+  }
 
-    /**
-     * Create key from username and password.
-     */
-    public static fromLogin(username: string, password: string, role: KeyRole = 'active') {
-        const seed = username + role + password
-        return PrivateKey.fromSeed(seed)
-    }
+  /**
+   * 通过种子字符串创建私钥。
+   */
+  public static fromSeed(seed: string) {
+    return new PrivateKey(sha256(seed))
+  }
 
-    constructor(private key: Buffer) {
-        assert(secp256k1.privateKeyVerify(key), 'invalid private key')
-    }
+  /**
+   * 通过 username 和 password 创建私钥。
+   */
+  public static fromLogin(username: string, password: string, role: KeyRole = 'active') {
+    const seed = username + role + password
+    return PrivateKey.fromSeed(seed)
+  }
 
-    /**
-     * Sign message.
-     * @param message 32-byte message.
-     */
-    public sign(message: Buffer): Signature {
-        let rv: {signature: Buffer, recovery: number}
-        let attempts = 0
-        do {
-            const options = {data: sha256(Buffer.concat([message, Buffer.alloc(1, ++attempts)]))}
-            rv = secp256k1.sign(message, this.key, options)
-        } while (!isCanonicalSignature(rv.signature))
-        return new Signature(rv.signature, rv.recovery)
-    }
+  constructor(private key: Uint8Array) {
+    invariant(secp.utils.isValidPrivateKey(key), 'invalid private key')
+  }
 
-    /**
-     * Derive the public key for this private key.
-     */
-    public createPublic(prefix?: string): PublicKey {
-        return new PublicKey(secp256k1.publicKeyCreate(this.key), prefix)
-    }
+  /**
+   * 签名消息。
+   * @param message 32 字节消息。
+   */
+  public sign(message: Uint8Array): Signature {
+    let signature: secp.SignatureWithRecovery
+    let attempts = 0
+    do {
+      const data = concatBytes(message, new Uint8Array([attempts++]))
 
-    /**
-     * Return a WIF-encoded representation of the key.
-     */
-    public toString() {
-        return encodePrivate(Buffer.concat([NETWORK_ID, this.key]))
-    }
+      const options = { extraEntropy: sha256(data) }
 
-    /**
-     * Used by `utils.inspect` and `console.log` in node.js. Does not show the full key
-     * to get the full encoded key you need to explicitly call {@link toString}.
-     */
-    public inspect() {
-        const key = this.toString()
-        return `PrivateKey: ${ key.slice(0, 6) }...${ key.slice(-6) }`
-    }
+      signature = secp.sign(message, this.key, options)
+    } while (!isCanonicalSignature(signature.toCompactRawBytes()))
+    return new Signature(signature.toCompactRawBytes(), signature.recovery)
+  }
 
+  /**
+   * 派生公钥。
+   */
+  public createPublic(prefix?: string, isCompressed: boolean = true): PublicKey {
+    return new PublicKey(secp.getPublicKey(this.key, isCompressed), prefix)
+  }
+
+  /**
+   * 返回一个 WIF 编码的密钥。
+   */
+  public toString() {
+    const combined = concatBytes(NETWORK_ID, this.key)
+    return encodePrivate(combined)
+  }
+
+  /**
+   * 用于 node.js 中的 `utils.inspect` 和 `console.log`。不显示完整的密钥。
+   * 要获取完整的编码密钥，需要显式调用 {@link toString}。
+   */
+  public [Symbol.for('nodejs.util.inspect.custom')]() {
+    const key = this.toString()
+    return `PrivateKey: ${key.slice(0, 6)}...${key.slice(-6)}`
+  }
 }
 
 /**
- * ECDSA (secp256k1) signature.
+ * ECDSA (secp256k1) 签名。
  */
 export class Signature {
+  public static fromUint8Array(array: Uint8Array) {
+    invariant(array.length === 65, 'invalid signature')
+    const recovery = array.at(0)! - 31
+    const data = array.slice(1)
+    return new Signature(data, recovery)
+  }
 
-    public static fromBuffer(buffer: Buffer) {
-        assert.equal(buffer.length, 65, 'invalid signature')
-        const recovery = buffer.readUInt8(0) - 31
-        const data = buffer.slice(1)
-        return new Signature(data, recovery)
-    }
+  public static fromString(string: string) {
+    return Signature.fromUint8Array(hexToBytes(string))
+  }
 
-    public static fromString(string: string) {
-        return Signature.fromBuffer(Buffer.from(string, 'hex'))
-    }
+  constructor(public data: Uint8Array, public recovery: number) {
+    invariant(data.length === 64, 'invalid signature')
+  }
 
-    constructor(public data: Buffer, public recovery: number) {
-        assert.equal(data.length, 64, 'invalid signature')
-    }
+  /**
+   * 通过提供原始签名消息恢复公钥。
+   * @param message 用于创建签名的 32 字节消息。
+   */
+  public recover(message: Uint8Array, prefix?: string) {
+    const sig = secp.Signature.fromCompact(this.data).addRecoveryBit(this.recovery)
+    return new PublicKey(sig.recoverPublicKey(message).toRawBytes(), prefix)
+  }
 
-    /**
-     * Recover public key from signature by providing original signed message.
-     * @param message 32-byte message that was used to create the signature.
-     */
-    public recover(message: Buffer, prefix?: string) {
-        return new PublicKey(secp256k1.recover(message, this.data, this.recovery), prefix)
-    }
+  public toBuffer() {
+    return concatBytes(new Uint8Array([this.recovery + 31]), this.data)
+  }
 
-    public toBuffer() {
-        const buffer = Buffer.alloc(65)
-        buffer.writeUInt8(this.recovery + 31, 0)
-        this.data.copy(buffer, 1)
-        return buffer
-    }
-
-    public toString() {
-        return this.toBuffer().toString('hex')
-    }
-
+  public toString() {
+    return bytesToHex(this.toBuffer())
+  }
 }
+
 /**
- * Return the sha256 transaction digest.
- * @param chainId The chain id to use when creating the hash.
+ * 返回交易的 sha256 摘要。
+ * @param chainId 用于创建哈希的链 ID。
  */
-function transactionDigest(transaction: Transaction | SignedTransaction, chainId: Buffer = DEFAULT_CHAIN_ID) {
-    const buffer = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.LITTLE_ENDIAN)
-    try {
-        Types.Transaction(buffer, transaction)
-    } catch (cause) {
-        throw new VError({cause, name: 'SerializationError'}, 'Unable to serialize transaction')
-    }
-    buffer.flip()
+function transactionDigest(
+  transaction: Transaction | SignedTransaction,
+  chainId: Uint8Array,
+) {
+  const buffer = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.LITTLE_ENDIAN)
+  try {
+    Types.Transaction(buffer, transaction)
+  }
+  catch (cause) {
+    const e = new Error('Unable to serialize transaction', { cause })
+    e.name = 'SerializationError'
+    throw e
+  }
+  buffer.flip()
 
-    const transactionData = Buffer.from(buffer.toBuffer())
-    const digest = sha256(Buffer.concat([chainId, transactionData]))
-    return digest
+  const digest = sha256(concatBytes(chainId, new Uint8Array(buffer.toArrayBuffer())))
+  return digest
 }
 
 /**
- * Return copy of transaction with signature appended to signatures array.
- * @param transaction Transaction to sign.
- * @param keys Key(s) to sign transaction with.
- * @param options Chain id and address prefix, compatible with {@link Client}.
+ * 返回带有签名附加到签名数组的交易副本。
+ * @param transaction 要签名的交易。
+ * @param keys 用于签名的密钥。
+ * @param options 链 ID 和地址前缀，与 {@link Client} 兼容。
  */
 function signTransaction(
-    transaction: Transaction,
-    keys: PrivateKey | PrivateKey[],
-    chainId: Buffer = DEFAULT_CHAIN_ID
+  transaction: Transaction,
+  keys: PrivateKey | PrivateKey[],
+  chainId: Uint8Array = DEFAULT_CHAIN_ID,
 ) {
-    const digest = transactionDigest(transaction, chainId)
-    const signedTransaction = copy(transaction) as SignedTransaction
-    if (!signedTransaction.signatures) {
-        signedTransaction.signatures = []
-    }
+  const digest = transactionDigest(transaction, chainId)
+  const signedTransaction = structuredClone(transaction) as SignedTransaction
+  if (!signedTransaction.signatures) {
+    signedTransaction.signatures = []
+  }
 
-    if (!Array.isArray(keys)) { keys = [keys] }
-    for (const key of keys) {
-        const signature = key.sign(digest)
-        signedTransaction.signatures.push(signature.toString())
-    }
+  if (!Array.isArray(keys)) {
+    keys = [keys]
+  }
+  for (const key of keys) {
+    const signature = key.sign(digest)
+    signedTransaction.signatures.push(signature.toString())
+  }
 
-    return signedTransaction
+  return signedTransaction
 }
 
-/** Misc crypto utility functions. */
 export const cryptoUtils = {
-    decodePrivate,
-    doubleSha256,
-    encodePrivate,
-    encodePublic,
-    isCanonicalSignature,
-    ripemd160,
-    sha256,
-    signTransaction,
-    transactionDigest,
+  decodePrivate,
+  doubleSha256,
+  encodePrivate,
+  encodePublic,
+  isCanonicalSignature,
+  ripemd160,
+  sha256,
+  signTransaction,
+  transactionDigest,
 }
