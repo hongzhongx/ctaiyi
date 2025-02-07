@@ -13,9 +13,19 @@ const result = await client.baiyujing.evalNfaAction(22, 'short', [])
 
 ## 返回值
 
-[`NfaActionEvalResult`](/reference/types#nfaactionevalresult)
+`NfaActionEvalResult`
 
 返回动作评估结果对象，包含执行效果、消耗等信息。
+
+```ts twoslash
+import { LuaValue } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface NfaActionEvalResult {
+  eval_result: LuaValue[]
+  narrate_logs: string[]
+  err: string
+}
+```
 
 ## 参数
 

@@ -524,28 +524,3 @@ declare interface OwnerHistory {
   last_valid_time: number
 }
 ```
-
-## RecoveryRequest
-
-```ts twoslash
-import { AuthorityType } from '@taiyinet/ctaiyi'
-// ---cut---
-declare interface RecoveryRequest {
-  id: number
-  account_to_recover: string
-  new_owner_authority: AuthorityType
-  expires: number
-}
-```
-
-## NfaActionEvalResult
-
-```ts twoslash
-import { LuaValue } from '@taiyinet/ctaiyi'
-// ---cut---
-declare interface NfaActionEvalResult {
-  eval_result: LuaValue[]
-  narrate_logs: string[]
-  err: string
-}
-```

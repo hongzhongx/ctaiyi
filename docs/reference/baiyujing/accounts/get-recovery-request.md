@@ -13,9 +13,20 @@ const recoveryRequest = await client.baiyujing.getRecoveryRequest('alice')
 
 ## 返回值
 
-[`RecoveryRequest`](/reference/types#recoveryrequest) | `null`
+`RecoveryRequest` | `null`
 
 返回账户恢复请求对象，如果没有恢复请求则返回 `null`。
+
+```ts twoslash
+import { AuthorityType } from '@taiyinet/ctaiyi'
+// ---cut---
+declare interface RecoveryRequest {
+  id: number
+  account_to_recover: string
+  new_owner_authority: AuthorityType
+  expires: number
+}
+```
 
 ## 参数
 
