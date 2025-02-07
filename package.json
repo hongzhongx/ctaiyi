@@ -5,6 +5,12 @@
   "packageManager": "pnpm@10.0.0",
   "description": "Taiyi blockchain RPC client library",
   "author": "hongzhong🀄️",
+  "contributors": [
+    {
+      "name": "enpitsulin",
+      "email": "enpitsulin@gmail.com"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/hongzhongx/ctaiyi"
