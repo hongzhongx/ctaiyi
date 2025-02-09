@@ -1,6 +1,8 @@
+import type { AuthorityType } from './account'
 import type { Operation } from './operation'
-import * as ByteBuffer from 'bytebuffer'
+import ByteBuffer from 'bytebuffer'
 import { PublicKey } from '../crypto'
+import { Authority } from './account'
 import { Asset } from './asset'
 import { HexBuffer } from './misc'
 
@@ -172,22 +174,81 @@ function OptionalSerializer(valueSerializer: Serializer) {
   }
 }
 
-const AuthoritySerializer = ObjectSerializer([
-  ['weight_threshold', UInt32Serializer],
-  ['account_auths', FlatMapSerializer(StringSerializer, UInt16Serializer)],
-  ['key_auths', FlatMapSerializer(PublicKeySerializer, UInt16Serializer)],
-])
+function AuthoritySerializer(buffer: ByteBuffer, data: Authority | string | AuthorityType) {
+  const serializer = ObjectSerializer([
+    ['weight_threshold', UInt32Serializer],
+    ['account_auths', FlatMapSerializer(StringSerializer, UInt16Serializer)],
+    ['key_auths', FlatMapSerializer(PublicKeySerializer, UInt16Serializer)],
+  ])
+
+  serializer(buffer, Authority.from(data))
+}
 
 const PriceSerializer = ObjectSerializer([
   ['base', AssetSerializer],
   ['quote', AssetSerializer],
 ])
 
-const ChainPropertiesSerializer = ObjectSerializer([
+const SimingUpdatePropertiesSerializer = ObjectSerializer([
   ['account_creation_fee', AssetSerializer],
   ['maximum_block_size', UInt32Serializer],
-  ['sbd_interest_rate', UInt16Serializer],
 ])
+
+function SimingSetPropertiesSerializer(
+  buffer: ByteBuffer,
+  data: [
+    ['key', string],
+    ['new_signing_key', string | PublicKey],
+    ['account_creation_fee', Asset | string | number],
+    ['maximum_block_size', number],
+    ['url', string],
+  ],
+) {
+  function tempSerialize(serializer: Serializer, data: any) {
+    const buffer = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.LITTLE_ENDIAN)
+    serializer(buffer, data)
+    buffer.flip()
+    return new Uint8Array(buffer.toArrayBuffer())
+  }
+
+  buffer.writeVarint32(data.length)
+  data.forEach(([key, value], index) => {
+    StringSerializer(buffer, key)
+    switch (key) {
+      case 'key':
+      case 'new_signing_key': {
+        const v = tempSerialize(PublicKeySerializer, value)
+        // @ts-expect-error have to do this
+        data[index][1] = v
+        VariableBinarySerializer(buffer, v)
+        break
+      }
+      case 'maximum_block_size': {
+        const v = tempSerialize(UInt32Serializer, value)
+        // @ts-expect-error have to do this
+        data[index][1] = v
+        VariableBinarySerializer(buffer, v)
+        break
+      }
+      case 'url': {
+        const v = tempSerialize(StringSerializer, value)
+        // @ts-expect-error have to do this
+        data[index][1] = v
+        VariableBinarySerializer(buffer, v)
+        break
+      }
+      case 'account_creation_fee': {
+        const v = tempSerialize(AssetSerializer, value)
+        // @ts-expect-error have to do this
+        data[index][1] = v
+        VariableBinarySerializer(buffer, v)
+        break
+      }
+    }
+  })
+
+  data.sort((a, b) => a[0].localeCompare(b[0]))
+}
 
 function OperationDataSerializer<
   const Definitions extends Array<[string, Serializer<any>]>,
@@ -231,9 +292,8 @@ const OperationSerializers = {
     ['amount', AssetSerializer],
   ]),
   withdraw_qi: OperationDataSerializer(4, [
-    ['from', StringSerializer],
-    ['to', StringSerializer],
-    ['amount', AssetSerializer],
+    ['account', StringSerializer],
+    ['qi', AssetSerializer],
   ]),
   set_withdraw_qi_route: OperationDataSerializer(5, [
     ['from_account', StringSerializer],
@@ -251,16 +311,16 @@ const OperationSerializers = {
     ['owner', StringSerializer],
     ['url', StringSerializer],
     ['block_signing_key', PublicKeySerializer],
-    ['props', ChainPropertiesSerializer],
+    ['props', SimingUpdatePropertiesSerializer],
     ['fee', AssetSerializer],
   ]),
   siming_set_properties: OperationDataSerializer(8, [
     ['owner', StringSerializer],
-    ['props', ChainPropertiesSerializer],
+    ['props', SimingSetPropertiesSerializer],
     ['extensions', ArraySerializer(VoidSerializer)],
   ]),
   account_siming_adore: OperationDataSerializer(9, [
-    ['amount', StringSerializer],
+    ['account', StringSerializer],
     ['siming', StringSerializer],
     ['approve', BooleanSerializer],
   ]),
@@ -270,7 +330,7 @@ const OperationSerializers = {
   ]),
   decline_adoring_rights: OperationDataSerializer(11, [
     ['account', StringSerializer],
-    ['extensions', ArraySerializer(VoidSerializer)],
+    ['decline', BooleanSerializer],
   ]),
 
   custom: OperationDataSerializer(12, [
@@ -305,62 +365,58 @@ const OperationSerializers = {
 
   claim_reward_balance: OperationDataSerializer(17, [
     ['account', StringSerializer],
+    ['reward_yang', AssetSerializer],
     ['reward_qi', AssetSerializer],
-    ['extensions', ArraySerializer(VoidSerializer)],
+    ['reward_feigang', AssetSerializer],
   ]),
 
   // #region contract
   create_contract: OperationDataSerializer(18, [
     ['owner', StringSerializer],
     ['name', StringSerializer],
-    ['code', StringSerializer],
-    ['abi', StringSerializer],
-    ['fee', AssetSerializer],
+    ['data', StringSerializer],
+    ['contract_authority', PublicKeySerializer],
+    ['extensions', ArraySerializer(VoidSerializer)],
   ]),
   revise_contract: OperationDataSerializer(19, [
-    ['owner', StringSerializer],
-    ['name', StringSerializer],
-    ['code', StringSerializer],
-    ['abi', StringSerializer],
-    ['fee', AssetSerializer],
+    ['reviser', StringSerializer],
+    ['contract_name', StringSerializer],
+    ['data', StringSerializer],
+    ['extensions', ArraySerializer(StringSerializer)],
   ]),
   call_contract_function: OperationDataSerializer(20, [
     ['caller', StringSerializer],
-    ['contract', StringSerializer],
-    ['function', StringSerializer],
-    ['params', StringSerializer],
-    ['fee', AssetSerializer],
+    ['creator', StringSerializer],
+    ['contract_name', StringSerializer],
+    ['function_name', StringSerializer],
+    ['value_list', ArraySerializer(StringSerializer)],
+    ['extensions', ArraySerializer(StringSerializer)],
   ]),
   // #endregion
 
   // #region nfa (non fungible asset)
   create_nfa_symbol: OperationDataSerializer(21, [
-    ['owner', StringSerializer],
-    ['name', StringSerializer],
-    ['maximum_supply', UInt32Serializer],
-    ['json_metadata', StringSerializer],
+    ['creator', StringSerializer],
+    ['symbol', StringSerializer],
+    ['describe', StringSerializer],
+    ['default_contract', StringSerializer],
   ]),
 
   create_nfa: OperationDataSerializer(22, [
     ['creator', StringSerializer],
     ['symbol', StringSerializer],
-    ['to', StringSerializer],
-    ['uri', StringSerializer],
-    ['json_metadata', StringSerializer],
   ]),
 
   transfer_nfa: OperationDataSerializer(23, [
     ['from', StringSerializer],
     ['to', StringSerializer],
-    ['token_id', UInt32Serializer],
-    ['memo', StringSerializer],
+    ['id', UInt64Serializer],
   ]),
 
   approve_nfa_active: OperationDataSerializer(24, [
     ['owner', StringSerializer],
-    ['approved', StringSerializer],
-    ['token_id', UInt32Serializer],
-    ['approve', BooleanSerializer],
+    ['active_account', StringSerializer],
+    ['id', UInt64Serializer],
   ]),
 
   action_nfa: OperationDataSerializer(25, [
@@ -374,17 +430,16 @@ const OperationSerializers = {
 
   // #region zone
   create_zone: OperationDataSerializer(26, [
-    ['owner', StringSerializer],
+    ['fee', AssetSerializer],
+    ['creator', StringSerializer],
     ['name', StringSerializer],
-    ['json_metadata', StringSerializer],
   ]),
   // #endregion
 
   // #region actor
   create_actor_talent_rule: OperationDataSerializer(27, [
-    ['owner', StringSerializer],
-    ['name', StringSerializer],
-    ['rule', StringSerializer],
+    ['creator', StringSerializer],
+    ['contract', StringSerializer],
   ]),
 
   create_actor: OperationDataSerializer(28, [
@@ -409,80 +464,115 @@ const OperationSerializers = {
 
   return_qi_delegation: OperationDataSerializer(31, [
     ['account', StringSerializer],
-    ['return_qi_delegation', AssetSerializer],
+    ['qi', AssetSerializer],
   ]),
 
   producer_reward: OperationDataSerializer(32, [
     ['producer', StringSerializer],
-    ['qi_reward', AssetSerializer],
+    ['qi', AssetSerializer],
   ]),
 
   nfa_convert_resources: OperationDataSerializer(33, [
+    ['nfa', Int64Serializer],
     ['owner', StringSerializer],
-    ['token_id', UInt32Serializer],
-    ['resources', StringSerializer],
+    ['qi', AssetSerializer],
+    ['resource', AssetSerializer],
+    ['is_qi_to_resource', BooleanSerializer],
   ]),
 
   nfa_transfer: OperationDataSerializer(34, [
-    ['from', StringSerializer],
-    ['to', StringSerializer],
-    ['token_id', UInt32Serializer],
+    ['from', Int64Serializer],
+    ['from_owner', StringSerializer],
+    ['to', Int64Serializer],
+    ['to_owner', StringSerializer],
+    ['amount', AssetSerializer],
   ]),
 
   nfa_deposit_withdraw: OperationDataSerializer(35, [
-    ['owner', StringSerializer],
-    ['token_id', UInt32Serializer],
-    ['amount', AssetSerializer],
+    ['nfa', Int64Serializer],
+    ['account', StringSerializer],
+    ['deposited', AssetSerializer],
+    ['withdrawn', AssetSerializer],
   ]),
 
   reward_feigang: OperationDataSerializer(36, [
     ['account', StringSerializer],
-    ['reward', AssetSerializer],
+    ['qi', AssetSerializer],
   ]),
 
   reward_cultivation: OperationDataSerializer(37, [
     ['account', StringSerializer],
-    ['reward', AssetSerializer],
+    ['nfa', Int64Serializer],
+    ['qi', AssetSerializer],
   ]),
 
   tiandao_year_change: OperationDataSerializer(38, [
-    ['year', UInt32Serializer],
+    ['messager', StringSerializer],
+    ['years', UInt32Serializer],
+    ['months', UInt32Serializer],
+    ['times', UInt32Serializer],
+    ['live_num', UInt32Serializer],
+    ['dead_num', UInt32Serializer],
+    ['born_this_year', UInt32Serializer],
+    ['dead_this_year', UInt32Serializer],
   ]),
 
   tiandao_month_change: OperationDataSerializer(39, [
-    ['month', UInt32Serializer],
+    ['messager', StringSerializer],
+    ['years', UInt32Serializer],
+    ['months', UInt32Serializer],
+    ['times', UInt32Serializer],
   ]),
 
   tiandao_time_change: OperationDataSerializer(40, [
-    ['time', UInt32Serializer],
+    ['messager', StringSerializer],
+    ['years', UInt32Serializer],
+    ['months', UInt32Serializer],
+    ['times', UInt32Serializer],
   ]),
 
   actor_born: OperationDataSerializer(41, [
-    ['actor_id', UInt32Serializer],
     ['owner', StringSerializer],
-    ['json_metadata', StringSerializer],
+    ['name', StringSerializer],
+    ['zone', StringSerializer],
+    ['nfa', Int64Serializer],
   ]),
 
   actor_talent_trigger: OperationDataSerializer(42, [
-    ['actor_id', UInt32Serializer],
-    ['talent', StringSerializer],
-    ['params', StringSerializer],
+    ['owner', StringSerializer],
+    ['name', StringSerializer],
+    ['nfa', Int64Serializer],
+    ['tid', Int64Serializer],
+    ['title', StringSerializer],
+    ['desc', StringSerializer],
+    ['age', UInt32Serializer],
   ]),
 
   actor_movement: OperationDataSerializer(43, [
-    ['actor_id', UInt32Serializer],
-    ['from_zone', UInt32Serializer],
-    ['to_zone', UInt32Serializer],
+    ['owner', StringSerializer],
+    ['name', StringSerializer],
+    ['from_zone', StringSerializer],
+    ['to_zone', StringSerializer],
+    ['nfa', Int64Serializer],
   ]),
 
   actor_grown: OperationDataSerializer(44, [
-    ['actor_id', UInt32Serializer],
-    ['growth', StringSerializer],
+    ['owner', StringSerializer],
+    ['name', StringSerializer],
+    ['nfa', Int64Serializer],
+    ['years', UInt32Serializer],
+    ['months', UInt32Serializer],
+    ['times', UInt32Serializer],
+    ['age', UInt32Serializer],
+    ['health', Int32Serializer],
   ]),
 
   narrate_log: OperationDataSerializer(45, [
     ['narrator', StringSerializer],
-    ['content', StringSerializer],
+    ['years', UInt32Serializer],
+    ['months', UInt32Serializer],
+    ['times', UInt32Serializer],
+    ['log', StringSerializer],
   ]),
   // #endregion
 } satisfies Record<Operation['0'], Serializer>

@@ -137,12 +137,13 @@ export class Client extends EventTarget {
    * @param options 客户端选项
    * @returns 测试网客户端实例
    */
-  public static testnet(options?: ClientOptions) {
+  public static testnet(options?: ClientOptions & { url?: string }) {
     const opts: ClientOptions = defu(options, {
       addressPrefix: 'TAI',
       chainId: '18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e',
     })
-    return new Client('ws://47.109.49.30:8090', opts)
+    const url = options?.url ?? 'ws://127.0.0.1:8090'
+    return new Client(url, opts)
   }
 
   // #region Client Properties

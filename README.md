@@ -51,7 +51,7 @@ pnpm build
 
 ## FAQ and Troubleshooting
 
-ctaiyi supports all modern browsers (Chrome, Edge, Firefox, etc) & runtime environments (Node 18+, Deno, Bun, etc).
+ctaiyi supports all modern browsers (Chrome, Edge, Firefox, etc) & runtime environments (Node 22+, Deno, Bun, etc).
 
 ctaiyi uses modern EcmaScript features such as:
 

@@ -1,9 +1,12 @@
 import { randomBytes } from 'crypto'
 import * as fs from 'node:fs/promises'
 import process from 'node:process'
+import { Authority, Client, PrivateKey } from '../src'
 
 export const NUM_TEST_ACCOUNTS = 2
 export const TEST_NODE = process.env.TEST_NODE || 'http://127.0.0.1:8091'
+
+export const INITMINER_PRIVATE_KEY = PrivateKey.fromString('5JNHfZYKGaomSFvd4NUdQ9qMcEAC43kujbfjueTHpVapX1Kzq2n')
 
 export function randomString(length: number) {
   return randomBytes(length * 2)
@@ -14,17 +17,34 @@ export function randomString(length: number) {
 }
 
 export async function createAccount(): Promise<{ username: string, password: string }> {
+  const client = Client.testnet()
+
   const password = randomString(32)
   const username = `ctaiyi-${randomString(9)}`
-  const response = await fetch('http://47.109.49.30:8080/create', {
-    method: 'POST',
-    body: `username=${username}&password=${password}`,
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  })
-  const text = await response.text()
-  if (response.status !== 200) {
-    throw new Error(`Unable to create user: ${text}`)
-  }
+  const privateKey = PrivateKey.fromLogin(username, password)
+  const public_key = privateKey.createPublic('TAI')
+
+  const confirmation = await client.broadcast.sendOperations([
+    [
+      'account_create',
+      {
+        fee: '0.001 YANG',
+        creator: 'initminer',
+        new_account_name: username,
+        owner: Authority.from(public_key.toString()),
+        active: Authority.from(public_key.toString()),
+        posting: Authority.from(public_key.toString()),
+        memo_key: public_key.toString(),
+        json_metadata: '{ "ctaiyi-test": true }',
+      },
+    ],
+  ], INITMINER_PRIVATE_KEY)
+
+  const result = await client.baiyujing.getTransactionResults(confirmation.id)
+
+  // eslint-disable-next-line no-console
+  console.log(result, confirmation.id)
+
   return { username, password }
 }
 

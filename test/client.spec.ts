@@ -28,11 +28,11 @@ describe('client', () => {
   it('should flush call buffer on reconnection', async () => {
     // @ts-expect-error test usage
     client.socket!.close()
-    const p1 = client.call('baiyujing_api', 'get_accounts', [['sifu']])
+    const p1 = client.call('baiyujing_api', 'get_accounts', [['initminer']])
     const p2 = client.call('baiyujing_api', 'get_accounts', [['null']])
     const [r1, r2] = await Promise.all([p1, p2])
     expect(r1.length).toBe(1)
-    expect(r1[0].name).toBe('sifu')
+    expect(r1[0].name).toBe('initminer')
     expect(r2.length).toBe(1)
     expect(r2[0].name).toBe('null')
   })
@@ -41,7 +41,7 @@ describe('client', () => {
     client.sendTimeout = 100
     await client.disconnect()
     try {
-      await client.call('baiyujing_api', 'get_accounts', [['sifu']]) as any[]
+      await client.call('baiyujing_api', 'get_accounts', [['initminer']]) as any[]
       assert(false, 'should not be reached')
     }
     catch (error) {

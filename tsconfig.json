@@ -1,20 +1,21 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "Preserve",
+    "target": "esnext",
+    "lib": ["esnext", "DOM"],
+    "rootDir": ".",
+    "module": "esnext",
     "moduleResolution": "Bundler",
+    "paths": {
+      "@taiyinet/ctaiyi": ["./src/index.ts"]
+    },
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
     "allowJs": true,
-    "checkJs": true,
     "strict": true,
-    "noImplicitOverride": true,
+    "strictNullChecks": true,
     "noEmit": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": false,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true,
+    "preserveValueImports": false,
+    "esModuleInterop": true,
+    "skipDefaultLibCheck": true,
     "skipLibCheck": true
   },
   "references": [
@@ -22,9 +23,13 @@
       "path": "./tsconfig.spec.json"
     }
   ],
+  "include": [
+    "**/*.ts",
+    "**/*.mjs",
+    "eslint.config.js"
+  ],
   "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.spec.ts"
+    "**/node_modules/**",
+    "**/dist/**"
   ]
 }

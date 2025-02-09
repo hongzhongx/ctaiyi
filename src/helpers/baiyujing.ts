@@ -1,6 +1,7 @@
 import type { Client } from '../client'
-import type { Account, ExtendedAccount } from '../taiyi/account'
+import type { Account, AuthorityType, ExtendedAccount } from '../taiyi/account'
 import type { Actor, ActorTalentRule } from '../taiyi/actor'
+import type { MaterialAssets } from '../taiyi/asset'
 import type { BlockHeader, SignedBlock } from '../taiyi/block'
 import type { ChainProperties, DynamicGlobalProperties, QiDelegation } from '../taiyi/misc'
 import type { LuaValue, Nfa } from '../taiyi/nfa'
@@ -8,7 +9,7 @@ import type { AppliedOperation } from '../taiyi/operation'
 import type { RewardFund } from '../taiyi/rewards'
 import type { ScheduleSiming, Siming } from '../taiyi/siming'
 import type { TianDaoProperties, Zone, ZoneType } from '../taiyi/tiandao'
-import type { SignedTransaction, Transaction, TransactionConfirmation } from '../taiyi/transaction'
+import type { SignedTransaction, Transaction } from '../taiyi/transaction'
 
 export class BaiYuJingAPI {
   constructor(private readonly client: Client) { }
@@ -20,8 +21,8 @@ export class BaiYuJingAPI {
     return this.client.call<T>('baiyujing_api', method, params)
   }
 
-  public async getState(path?: string) {
-    return this.call<unknown>('get_state', [path])
+  public async getState(withRoute?: string) {
+    return this.call<{ current_route: string, simings: Record<string, Siming>, accounts: Record<string, ExtendedAccount>, props: DynamicGlobalProperties, siming_schedule: ScheduleSiming }>('get_state', [withRoute])
   }
 
   /** 当前司命 */
@@ -93,30 +94,36 @@ export class BaiYuJingAPI {
   }
 
   /**
-   * 从 `start` 开始反向查询指定账户的交易历史
+   * 从 `start` 开始反向查询指定账户的操作历史
    *
    * @param accountName 账户名
    * @param start `-1` 或者任意正整数
    * @param limit 最大 1000，如果 start 为正，需要小于 start
    */
   async getAccountHistory(accountName: string, start: number, limit: number) {
-    return this.call<unknown[]>('get_account_history', [accountName, start, limit])
+    return this.call<[nonce: number, operation: AppliedOperation][]>('get_account_history', [accountName, start, limit])
   }
 
   async getAccountResources(accountName: string[]) {
-    return this.call<Pick<Account, 'fabric' | 'food' | 'gold' | 'herb' | 'wood'>[]>('get_account_resources', [accountName])
+    return this.call<MaterialAssets[]>('get_account_resources', [accountName])
   }
 
-  async getOwnerHistory(owner: string) {
-    return this.call<unknown[]>('get_owner_history', [owner])
+  /**
+   *  获取指定账户的 owner key 历史
+   */
+  async getOwnerHistory(account: string) {
+    return this.call<{ id: number, account: string, previous_owner_authority: AuthorityType, last_valid_time: number }[]>('get_owner_history', [account])
   }
 
+  /**
+   * 获取指定账户的恢复请求
+   */
   async getRecoveryRequest(accountName: string) {
-    return this.call<unknown>('get_recovery_request', [accountName])
+    return this.call<{ id: number, account_to_recover: string, new_owner_authority: AuthorityType, expires: number } | null>('get_recovery_request', [accountName])
   }
 
   async getWithdrawRoutes(accountName: string, routeType?: 'incoming' | 'outgoing' | 'all') {
-    return this.call<unknown[]>('get_withdraw_routes', [accountName, routeType])
+    return this.call<{ from_account: string, to_account: string, percent: number, auto_vest: boolean }[]>('get_withdraw_routes', [accountName, routeType])
   }
 
   async getQiDelegations(delegator: string, start: number, limit?: number) {
@@ -124,7 +131,7 @@ export class BaiYuJingAPI {
   }
 
   async getExpiringQiDelegations(delegator: string, start: number, limit?: number) {
-    return this.call<unknown[]>('get_expiring_qi_delegations', [delegator, start, limit])
+    return this.call<{ id: string, delegator: string, qi: string, expiration: number }[]>('get_expiring_qi_delegations', [delegator, start, limit])
   }
 
   // #region Siming
@@ -151,7 +158,7 @@ export class BaiYuJingAPI {
 
   // #region Transaction
 
-  async getTransactionHex(tx: SignedTransaction) {
+  async getTransactionHex(tx: SignedTransaction | Transaction) {
     return this.call<string>('get_transaction_hex', [tx])
   }
 
@@ -160,7 +167,7 @@ export class BaiYuJingAPI {
   }
 
   async getTransactionResults(trxId: string) {
-    return this.call<unknown>('get_transaction_results', [trxId])
+    return this.call<AppliedOperation[]>('get_transaction_results', [trxId])
   }
 
   async getRequiredSignatures(trx: SignedTransaction, availableKeys: string[]) {
@@ -175,8 +182,8 @@ export class BaiYuJingAPI {
     return this.call<boolean>('verify_authority', [trx])
   }
 
-  async verifyAccountAuthority(accountName: string, signers: string[]) {
-    return this.call<boolean>('verify_account_authority', [accountName, signers])
+  async verifyAccountAuthority(accountName: string, keys: string[]) {
+    return this.call<boolean>('verify_account_authority', [accountName, keys])
   }
 
   // #endregion
@@ -226,7 +233,7 @@ export class BaiYuJingAPI {
   }
 
   async getActorHistory(actorName: string, start: number, limit: number) {
-    return this.call<unknown[]>('get_actor_history', [actorName, start, limit])
+    return this.call<[number, AppliedOperation][]>('get_actor_history', [actorName, start, limit])
   }
 
   async listActorsBelowHealth(start: number, limit: number) {
