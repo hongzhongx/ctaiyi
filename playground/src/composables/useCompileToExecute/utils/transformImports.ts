@@ -5,7 +5,6 @@ import type {
   Statement,
 } from '@babel/types'
 import { packages } from '@babel/standalone'
-import ctaiyiUrl from '@taiyinet/ctaiyi?url'
 import { expose } from 'comlink'
 import * as convert from 'convert-source-map'
 import { groupBy } from 'lodash-es'
@@ -37,7 +36,7 @@ export function transformImports(code: string): string {
     sourceFilename: 'ctaiyi-example.ts',
   })
 
-  const defineAst = parser.parse(defineCode.replace('__REPLACED__', ctaiyiUrl), {
+  const defineAst = parser.parse(defineCode, {
     sourceType: 'module',
     plugins: ['typescript'],
   })

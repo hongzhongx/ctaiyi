@@ -4,6 +4,7 @@ import { onMounted, ref } from 'vue'
 
 import Editor from '~/components/playground/Editor.vue'
 import Pane from '~/components/playground/Pane.vue'
+import Console from './Console.vue'
 
 const size = ref([
   { id: 'code', size: 50 },
@@ -37,9 +38,7 @@ await client.connect()
     </Splitter.ResizeTrigger>
     <Splitter.Panel id="console">
       <Pane title="Console">
-        <div p-2>
-          Output
-        </div>
+        <Console />
       </Pane>
     </Splitter.Panel>
   </Splitter.Root>

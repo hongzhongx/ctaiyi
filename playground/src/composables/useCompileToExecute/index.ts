@@ -56,7 +56,7 @@ export function useCompileToExecute(editorRef: MaybeRefOrGetter<Editor.IStandalo
     return result.code
   }
 
-  async function execute() {
+  async function execute(runner: (code: string) => void) {
     try {
       const editor = toValue(editorRef)
       if (!editor)
@@ -64,7 +64,7 @@ export function useCompileToExecute(editorRef: MaybeRefOrGetter<Editor.IStandalo
       // await editor.getAction('editor.action.formatDocument')?.run()
       const code = editor.getValue()
       const buildCode = await compileCode(code)
-      await injectAndExecuteCode(buildCode)
+      runner(buildCode)
       // toast.success('Code executed successfully')
     }
     catch (error) {
@@ -76,19 +76,6 @@ export function useCompileToExecute(editorRef: MaybeRefOrGetter<Editor.IStandalo
       //     'background: #FEF2F2; color: #991B1B; border: 1px solid #F87171;',
       // })
     }
-  }
-
-  function injectAndExecuteCode(code: string) {
-    // 清理之前的脚本
-    const existingScript = document.getElementById('playground-execute-script')
-    if (existingScript)
-      document.body.removeChild(existingScript)
-
-    const script = document.createElement('script')
-    script.id = 'playground-execute-script'
-    script.type = 'module'
-    script.textContent = code
-    document.body.appendChild(script)
   }
 
   return execute
