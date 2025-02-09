@@ -134,19 +134,28 @@ importers:
 
   playground:
     dependencies:
+      '@taiyinet/ctaiyi':
+        specifier: workspace:*
+        version: link:..
+      '@unocss/reset':
+        specifier: ^65.4.3
+        version: 65.4.3
+      '@vueuse/core':
+        specifier: ^12.5.0
+        version: 12.5.0(typescript@5.7.3)
       monaco-editor:
         specifier: ^0.52.2
         version: 0.52.2
       monaco-editor-core:
         specifier: ^0.52.2
         version: 0.52.2
+      theme-vitesse:
+        specifier: ^0.8.3
+        version: 0.8.3
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.7.3)
     devDependencies:
-      '@iconify/json':
-        specifier: ^2.2.304
-        version: 2.2.304
       '@vitejs/plugin-vue':
         specifier: ^5.2.1
         version: 5.2.1(vite@6.1.0(@types/node@22.13.1)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
@@ -952,9 +961,6 @@ packages:
 
   '@iconify-json/simple-icons@1.2.23':
     resolution: {integrity: sha512-ySyZ0ZXdNveWnR71t7XGV7jhknxSlTtpM2TyIR1cUHTUzZLP36hYHTNqb2pYYsCzH5ed85KTTKz7vYT33FyNIQ==}
-
-  '@iconify/json@2.2.304':
-    resolution: {integrity: sha512-8eO5m27lIfYLRFCxNgZQD/AMcDYw9NzPT6ViSYJDvX+Vevuj/smaQ/SfHVTNFzj5JcISDh5AV6n2nllQthceog==}
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -3510,6 +3516,10 @@ packages:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
     engines: {node: '>=6'}
 
+  theme-vitesse@0.8.3:
+    resolution: {integrity: sha512-+H/p9fxfuP+qZHNeqNNFSehygzC2TfVelRY4rmRg6diX/L97JfMZOE3YHlLpOsm8/AFxc/n6E6MY3+Hkz3G96Q==}
+    engines: {vscode: ^1.43.0}
+
   tiny-invariant@1.3.3:
     resolution: {integrity: sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==}
 
@@ -4596,11 +4606,6 @@ snapshots:
   '@iconify-json/simple-icons@1.2.23':
     dependencies:
       '@iconify/types': 2.0.0
-
-  '@iconify/json@2.2.304':
-    dependencies:
-      '@iconify/types': 2.0.0
-      pathe: 1.1.2
 
   '@iconify/types@2.0.0': {}
 
@@ -7536,6 +7541,8 @@ snapshots:
   tabbable@6.2.0: {}
 
   tapable@2.2.1: {}
+
+  theme-vitesse@0.8.3: {}
 
   tiny-invariant@1.3.3: {}
 
