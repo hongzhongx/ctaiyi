@@ -6,14 +6,15 @@ import { getCurrentInstance, onMounted } from 'vue'
 import ctaiyiTypes from '../../../dist/index.d.ts?raw'
 
 const setup = createSingletonPromise(async () => {
-  monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-    ...monaco.languages.typescript.javascriptDefaults.getCompilerOptions(),
-    noUnusedLocals: false,
-    noUnusedParameters: false,
-    allowUnreachableCode: true,
-    allowUnusedLabels: true,
-    strict: false,
-    allowJs: true,
+  monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+    target: monaco.languages.typescript.ScriptTarget.ESNext,
+    allowNonTsExtensions: true,
+    moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+    module: monaco.languages.typescript.ModuleKind.ESNext,
+    jsx: monaco.languages.typescript.JsxEmit.Preserve,
+    noEmit: true,
+    strict: true,
+    esModuleInterop: true,
   })
 
   monaco.languages.typescript.typescriptDefaults.addExtraLib(`

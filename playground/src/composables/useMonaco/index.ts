@@ -1,22 +1,28 @@
 import type { editor as Editor } from 'monaco-editor'
 import type { Ref } from 'vue'
-import { createEventHook, tryOnUnmounted, until } from '@vueuse/core'
 
+import { createEventHook, tryOnUnmounted, until } from '@vueuse/core'
 import darktheme from 'theme-vitesse/themes/vitesse-dark.json'
 import lightTheme from 'theme-vitesse/themes/vitesse-light.json'
-import { ref, unref, watch } from 'vue'
+import { ref, shallowRef, unref, watch } from 'vue'
 import { isDark } from '~/composables/dark'
+import { useCompileToExecute } from '~/composables/useCompileToExecute'
 import setupMonaco from '~/monaco'
 
-export function useMonaco(target: Ref, options: any) {
+export interface MonacoOptions {
+  code: string
+}
+
+export function useMonaco(target: Ref<HTMLDivElement | null>, options: MonacoOptions) {
   const changeEventHook = createEventHook<string>()
   const isSetup = ref(false)
-  let editor: Editor.IStandaloneCodeEditor
+  const editor = shallowRef<Editor.IStandaloneCodeEditor | null>(null)
+  const execute = useCompileToExecute(editor)
 
   const setContent = async (content: string) => {
     await until(isSetup).toBeTruthy()
-    if (editor)
-      editor.setValue(content)
+    if (editor.value)
+      editor.value.setValue(content)
   }
 
   const init = async () => {
@@ -32,17 +38,13 @@ export function useMonaco(target: Ref, options: any) {
       if (!el)
         return
 
-      const extension = () => {
-        if (options.language === 'typescript')
-          return 'ts'
-        else if (options.language === 'javascript')
-          return 'js'
-        else if (options.language === 'html')
-          return 'html'
-      }
+      const model = monaco.editor.createModel(
+        options.code,
+        'typescript',
+        monaco.Uri.parse(`file:///root/${Date.now()}.ts`),
+      )
 
-      const model = monaco.editor.createModel(options.code, options.language, monaco.Uri.parse(`file:///root/${Date.now()}.${extension()}`))
-      editor = monaco.editor.create(el, {
+      editor.value = monaco.editor.create(el, {
         model,
         tabSize: 2,
         insertSpaces: true,
@@ -77,5 +79,6 @@ export function useMonaco(target: Ref, options: any) {
   return {
     onChange: changeEventHook.on,
     setContent,
+    execute,
   }
 }
