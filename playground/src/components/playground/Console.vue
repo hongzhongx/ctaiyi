@@ -21,7 +21,7 @@ eventBus.on((e) => {
 })
 
 function onClick() {
-  runnerIframe.value?.contentWindow?.postMessage({ event: 'CODE_UPDATE', value: '' })
+  eventBus.emit({ type: 'COMPILE_CODE' })
 }
 </script>
 
