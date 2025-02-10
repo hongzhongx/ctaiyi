@@ -30,11 +30,20 @@ function generateHTML() {
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <script type="importmap">${JSON.stringify({
-        imports: {
-          '@taiyinet/ctaiyi': new URL(ctaiyiUrl, import.meta.url).href,
-        },
-      })}</script>
+      <script type="importmap">
+       {
+          "imports": {
+            "@noble/hashes": "https://esm.sh/@noble/hashes@1.7.1",
+            "@noble/hashes/": "https://esm.sh/@noble/hashes@1.7.1/",
+            "@noble/secp256k1": "https://esm.sh/@noble/secp256k1@2.2.3",
+            "tiny-invariant": "https://esm.sh/tiny-invariant@1.3.3",
+            "bs58": "https://esm.sh/bs58@6.0.0",
+            "bytebuffer": "https://esm.sh/bytebuffer@5.0.1",
+            "defu": "https://esm.sh/defu@6.1.4",
+            "@taiyinet/ctaiyi": ${JSON.stringify(new URL(ctaiyiUrl, import.meta.url).href)},
+          }
+        }
+        </script>
       <script src="https://cdn.jsdelivr.net/npm/chobitsu"></script>
       <script type="module">
         window.addEventListener('message', ({ data }) => {
