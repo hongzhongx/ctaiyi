@@ -3,7 +3,6 @@ import { Splitter } from '@ark-ui/vue/splitter'
 import { onMounted, ref } from 'vue'
 
 import Editor from '~/components/playground/Editor.vue'
-import Pane from '~/components/playground/Pane.vue'
 import Console from './Console.vue'
 
 const size = ref([
@@ -37,9 +36,7 @@ await client.connect()
       <div absolute h-30px w-1px bg-gray-200 mr="1px" class="left-1/2 top-1/2 translate-y--1/2" />
     </Splitter.ResizeTrigger>
     <Splitter.Panel id="console">
-      <Pane title="Console">
-        <Console />
-      </Pane>
+      <Console />
     </Splitter.Panel>
   </Splitter.Root>
 </template>

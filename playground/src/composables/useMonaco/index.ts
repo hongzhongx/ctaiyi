@@ -58,6 +58,11 @@ export function useMonaco(target: Ref<HTMLDivElement | null>, options: MonacoOpt
         },
       })
 
+      model.onDidChangeContent(() => {
+        const value = model.getValue()
+        changeEventHook.trigger(value)
+      })
+
       isSetup.value = true
 
       watch(isDark, () => {
