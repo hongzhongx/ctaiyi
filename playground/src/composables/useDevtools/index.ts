@@ -40,7 +40,7 @@ function generateHTML() {
             "bs58": "https://esm.sh/bs58@6.0.0",
             "bytebuffer": "https://esm.sh/bytebuffer@5.0.1",
             "defu": "https://esm.sh/defu@6.1.4",
-            "@taiyinet/ctaiyi": ${JSON.stringify(new URL(ctaiyiUrl, import.meta.url).href)},
+            "@taiyinet/ctaiyi": ${JSON.stringify(new URL(ctaiyiUrl, import.meta.url).href)}
           }
         }
         </script>
