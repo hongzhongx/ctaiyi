@@ -1,3 +1,4 @@
+/* eslint-disable ts/no-unsafe-declaration-merging */
 import type { Client } from '../client'
 
 import type { AuthorityType } from '../taiyi/account'
@@ -44,6 +45,136 @@ export interface CreateAccountOptions {
   metadata?: { [key: string]: any }
 }
 
+const allOperations: (operations.Operation[0] | [name: operations.Operation[0], alias: string])[] = [
+  // 'account_create',
+  ['account_update', 'updateAccount'],
+
+  'transfer',
+  'transfer_to_qi',
+  'withdraw_qi',
+  'set_withdraw_qi_route',
+  'delegate_qi',
+
+  'siming_update',
+  'siming_set_properties',
+  'account_siming_adore',
+  'account_siming_proxy',
+  'decline_adoring_rights',
+
+  'custom',
+  'custom_json',
+
+  'request_account_recovery',
+  'recover_account',
+  'change_recovery_account',
+
+  'claim_reward_balance',
+
+  'create_contract',
+  'revise_contract',
+  'call_contract_function',
+
+  'create_nfa_symbol',
+  'create_nfa',
+  'transfer_nfa',
+  'approve_nfa_active',
+  'action_nfa',
+
+  'create_zone',
+
+  'create_actor_talent_rule',
+  'create_actor',
+
+  'hardfork',
+  'fill_qi_withdraw',
+  'return_qi_delegation',
+  'producer_reward',
+
+  'nfa_convert_resources',
+  'nfa_transfer',
+  'nfa_deposit_withdraw',
+  'reward_feigang',
+  'reward_cultivation',
+
+  'tiandao_year_change',
+  'tiandao_month_change',
+  'tiandao_time_change',
+
+  'actor_born',
+  'actor_talent_trigger',
+  'actor_movement',
+  'actor_grown',
+
+  'narrate_log',
+]
+
+function methodToOperationName(methodName: string): string {
+  return methodName.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
+}
+
+export interface BroadcastAPI {
+  // createAccount: (options: CreateAccountOptions, key: PrivateKey) => Promise<TransactionConfirmation>
+  updateAccount: (data: operations.AccountUpdateOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  transfer: (data: operations.TransferOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  transferToQi: (data: operations.TransferToQiOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  withdrawQi: (data: operations.WithdrawQiOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  setWithdrawQiRoute: (data: operations.SetWithdrawQiRouteOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  delegateQi: (data: operations.DelegateQiOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  simingUpdate: (data: operations.SimingUpdateOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  simingSetProperties: (data: operations.SimingSetPropertiesOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  accountSimingAdore: (data: operations.AccountSimingAdoreOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  accountSimingProxy: (data: operations.AccountSimingProxyOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  declineAdoringRights: (data: operations.DeclineAdoringRightsOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  custom: (data: operations.CustomOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  customJson: (data: operations.CustomJsonOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  requestAccountRecovery: (data: operations.RequestAccountRecoveryOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  recoverAccount: (data: operations.RecoverAccountOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  changeRecoveryAccount: (data: operations.ChangeRecoveryAccountOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  claimRewardBalance: (data: operations.ClaimRewardBalanceOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  createContract: (data: operations.CreateContractOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  reviseContract: (data: operations.ReviseContractOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  callContractFunction: (data: operations.CallContractFunctionOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  createNfaSymbol: (data: operations.CreateNfaSymbolOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  createNfa: (data: operations.CreateNfaOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  transferNfa: (data: operations.TransferNfaOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  approveNfaActive: (data: operations.ApproveNfaActiveOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  actionNfa: (data: operations.ActionNfaOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  createZone: (data: operations.CreateZoneOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  createActorTalentRule: (data: operations.CreateActorTalentRuleOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  createActor: (data: operations.CreateActorOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  hardfork: (data: operations.HardforkOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  fillQiWithdraw: (data: operations.FillQiWithdrawOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  returnQiDelegation: (data: operations.ReturnQiDelegationOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  producerReward: (data: operations.ProducerRewardOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  nfaConvertResources: (data: operations.NfaConvertResourcesOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  nfaTransfer: (data: operations.NfaTransferOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  nfaDepositWithdraw: (data: operations.NfaDepositWithdrawOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  rewardFeigang: (data: operations.RewardFeigangOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  rewardCultivation: (data: operations.RewardCultivationOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  tiandaoYearChange: (data: operations.TiandaoYearChangeOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  tiandaoMonthChange: (data: operations.TiandaoMonthChangeOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  tiandaoTimeChange: (data: operations.TiandaoTimeChangeOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  actorBorn: (data: operations.ActorBornOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  actorTalentTrigger: (data: operations.ActorTalentTriggerOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  actorMovement: (data: operations.ActorMovementOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  actorGrown: (data: operations.ActorGrownOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  narrateLog: (data: operations.NarrateLogOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+}
+
 export class BroadcastAPI {
   /**
    * 广播交易时将到期时间设置为未来多少毫秒
@@ -51,7 +182,28 @@ export class BroadcastAPI {
    */
   public expireTime = 60 * 1000
 
-  constructor(readonly client: Client) { }
+  constructor(readonly client: Client) {
+    return new Proxy(this, {
+      get(target, prop) {
+        if (prop in target) {
+          return target[prop as keyof typeof target]
+        }
+        else if (typeof prop === 'string') {
+          const opName = methodToOperationName(prop)
+          const operation = allOperations.find(op => Array.isArray(op) ? op[1] === prop : op === opName)
+          if (operation) {
+            return (data: operations.Operation[1], key: PrivateKey) => {
+              const operationName = Array.isArray(operation) ? operation[0] : operation
+              const op: operations.Operation = [operationName, data]
+              return target.sendOperations([op], key)
+            }
+          }
+        }
+
+        throw new Error(`Method ${prop.toString()} not found`)
+      },
+    })
+  }
 
   /**
    * 创建新账户
@@ -111,75 +263,6 @@ export class BroadcastAPI {
     const ops: any[] = [create_op]
 
     return this.sendOperations(ops, key)
-  }
-
-  /**
-   * 更新账户
-   */
-  public async updateAccount(data: operations.AccountUpdateOperation[1], key: PrivateKey) {
-    const op: operations.Operation = ['account_update', data]
-    return this.sendOperations([op], key)
-  }
-
-  /**
-   * 广播转账操作
-   */
-  public async transfer(data: operations.TransferOperation[1], key: PrivateKey) {
-    const op: operations.Operation = ['transfer', data]
-    return this.sendOperations([op], key)
-  }
-
-  /**
-   * 广播转账到 QI
-   */
-  public async transferQi(data: operations.TransferToQiOperation[1], key: PrivateKey) {
-    const op: operations.Operation = ['transfer_to_qi', data]
-    return this.sendOperations([op], key)
-  }
-
-  /**
-   * 广播提现 QI 操作
-   */
-  public async withdrawQi(data: operations.WithdrawQiOperation[1], key: PrivateKey) {
-    const op: operations.Operation = ['withdraw_qi', data]
-    return this.sendOperations([op], key)
-  }
-
-  /**
-   * 广播设置提现 QI 路由操作
-   */
-  public async setWithdrawQiRoute(data: operations.SetWithdrawQiRouteOperation[1], key: PrivateKey) {
-    const op: operations.Operation = ['set_withdraw_qi_route', data]
-    return this.sendOperations([op], key)
-  }
-
-  /**
-   * 将气从一个账户委托给另一个账户。气仍由原始账户拥有，
-   * 但司命信仰权和带宽分配将转移到接收账户。
-   * 这将委托设置为`qi`，根据需要增加或减少它。
-   * (即委托为0时会移除委托)
-   *
-   * 当委托被移除时，气会被置于一周的清算期，以防止同一个司命被重复投票。
-   */
-  public async delegateQi(options: operations.DelegateQiOperation[1], key: PrivateKey) {
-    const op: operations.Operation = ['delegate_qi', options]
-    return this.sendOperations([op], key)
-  }
-
-  /**
-   * 广播更新司命操作
-   */
-  public async simingUpdate(data: operations.SimingUpdateOperation[1], key: PrivateKey) {
-    const op: operations.Operation = ['siming_update', data]
-    return this.sendOperations([op], key)
-  }
-
-  /**
-   * 广播自定义JSON
-   */
-  public async json(data: operations.CustomJsonOperation[1], key: PrivateKey) {
-    const op: operations.Operation = ['custom_json', data]
-    return this.sendOperations([op], key)
   }
 
   /**
