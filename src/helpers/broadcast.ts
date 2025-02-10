@@ -1,14 +1,7 @@
 import type { Client } from '../client'
 
 import type { AuthorityType } from '../taiyi/account'
-import type {
-  AccountCreateOperation,
-  AccountUpdateOperation,
-  CustomJsonOperation,
-  DelegateQiOperation,
-  Operation,
-  TransferOperation,
-} from '../taiyi/operation'
+import type * as operations from '../taiyi/operation'
 import type { SignedTransaction, Transaction, TransactionConfirmation } from '../taiyi/transaction'
 import { hexToBytes } from '@noble/hashes/utils'
 
@@ -61,33 +54,11 @@ export class BroadcastAPI {
   constructor(readonly client: Client) { }
 
   /**
-   * 广播转账操作
-   * @param data 转账操作的内容
-   * @param key 发送者的私有活动密钥
-   */
-  public async transfer(data: TransferOperation[1], key: PrivateKey) {
-    const op: Operation = ['transfer', data]
-    return this.sendOperations([op], key)
-  }
-
-  /**
-   * 广播自定义JSON
-   * @param data custom_json 操作的内容
-   * @param key 私有发布密钥或活动密钥
-   */
-  public async json(data: CustomJsonOperation[1], key: PrivateKey) {
-    const op: Operation = ['custom_json', data]
-    return this.sendOperations([op], key)
-  }
-
-  /**
-   * 在测试网络上创建新账户
+   * 创建新账户
    * @param options 新账户选项
    * @param key 账户创建者的私钥
    */
-  public async createTestAccount(options: CreateAccountOptions, key: PrivateKey) {
-    assert(Object.prototype.hasOwnProperty.call(globalThis, 'it'), 'helper to be used only for mocha tests')
-
+  public async createAccount(options: CreateAccountOptions, key: PrivateKey) {
     const { username, metadata, creator } = options
 
     const prefix = this.client.addressPrefix
@@ -123,7 +94,7 @@ export class BroadcastAPI {
       }
     }
 
-    const create_op: AccountCreateOperation = [
+    const create_op: operations.AccountCreateOperation = [
       'account_create',
       {
         active,
@@ -144,11 +115,41 @@ export class BroadcastAPI {
 
   /**
    * 更新账户
-   * @param data account_update的载荷
-   * @param key 受影响账户的私钥，应该是相应的密钥级别或更高级别以更新账户权限
    */
-  public async updateAccount(data: AccountUpdateOperation[1], key: PrivateKey) {
-    const op: Operation = ['account_update', data]
+  public async updateAccount(data: operations.AccountUpdateOperation[1], key: PrivateKey) {
+    const op: operations.Operation = ['account_update', data]
+    return this.sendOperations([op], key)
+  }
+
+  /**
+   * 广播转账操作
+   */
+  public async transfer(data: operations.TransferOperation[1], key: PrivateKey) {
+    const op: operations.Operation = ['transfer', data]
+    return this.sendOperations([op], key)
+  }
+
+  /**
+   * 广播转账到 QI
+   */
+  public async transferQi(data: operations.TransferToQiOperation[1], key: PrivateKey) {
+    const op: operations.Operation = ['transfer_to_qi', data]
+    return this.sendOperations([op], key)
+  }
+
+  /**
+   * 广播提现 QI 操作
+   */
+  public async withdrawQi(data: operations.WithdrawQiOperation[1], key: PrivateKey) {
+    const op: operations.Operation = ['withdraw_qi', data]
+    return this.sendOperations([op], key)
+  }
+
+  /**
+   * 广播设置提现 QI 路由操作
+   */
+  public async setWithdrawQiRoute(data: operations.SetWithdrawQiRouteOperation[1], key: PrivateKey) {
+    const op: operations.Operation = ['set_withdraw_qi_route', data]
     return this.sendOperations([op], key)
   }
 
@@ -159,12 +160,25 @@ export class BroadcastAPI {
    * (即委托为0时会移除委托)
    *
    * 当委托被移除时，气会被置于一周的清算期，以防止同一个司命被重复投票。
-   *
-   * @param options 委托选项
-   * @param key 委托人的私有活动密钥
    */
-  public async delegateQi(options: DelegateQiOperation[1], key: PrivateKey) {
-    const op: Operation = ['delegate_qi', options]
+  public async delegateQi(options: operations.DelegateQiOperation[1], key: PrivateKey) {
+    const op: operations.Operation = ['delegate_qi', options]
+    return this.sendOperations([op], key)
+  }
+
+  /**
+   * 广播更新司命操作
+   */
+  public async simingUpdate(data: operations.SimingUpdateOperation[1], key: PrivateKey) {
+    const op: operations.Operation = ['siming_update', data]
+    return this.sendOperations([op], key)
+  }
+
+  /**
+   * 广播自定义JSON
+   */
+  public async json(data: operations.CustomJsonOperation[1], key: PrivateKey) {
+    const op: operations.Operation = ['custom_json', data]
     return this.sendOperations([op], key)
   }
 
@@ -196,7 +210,7 @@ export class BroadcastAPI {
    * @param operations 要发送的操作列表
    * @param key 用于签名交易的私钥
    */
-  public async sendOperations(operations: Operation[], key: PrivateKey | PrivateKey[]): Promise<TransactionConfirmation> {
+  public async sendOperations(operations: operations.Operation[], key: PrivateKey | PrivateKey[]): Promise<TransactionConfirmation> {
     const props = await this.client.baiyujing.getDynamicGlobalProperties()
 
     const ref_block_num = props.head_block_number & 0xFFFF
