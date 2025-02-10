@@ -28,7 +28,6 @@ eventBus.on((e) => {
     })
   }
 })
-
 </script>
 
 <template>

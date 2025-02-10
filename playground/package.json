@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@babel/types": "^7.26.8",
+    "@iconify-json/carbon": "^1.2.6",
     "@types/babel__standalone": "^7.1.9",
     "@types/convert-source-map": "^2.0.3",
     "@types/lodash-es": "^4.17.12",
