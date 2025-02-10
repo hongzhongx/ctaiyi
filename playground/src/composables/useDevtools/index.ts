@@ -1,8 +1,8 @@
 import ctaiyiUrl from '@taiyinet/ctaiyi?url'
 import { useEventListener } from '@vueuse/core'
 import { onScopeDispose, ref, watchPostEffect } from 'vue'
-
-import { isDark } from './dark'
+import { isDark } from '../dark'
+import { injectDevtools } from './devtoolsInject'
 
 function dispatchKeyboardEventToParentZoomState() {
   return `
@@ -109,62 +109,7 @@ function generateHTML() {
   </html>`
 }
 
-const INJECT_SCRIPT = `
-async function waitForElement(selector, container, waitForShadowRoot = false) {
-  let el;
-  while(!el) {
-    el = container.querySelector(selector);
-    if (!el || (waitForShadowRoot && !el.shadowRoot)) {
-      await new Promise(resolve => setTimeout(resolve, 50));
-    }
-  }
-  return el;
-}
-
-function hideBySelector(root, selector) {
-  const el = root.querySelector(selector);
-  if (!el) return;
-  el.style.display = 'none';
-}
-  
-function hideBySelectorAll(root, selector) {
-  const els = root.querySelectorAll(selector);
-  for (const el of els) {
-    el.style.display = 'none';
-  }
-}
-
-async function focusConsole(tabbedPane) {
-  const consoleTab = await waitForElement('#tab-console', tabbedPane.shadowRoot);
-
-  // tabs get focused on mousedown instead of click
-  consoleTab.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-  consoleTab.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
-}
-
-(async ()=>{
-  const tabbedPane = await waitForElement('.tabbed-pane', document.documentElement);
-  await focusConsole(tabbedPane);
-
-  const style = document.createElement('style');
-  style.id = 'inject-css-tab-pane';
-  style.textContent = \`
-  .tabbed-pane-left-toolbar {
-    display: none;
-  }\`
-  tabbedPane.shadowRoot.append(style);
-
-  console.log(style)
-
-  const tabedPaneWidget = tabbedPane.__widget
-  const tabPaneDelegate = tabedPaneWidget.delegate
-
-  tabPaneDelegate.moveToDrawer('elements')
-  tabPaneDelegate.moveToDrawer('resources')
-
-  tabedPaneWidget.selectTab('console',true)
-})()
-`
+const INJECT_SCRIPT = `(${injectDevtools.toString()})()`
 
 export function useDevtoolsSrc() {
   const html = `

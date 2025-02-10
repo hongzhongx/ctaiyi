@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useEventBus } from '@vueuse/core'
-import { useDevtoolsSrc } from '~/composables/devtools'
+import { useDevtoolsSrc } from '~/composables/useDevtools'
 
 const {
   devtoolsRawUrl,
