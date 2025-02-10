@@ -459,103 +459,105 @@ describe('nfa', () => {
   })
 })
 
-// 同 nfa
-describe.skip('actor', () => {
-  it('should find actor', async () => {
-    const actor = await client.baiyujing.findActor('李火旺')
-    expect(actor).toHaveProperty('name', '李火旺')
+// 本地测试网角色和区域合约尚未部署
+describe.skip('actor and zone contract does implement', () => {
+  describe('actor', () => {
+    it('should find actor', async () => {
+      const actor = await client.baiyujing.findActor('李火旺')
+      expect(actor).toHaveProperty('name', '李火旺')
+    })
+
+    it('should find actors', async () => {
+      const actors = await client.baiyujing.findActors([1, 2])
+      expect(actors).toHaveLength(2)
+    })
+
+    it('should list actors', async () => {
+      const actors = await client.baiyujing.listActors('initminer', 10)
+      expect(actors).toHaveLength(0)
+    })
+
+    it('should get actor history', async () => {
+      const history = await client.baiyujing.getActorHistory('李火旺', 10, 10)
+      expect(history).toBeDefined()
+    })
+
+    it('should list actors below health', async () => {
+      const actors = await client.baiyujing.listActorsBelowHealth(0, 1)
+      expect(actors).toBeDefined()
+      expect(actors).instanceOf(Array)
+    })
+
+    it('should get actor talent rules', async () => {
+      const rules = await client.baiyujing.findActorTalentRules([0, 1])
+      expect(rules).toBeInstanceOf(Array)
+      expect(rules).toHaveLength(2)
+    })
+
+    it('should list actors on zone', async () => {
+      const actors = await client.baiyujing.listActorsOnZone(0, 10)
+      expect(actors).toMatchInlineSnapshot(`[]`)
+    })
   })
 
-  it('should find actors', async () => {
-    const actors = await client.baiyujing.findActors([1, 2])
-    expect(actors).toHaveLength(2)
-  })
+  describe('tiandao', () => {
+    it('should get tiandao properties', async () => {
+      const properties = await client.baiyujing.getTiandaoProperties()
+      expect(properties).toBeDefined()
+      expect(properties).toHaveProperty('id')
+      expect(properties).toHaveProperty('v_years')
+      expect(properties).toHaveProperty('v_months')
+      expect(properties).toHaveProperty('v_times')
+    })
 
-  it('should list actors', async () => {
-    const actors = await client.baiyujing.listActors('initminer', 10)
-    expect(actors).toHaveLength(0)
-  })
+    it('should find zones', async () => {
+      const zones = await client.baiyujing.findZones([1, 2])
+      expect(zones).toHaveLength(2)
+    })
 
-  it('should get actor history', async () => {
-    const history = await client.baiyujing.getActorHistory('李火旺', 10, 10)
-    expect(history).toBeDefined()
-  })
+    it('should find zones by name', async () => {
+      const zones = await client.baiyujing.findZonesByName(['牛心村'])
+      expect(zones).toHaveLength(1)
+      expect(zones[0].id).toBe(4)
+    })
 
-  it('should list actors below health', async () => {
-    const actors = await client.baiyujing.listActorsBelowHealth(0, 1)
-    expect(actors).toBeDefined()
-    expect(actors).instanceOf(Array)
-  })
+    it('should list zones', async () => {
+      const zones = await client.baiyujing.listZones('initminer', 10)
+      expect(zones).instanceOf(Array)
+      expect(zones.length).toBeGreaterThanOrEqual(0)
+    })
 
-  it('should get actor talent rules', async () => {
-    const rules = await client.baiyujing.findActorTalentRules([0, 1])
-    expect(rules).toBeInstanceOf(Array)
-    expect(rules).toHaveLength(2)
-  })
+    it('should list zones by type', async () => {
+      const zones = await client.baiyujing.listZonesByType('XUKONG', 10)
+      expect(zones).instanceOf(Array)
+      expect(zones.length).toBeGreaterThanOrEqual(0)
+    })
 
-  it('should list actors on zone', async () => {
-    const actors = await client.baiyujing.listActorsOnZone(0, 10)
-    expect(actors).toMatchInlineSnapshot(`[]`)
-  })
-})
+    it('should list to zones by from', async () => {
+      const zones = await client.baiyujing.listToZonesByFrom('牛心村', 10)
 
-describe.skip('tiandao', () => {
-  it('should get tiandao properties', async () => {
-    const properties = await client.baiyujing.getTiandaoProperties()
-    expect(properties).toBeDefined()
-    expect(properties).toHaveProperty('id')
-    expect(properties).toHaveProperty('v_years')
-    expect(properties).toHaveProperty('v_months')
-    expect(properties).toHaveProperty('v_times')
-  })
+      expect(zones).instanceOf(Array)
+      expect(zones.length).toBeGreaterThanOrEqual(0)
+    })
 
-  it('should find zones', async () => {
-    const zones = await client.baiyujing.findZones([1, 2])
-    expect(zones).toHaveLength(2)
-  })
+    it('should list from zones by to', async () => {
+      const zones = await client.baiyujing.listFromZonesByTo('牛心村', 10)
 
-  it('should find zones by name', async () => {
-    const zones = await client.baiyujing.findZonesByName(['牛心村'])
-    expect(zones).toHaveLength(1)
-    expect(zones[0].id).toBe(4)
-  })
+      expect(zones).instanceOf(Array)
+      expect(zones.length).toBeGreaterThanOrEqual(0)
+    })
 
-  it('should list zones', async () => {
-    const zones = await client.baiyujing.listZones('initminer', 10)
-    expect(zones).instanceOf(Array)
-    expect(zones.length).toBeGreaterThanOrEqual(0)
-  })
+    it('should find way to zone', async () => {
+      const zones = await client.baiyujing.findWayToZone('牛心村', '大梁')
 
-  it('should list zones by type', async () => {
-    const zones = await client.baiyujing.listZonesByType('XUKONG', 10)
-    expect(zones).instanceOf(Array)
-    expect(zones.length).toBeGreaterThanOrEqual(0)
-  })
+      expect(zones).toBeDefined()
+      expect(zones.way_points).toBeDefined()
+      expect(zones.way_points).instanceOf(Array)
+    })
 
-  it('should list to zones by from', async () => {
-    const zones = await client.baiyujing.listToZonesByFrom('牛心村', 10)
-
-    expect(zones).instanceOf(Array)
-    expect(zones.length).toBeGreaterThanOrEqual(0)
-  })
-
-  it('should list from zones by to', async () => {
-    const zones = await client.baiyujing.listFromZonesByTo('牛心村', 10)
-
-    expect(zones).instanceOf(Array)
-    expect(zones.length).toBeGreaterThanOrEqual(0)
-  })
-
-  it('should find way to zone', async () => {
-    const zones = await client.baiyujing.findWayToZone('牛心村', '大梁')
-
-    expect(zones).toBeDefined()
-    expect(zones.way_points).toBeDefined()
-    expect(zones.way_points).instanceOf(Array)
-  })
-
-  it('should get contract source code', async () => {
-    const code = await client.baiyujing.getContractSourceCode('contract.nfa.base')
-    await expect(code).toMatchFileSnapshot('./__snapshots__/get_contract_source_code.snap')
+    it('should get contract source code', async () => {
+      const code = await client.baiyujing.getContractSourceCode('contract.nfa.base')
+      await expect(code).toMatchFileSnapshot('./__snapshots__/get_contract_source_code.snap')
+    })
   })
 })

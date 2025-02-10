@@ -7,7 +7,7 @@ describe('broadcast', () => {
     testTimeout: 60 * 1000,
   })
 
-  const client = Client.testnet({ url: 'ws://47.109.49.30:8090' })
+  const client = Client.testnet()
 
   type Account = Awaited<ReturnType<typeof getTestnetAccounts>>[number]
   let acc1: Account, acc2: Account
