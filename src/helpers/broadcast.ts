@@ -114,12 +114,25 @@ function methodToOperationName(methodName: string): string {
 
 export interface BroadcastAPI {
   // createAccount: (options: CreateAccountOptions, key: PrivateKey) => Promise<TransactionConfirmation>
+  /** 更新账户 */
   updateAccount: (data: operations.AccountUpdateOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
 
+  /** 广播转账操作 */
   transfer: (data: operations.TransferOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  /** 广播以QI发送交易 */
   transferToQi: (data: operations.TransferToQiOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  /** 广播提现QI操作 */
   withdrawQi: (data: operations.WithdrawQiOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  /** 广播设置提现QI路由 */
   setWithdrawQiRoute: (data: operations.SetWithdrawQiRouteOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  /**
+   * 将气从一个账户委托给另一个账户。气仍由原始账户拥有，
+   * 但司命崇拜权和带宽分配将转移到接收账户。
+   * 这将委托设置为`qi`，根据需要增加或减少它。
+   * (即委托为0时会移除委托)
+   *
+   * 当委托被移除时，气会被置于一周的清算期，以防止同一个司命被重复投票。
+   */
   delegateQi: (data: operations.DelegateQiOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
 
   simingUpdate: (data: operations.SimingUpdateOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
@@ -128,7 +141,9 @@ export interface BroadcastAPI {
   accountSimingProxy: (data: operations.AccountSimingProxyOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
   declineAdoringRights: (data: operations.DeclineAdoringRightsOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
 
+  /** 广播自定义数据 */
   custom: (data: operations.CustomOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  /** 广播自定义JSON */
   customJson: (data: operations.CustomJsonOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
 
   requestAccountRecovery: (data: operations.RequestAccountRecoveryOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
@@ -147,9 +162,12 @@ export interface BroadcastAPI {
   approveNfaActive: (data: operations.ApproveNfaActiveOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
   actionNfa: (data: operations.ActionNfaOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
 
+  /** 创建区域 */
   createZone: (data: operations.CreateZoneOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
 
+  /** 创建角色天赋规则 */
   createActorTalentRule: (data: operations.CreateActorTalentRuleOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  /** 创建角色 */
   createActor: (data: operations.CreateActorOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
 
   hardfork: (data: operations.HardforkOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
