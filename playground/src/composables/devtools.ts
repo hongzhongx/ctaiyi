@@ -40,7 +40,6 @@ function generateHTML() {
         window.addEventListener('message', ({ data }) => {
           const { event, value } = data;
 
-          console.log(data)
           if (event !== 'CODE_UPDATE') return;
  
           window.dispose?.();
