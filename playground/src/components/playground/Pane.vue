@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineProps<{
-  title: string
+  title?: string
 }>()
 </script>
 
@@ -12,13 +12,15 @@ defineProps<{
       items="center"
       bg="light-500 dark:dark-800"
       border="b-1 dark:dark-400 light-900"
-      p="l-2"
+      :p="!$slots.title && 'l-2'"
       h="8" class="rounded-t-md"
     >
       <div flex="1">
-        {{ title }}
+        <slot name="title">
+          {{ title }}
+        </slot>
       </div>
-      <div flex="~ row" items="center">
+      <div flex="~ row" items="center" class="divide-x-1 dark:divide-dark-300">
         <slot name="controls" />
       </div>
     </div>

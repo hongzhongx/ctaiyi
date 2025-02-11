@@ -11,15 +11,21 @@ const setup = createSingletonPromise(async () => {
     allowNonTsExtensions: true,
     moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
     module: monaco.languages.typescript.ModuleKind.ESNext,
-    jsx: monaco.languages.typescript.JsxEmit.Preserve,
     noEmit: true,
     strict: true,
     esModuleInterop: true,
+    moduleDetection: 3, // force
   })
 
-  monaco.languages.typescript.typescriptDefaults.addExtraLib(`
-    declare module "@taiyinet/ctaiyi" {${ctaiyiTypes}z}
-  `, 'ts:ctaiyi')
+  monaco.languages.typescript.typescriptDefaults.addExtraLib(
+    `declare module "@taiyinet/ctaiyi" {${ctaiyiTypes}}`,
+    'file:///ctaiyi.d.ts',
+  )
+
+  monaco.languages.typescript.typescriptDefaults.addExtraLib(
+    `declare const client: import("@taiyinet/ctaiyi").Client;`,
+    `file:///runtime.d.ts`,
+  )
 
   const loadWorkers = async () => {
     const { default: EditorWorker } = await import('monaco-editor/esm/vs/editor/editor.worker?worker')

@@ -2,147 +2,47 @@ import ctaiyiUrl from '@taiyinet/ctaiyi?url'
 import { useEventListener } from '@vueuse/core'
 import { onScopeDispose, ref, watchPostEffect } from 'vue'
 import { isDark } from '../dark'
-import { injectDevtools } from './devtoolsInject'
+import devtoolsInjectUrl from './script/devtools?url'
+import runnerScriptUrl from './script/runner?url'
 
-function dispatchKeyboardEventToParentZoomState() {
-  return `
-  document.addEventListener('keydown', (e) => {
-    if (!(e.ctrlKey || e.metaKey)) return;
-    if (!['=', '-'].includes(e.key)) return;
+import devtoolsTemplate from './templates/devtools.html?raw'
+import runnerTemplate from './templates/runner.html?raw'
 
-    const options = {
-      key: e.key,
-      ctrlKey: e.ctrlKey,
-      metaKey: e.metaKey,
-    };
-    const keyboardEvent = new KeyboardEvent('keydown', options);
-    window.parent.document.dispatchEvent(keyboardEvent);
-
-    e.preventDefault();
-  }, true);
-`
+const DEFAULT_IMPORT_MAP = {
+  '@noble/hashes': 'https://esm.sh/@noble/hashes@1.7.1',
+  '@noble/hashes/': 'https://esm.sh/@noble/hashes@1.7.1/',
+  '@noble/secp256k1': 'https://esm.sh/@noble/secp256k1@2.2.3',
+  'tiny-invariant': 'https://esm.sh/tiny-invariant@1.3.3',
+  'bs58': 'https://esm.sh/bs58@6.0.0',
+  'bytebuffer': 'https://esm.sh/bytebuffer@5.0.1',
+  'defu': 'https://esm.sh/defu@6.1.4',
+  '@taiyinet/ctaiyi': new URL(ctaiyiUrl, import.meta.url).href,
 }
 
-function generateHTML() {
-  return `
-    <!doctype html>
-    <html>
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <script type="importmap">
-       {
-          "imports": {
-            "@noble/hashes": "https://esm.sh/@noble/hashes@1.7.1",
-            "@noble/hashes/": "https://esm.sh/@noble/hashes@1.7.1/",
-            "@noble/secp256k1": "https://esm.sh/@noble/secp256k1@2.2.3",
-            "tiny-invariant": "https://esm.sh/tiny-invariant@1.3.3",
-            "bs58": "https://esm.sh/bs58@6.0.0",
-            "bytebuffer": "https://esm.sh/bytebuffer@5.0.1",
-            "defu": "https://esm.sh/defu@6.1.4",
-            "@taiyinet/ctaiyi": ${JSON.stringify(new URL(ctaiyiUrl, import.meta.url).href)}
-          }
-        }
-        </script>
-      <script src="https://cdn.jsdelivr.net/npm/chobitsu"></script>
-      <script type="module">
-        window.addEventListener('message', ({ data }) => {
-          const { event, value } = data;
+const parser = new DOMParser()
 
-          if (event !== 'CODE_UPDATE') return;
- 
-          window.dispose?.();
-          window.dispose = undefined;
-          
-          console.clear();
+function generateHTML(importMap: Record<string, string> = DEFAULT_IMPORT_MAP) {
+  const runnerDOM = parser.parseFromString(runnerTemplate, 'text/html')
 
-          document.getElementById('runner')?.remove();
-          const script = document.createElement('script');
-          script.id = 'runner';
-          script.type = 'module';
-          script.textContent = value;
-          document.body.appendChild(script);
-        });
+  const importMapScript = runnerDOM.querySelector<HTMLScriptElement>('script[type="importmap"]')!
+  importMapScript.textContent = JSON.stringify({ imports: importMap })
 
-        const sendToDevtools = (message) => {
-          window.parent.postMessage(JSON.stringify(message), '*');
-        };
-        let id = 0;
-        const sendToChobitsu = (message) => {
-          message.id = 'tmp' + ++id;
-          chobitsu.sendRawMessage(JSON.stringify(message));
-        };
-        chobitsu.setOnMessage((message) => {
-          if (message.includes('"id":"tmp')) return;
-          window.parent.postMessage(message, '*');
-        });
-        window.addEventListener('message', ({ data }) => {
-          try {
-            const { event, value } = data;
-            if (event === 'DEV') {
-              chobitsu.sendRawMessage(data.data);
-            } else if (event === 'LOADED') {
-              sendToDevtools({
-                method: 'Page.frameNavigated',
-                params: {
-                  frame: {
-                    id: '1',
-                    mimeType: 'text/html',
-                    securityOrigin: location.origin,
-                    url: location.href,
-                  },
-                  type: 'Navigation',
-                },
-              });
-              sendToChobitsu({ method: 'Network.enable' });
-              sendToDevtools({ method: 'Runtime.executionContextsCleared' });
-              sendToChobitsu({ method: 'Runtime.enable' });
-              sendToChobitsu({ method: 'Debugger.enable' });
-              sendToChobitsu({ method: 'DOMStorage.enable' });
-              sendToChobitsu({ method: 'DOM.enable' });
-              sendToChobitsu({ method: 'CSS.enable' });
-              sendToChobitsu({ method: 'Overlay.enable' });
-              sendToDevtools({ method: 'DOM.documentUpdated' });
-            }
-          } catch (e) {
-            console.error(e);
-          }
-        });
+  const script = runnerDOM.querySelector<HTMLScriptElement>('script[src="__RUNNER_SCRIPT_URL__"]')!
+  script.src = new URL(runnerScriptUrl, import.meta.url).href
 
-        ${dispatchKeyboardEventToParentZoomState()}
-      </script>
-    </head>
-    <body>
-      <script id="runner" type="module"></script>
-    </body>
-  </html>`
+  return runnerDOM.documentElement.innerHTML
 }
 
-const INJECT_SCRIPT = `(${injectDevtools.toString()})()`
+function generateDevtoolsHTML() {
+  const devtoolsDOM = parser.parseFromString(devtoolsTemplate, 'text/html')
 
+  const script = devtoolsDOM.querySelector<HTMLScriptElement>('script[src="__DEVTOOLS_SCRIPT_URL__"]')!
+  script.src = new URL(devtoolsInjectUrl, import.meta.url).href
+
+  return devtoolsDOM.documentElement.innerHTML
+}
 export function useDevtoolsSrc() {
-  const html = `
-  <!DOCTYPE html>
-  <html lang="en">
-  <meta charset="utf-8">
-  <title>DevTools</title>
-  <style>
-    @media (prefers-color-scheme: dark) {
-      body {
-        background-color: rgb(41 42 45);
-      }
-    }
-  </style>
-  <script>
-    ${dispatchKeyboardEventToParentZoomState()}
-  </script>
-  <script>
-    ${INJECT_SCRIPT}
-  </script>
-  <meta name="referrer" content="no-referrer">
-  <script src="https://unpkg.com/@ungap/custom-elements/es.js"></script>
-  <script type="module" src="https://cdn.jsdelivr.net/npm/chii@1.12.3/public/front_end/entrypoints/chii_app/chii_app.js"></script>
-  <body class="undocked" id="-blink-dev-tools">`
+  const html = generateDevtoolsHTML()
   const devtoolsRawUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }))
 
   const runnerIframeSrcUrl = URL.createObjectURL(new Blob([generateHTML()], { type: 'text/html' }))

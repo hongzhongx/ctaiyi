@@ -13,14 +13,13 @@ const size = ref([
 const initialTemplate = ref('')
 
 onMounted(() => {
-  initialTemplate.value = `import { Client } from '@taiyinet/ctaiyi'
+  initialTemplate.value = `/**
+ * playground 已经初始化好运行环境
+ * 只需要访问 client 就可以使用客户端的接口来通过设置的 rpc 来与 taiyi 交互
+ */
+const accounts = await client.baiyujing.getAccounts(['initminer'])
 
-const client = Client.testnet({ autoConnect: false ,url: "ws://47.109.49.30:8090"})
-
-console.log(client)
-
-await client.connect()
-`
+console.log(accounts)`
 })
 </script>
 
