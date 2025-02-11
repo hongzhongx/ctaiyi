@@ -20,6 +20,7 @@ const DEFAULT_IMPORT_MAP = {
 }
 
 const parser = new DOMParser()
+const serializer = new XMLSerializer()
 
 function generateHTML(importMap: Record<string, string> = DEFAULT_IMPORT_MAP) {
   const runnerDOM = parser.parseFromString(runnerTemplate, 'text/html')
@@ -30,7 +31,7 @@ function generateHTML(importMap: Record<string, string> = DEFAULT_IMPORT_MAP) {
   const script = runnerDOM.querySelector<HTMLScriptElement>('script[src="__RUNNER_SCRIPT_URL__"]')!
   script.src = new URL(runnerScriptUrl, import.meta.url).href
 
-  return runnerDOM.documentElement.innerHTML
+  return serializer.serializeToString(runnerDOM)
 }
 
 function generateDevtoolsHTML() {
@@ -39,7 +40,7 @@ function generateDevtoolsHTML() {
   const script = devtoolsDOM.querySelector<HTMLScriptElement>('script[src="__DEVTOOLS_SCRIPT_URL__"]')!
   script.src = new URL(devtoolsInjectUrl, import.meta.url).href
 
-  return devtoolsDOM.documentElement.innerHTML
+  return serializer.serializeToString(devtoolsDOM)
 }
 export function useDevtoolsSrc() {
   const html = generateDevtoolsHTML()
