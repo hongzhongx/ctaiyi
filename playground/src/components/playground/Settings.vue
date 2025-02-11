@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Field } from '@ark-ui/vue/field'
 import { createListCollection, Select } from '@ark-ui/vue/select'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useClientConfig } from '~/composables/useDevtools/client-state'
 import Pane from './Pane.vue'
 
@@ -18,12 +18,13 @@ const collection = createListCollection({
 
 const autoDisconnect = computed<string[]>({
   get() {
-    return [config.value.autoDisconnect?.toString()]
+    return [config.value.autoDisconnect as unknown as string]
   },
   set(value) {
     config.value.autoDisconnect = value.at(0) ? Number.parseInt(value.at(0)!) : 0
   },
 })
+
 </script>
 
 <template>
