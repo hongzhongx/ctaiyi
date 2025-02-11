@@ -3,7 +3,6 @@ import { useEventBus } from '@vueuse/core'
 import { useDevtoolsSrc } from '~/composables/useDevtools'
 import { useClientState } from '~/composables/useDevtools/client-state'
 import Pane from './Pane.vue'
-import Settings from './Settings.vue'
 
 const {
   devtoolsRawUrl,
