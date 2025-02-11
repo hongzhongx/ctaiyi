@@ -1,5 +1,5 @@
 <script setup lang="ts">
-
+import ThemeToggle from './ThemeToggle.vue'
 </script>
 
 <template>
@@ -12,11 +12,12 @@
         ctaiyi
       </h2>
     </div>
-    <div>
+    <div flex="~ items-center gap-2">
+      <ThemeToggle />
       <a
-        inline-block
-        role="button" p-1 rounded-md
-        bg="hover:dark-200 active:dark-300"
+        role="button"
+        flex="inline items-center justify-center" size-8 rounded-md p-1
+        bg="hover:light-200 active:light-300 dark:hover:dark-200 dark:active:dark-300"
         href="https://github.com/hongzhongx/ctaiyi" target="_blank"
       >
         <div class="i-carbon:logo-github" size-5 />
