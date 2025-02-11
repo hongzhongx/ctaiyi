@@ -1,6 +1,6 @@
 import type Chobitsu from 'chobitsu'
 import { Client } from '@taiyinet/ctaiyi'
-import { debouncedWatch } from '@vueuse/core'
+import { debouncedWatch, useTimeoutFn } from '@vueuse/core'
 import { useClientConfig, useClientState } from '../client-state'
 
 declare const chobitsu: typeof Chobitsu
@@ -13,19 +13,64 @@ declare global {
 }
 
 const {
+  data: connectState,
   post: postToConnectingBC,
 } = useClientState()
 
 const config = useClientConfig()
 
+const {
+  start,
+  stop,
+} = useTimeoutFn(
+  () => {
+    if (!window.client) {
+      console.warn('[ctaiyi-repl] ctaiyi client not initialized yet')
+      return
+    }
+
+    window.client.disconnect()
+  },
+  () => config.value.autoDisconnect ?? Number.POSITIVE_INFINITY,
+  { immediate: false },
+)
+
+debouncedWatch(connectState, (value) => {
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log('[ctaiyi-repl] update runner connect state', value)
+  }
+  if (!window.client) {
+    console.warn('[ctaiyi-repl] ctaiyi client not initialized yet')
+    return
+  }
+  if (window.client.isConnected() && !value) {
+    window.client.disconnect()
+  }
+  else if (!window.client.isConnected() && value) {
+    window.client.connect()
+  }
+}, { debounce: 500 })
+
 debouncedWatch(config, (value) => {
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log('[ctaiyi-repl] update runner config', value)
+  }
   if (!window.client) {
     console.warn('[ctaiyi-repl] ctaiyi client not initialized yet')
     return
   }
   // @ts-expect-error: override url
   window.client.url = value.url
-})
+
+  if (value.autoDisconnect === null) {
+    stop()
+  }
+  else {
+    start()
+  }
+}, { debounce: 500 })
 
 function sendToDevtools(message: Record<string, any>) {
   window.parent.postMessage(JSON.stringify(message), '*')

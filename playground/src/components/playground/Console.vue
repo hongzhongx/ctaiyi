@@ -15,6 +15,7 @@ type Events = { type: 'EXECUTE_CODE', data: string } | { type: 'COMPILE_CODE' }
 const eventBus = useEventBus<Events>('code')
 const {
   data: connectState,
+  post: postToConnectingBC,
 } = useClientState()
 
 eventBus.on((e) => {
@@ -25,6 +26,10 @@ eventBus.on((e) => {
 
 function onClick() {
   eventBus.emit({ type: 'COMPILE_CODE' })
+}
+
+function onConnectButtonClick() {
+  postToConnectingBC(!connectState.value)
 }
 </script>
 
@@ -52,6 +57,15 @@ function onClick() {
         />
         {{ !!connectState ? 'Connected' : 'Disconnected' }}
       </div>
+      <button
+        :title="connectState ? 'Disconnect' : 'Connect'"
+        h-8 px-2
+        flex="inline items-center gap-2"
+        bg="hover:dark-200 active:dark-300"
+        @click="onConnectButtonClick"
+      >
+        <div size-4 rounded-full :class="!connectState ? 'i-carbon:plug' : 'i-carbon:unlink'" />
+      </button>
     </template>
     <iframe
       ref="devtoolsIframe"
