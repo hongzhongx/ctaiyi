@@ -12,10 +12,7 @@ declare global {
   }
 }
 
-const {
-  data: connectState,
-  post: postToConnectingBC,
-} = useClientState()
+const { post: postToConnectingBC } = useClientState()
 
 const config = useClientConfig()
 
@@ -34,23 +31,6 @@ const {
   () => config.value.autoDisconnect ?? Number.POSITIVE_INFINITY,
   { immediate: false },
 )
-
-debouncedWatch(connectState, (value) => {
-  if (import.meta.env.DEV) {
-    // eslint-disable-next-line no-console
-    console.log('[ctaiyi-repl] update runner connect state', value)
-  }
-  if (!window.client) {
-    console.warn('[ctaiyi-repl] ctaiyi client not initialized yet')
-    return
-  }
-  if (window.client.isConnected() && !value) {
-    window.client.disconnect()
-  }
-  else if (!window.client.isConnected() && value) {
-    window.client.connect()
-  }
-}, { debounce: 500 })
 
 debouncedWatch(config, (value) => {
   if (import.meta.env.DEV) {
@@ -116,6 +96,15 @@ window.addEventListener('message', ({ data }) => {
     const { event } = data
     if (event === 'DEV') {
       chobitsu.sendRawMessage(data.data)
+    }
+    else if (['CONNECT', 'DISCONNECT'].includes(event)) {
+      if (!window.client) {
+        console.warn('[ctaiyi-repl] ctaiyi client not initialized yet')
+      }
+      if (event === 'CONNECT')
+        window.client?.connect()
+      else
+        window.client?.disconnect()
     }
     else if (event === 'LOADED') {
       sendToDevtools({

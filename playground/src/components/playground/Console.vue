@@ -13,10 +13,7 @@ const {
 type Events = { type: 'EXECUTE_CODE', data: string } | { type: 'COMPILE_CODE' }
 
 const eventBus = useEventBus<Events>('code')
-const {
-  data: connectState,
-  post: postToConnectingBC,
-} = useClientState()
+const { data: connectState } = useClientState()
 
 eventBus.on((e) => {
   if (e.type === 'EXECUTE_CODE') {
@@ -29,7 +26,7 @@ function onClick() {
 }
 
 function onConnectButtonClick() {
-  postToConnectingBC(!connectState.value)
+  runnerIframe.value?.contentWindow?.postMessage({ event: !connectState.value ? 'CONNECT' : 'DISCONNECT' }, '*')
 }
 </script>
 
