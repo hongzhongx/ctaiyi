@@ -7,8 +7,8 @@ import Console from './Console.vue'
 import Settings from './Settings.vue'
 
 const size = ref([
-  { id: 'code', size: 50, minSize: 50 },
-  { id: 'console', size: 50 },
+  { id: 'code', size: 50 },
+  { id: 'console', size: 50, minSize: 50 },
 ])
 
 const initialTemplate = ref('')

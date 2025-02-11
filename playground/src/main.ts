@@ -1,6 +1,11 @@
+import { createHead } from '@unhead/vue'
 import { createApp } from 'vue'
 import App from './App.vue'
 import 'uno.css'
 import './styles/main.css'
 
-createApp(App).mount('#app')
+const head = createHead()
+
+createApp(App)
+  .use(head)
+  .mount('#app')

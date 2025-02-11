@@ -41,7 +41,7 @@ export function useMonaco(target: Ref<HTMLDivElement | null>, options: MonacoOpt
       const model = monaco.editor.createModel(
         options.code,
         'typescript',
-        monaco.Uri.parse(`file:///root/${Date.now()}.ts`),
+        monaco.Uri.parse(`file:///root/ctaiyi-example.ts`),
       )
 
       editor.value = monaco.editor.create(el, {

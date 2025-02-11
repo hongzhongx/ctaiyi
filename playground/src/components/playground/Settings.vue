@@ -12,19 +12,16 @@ const collection = createListCollection({
     { label: '1 mintue', value: 1 * 60 * 1000 },
     { label: '5 mintues', value: 5 * 60 * 1000 },
     { label: '10 mintues', value: 10 * 60 * 1000 },
-    { label: 'never', value: null },
+    { label: 'never', value: 0 },
   ],
 })
 
 const autoDisconnect = computed<string[]>({
   get() {
-    if (config.value.autoDisconnect === null) {
-      return []
-    }
     return [config.value.autoDisconnect?.toString()]
   },
   set(value) {
-    config.value.autoDisconnect = value.at(0) ? Number.parseInt(value.at(0)!) : null
+    config.value.autoDisconnect = value.at(0) ? Number.parseInt(value.at(0)!) : 0
   },
 })
 </script>

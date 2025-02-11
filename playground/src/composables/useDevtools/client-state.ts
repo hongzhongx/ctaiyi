@@ -4,7 +4,7 @@ export const useClientState = () => useBroadcastChannel<boolean | undefined, boo
 
 interface Config {
   url: string
-  autoDisconnect: number | null
+  autoDisconnect: number
 }
 
 export function useClientConfig() {

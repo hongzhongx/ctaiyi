@@ -64,7 +64,7 @@ debouncedWatch(config, (value) => {
   // @ts-expect-error: override url
   window.client.url = value.url
 
-  if (value.autoDisconnect === null) {
+  if (value.autoDisconnect === 0) {
     stop()
   }
   else {
