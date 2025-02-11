@@ -7,7 +7,7 @@ describe('broadcast', () => {
     testTimeout: 60 * 1000,
   })
 
-  const client = Client.testnet()
+  const client = Client.testnet({ url: 'ws://47.109.49.30:8090' })
 
   type Account = Awaited<ReturnType<typeof getTestnetAccounts>>[number]
   let acc1: Account, acc2: Account
@@ -128,5 +128,9 @@ describe('broadcast', () => {
     check('actorGrown')
 
     check('narrateLog')
+
+    // @ts-expect-error: check something else throw TypeError: client.broadcast.someThingElse is not a function
+    expect(() => client.broadcast.someThingElse())
+      .throws(TypeError, 'client.broadcast.someThingElse is not a function')
   })
 })

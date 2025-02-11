@@ -203,10 +203,7 @@ export class BroadcastAPI {
   constructor(readonly client: Client) {
     return new Proxy(this, {
       get(target, prop) {
-        if (prop in target) {
-          return target[prop as keyof typeof target]
-        }
-        else if (typeof prop === 'string') {
+        if (typeof prop === 'string') {
           const opName = methodToOperationName(prop)
           const operation = allOperations.find(op => Array.isArray(op) ? op[1] === prop : op === opName)
           if (operation) {
@@ -218,7 +215,7 @@ export class BroadcastAPI {
           }
         }
 
-        throw new Error(`Method ${prop.toString()} not found`)
+        return Reflect.get(target, prop)
       },
     })
   }
