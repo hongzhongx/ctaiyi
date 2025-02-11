@@ -1,1 +1,6 @@
 @import '@unocss/reset/tailwind.css';
+
+.overflowingOverlayWidgets > *,
+.overflowingContentWidgets > * {
+  --at-apply: translate-y-22;
+}

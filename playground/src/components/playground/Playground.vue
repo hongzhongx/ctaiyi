@@ -13,13 +13,16 @@ const size = ref([
 const initialTemplate = ref('')
 
 onMounted(() => {
-  initialTemplate.value = `/**
- * playground 已经初始化好运行环境
- * 只需要访问 client 就可以使用客户端的接口来通过设置的 rpc 来与 taiyi 交互
- */
-const accounts = await client.baiyujing.getAccounts(['initminer'])
+  initialTemplate.value = `// playground 已经初始化好运行环境
+// 只需要访问 client 就可以使用客户端的接口来通过设置的 rpc 来与 taiyi 交互
 
-console.log(accounts)`
+await client.connect()
+
+const {
+  head_block_number
+} = await client.baiyujing.getDynamicGlobalProperties()
+
+console.log('当前块高:', head_block_number)`
 })
 </script>
 
