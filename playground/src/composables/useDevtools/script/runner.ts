@@ -1,5 +1,7 @@
 import type Chobitsu from 'chobitsu'
 import { Client } from '@taiyinet/ctaiyi'
+import { debouncedWatch } from '@vueuse/core'
+import { useClientConfig, useClientState } from '../client-state'
 
 declare const chobitsu: typeof Chobitsu
 
@@ -9,6 +11,21 @@ declare global {
     client?: import('@taiyinet/ctaiyi').Client
   }
 }
+
+const {
+  post: postToConnectingBC,
+} = useClientState()
+
+const config = useClientConfig()
+
+debouncedWatch(config, (value) => {
+  if (!window.client) {
+    console.warn('[ctaiyi-repl] ctaiyi client not initialized yet')
+    return
+  }
+  // @ts-expect-error: override url
+  window.client.url = value.url
+})
 
 function sendToDevtools(message: Record<string, any>) {
   window.parent.postMessage(JSON.stringify(message), '*')
@@ -87,4 +104,10 @@ window.addEventListener('message', ({ data }) => {
 
 function attachClientInstance() {
   window.client = Client.testnet({ autoConnect: false, url: 'ws://47.109.49.30:8090' })
+  window.client.addEventListener('open', () => {
+    postToConnectingBC(true)
+  })
+  window.client.addEventListener('close', () => {
+    postToConnectingBC(false)
+  })
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useEventBus } from '@vueuse/core'
 import { useDevtoolsSrc } from '~/composables/useDevtools'
+import { useClientState } from '~/composables/useDevtools/client-state'
 import Pane from './Pane.vue'
 import Settings from './Settings.vue'
 
@@ -13,6 +14,9 @@ const {
 type Events = { type: 'EXECUTE_CODE', data: string } | { type: 'COMPILE_CODE' }
 
 const eventBus = useEventBus<Events>('code')
+const {
+  data: connectState,
+} = useClientState()
 
 eventBus.on((e) => {
   if (e.type === 'EXECUTE_CODE') {
@@ -41,10 +45,14 @@ function onClick() {
     </template>
     <template #controls>
       <div px-2 flex="inline items-center gap-2">
-        <div size-2 rounded-full class="bg-dark-300" :class="{ 'animate-flash animate-iteration-infinite animate-duration-3000 bg-emerald': !true }" />
-        {{ !true ? 'Connected' : 'Disconnected' }}
+        <div
+          size-2 rounded-full class="bg-dark-300"
+          :class="{
+            'animate-flash animate-iteration-infinite animate-duration-3000 bg-emerald': !!connectState,
+          }"
+        />
+        {{ !!connectState ? 'Connected' : 'Disconnected' }}
       </div>
-      <Settings />
     </template>
     <iframe
       ref="devtoolsIframe"
