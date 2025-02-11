@@ -56,6 +56,7 @@ export function useMonaco(target: Ref<HTMLDivElement | null>, options: MonacoOpt
         minimap: {
           enabled: false,
         },
+        fixedOverflowWidgets: true,
         overflowWidgetsDomNode: document.querySelector<HTMLElement>('#app')!,
       })
 

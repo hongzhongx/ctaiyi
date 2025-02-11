@@ -32,8 +32,6 @@ eventBus.on((e) => {
 
 <template>
   <Pane title="Code">
-    <div class="h-full w-full of-hidden">
-      <div ref="target" class="h-full w-full" />
-    </div>
+    <div ref="target" class="h-full w-full of-hidden" />
   </Pane>
 </template>
