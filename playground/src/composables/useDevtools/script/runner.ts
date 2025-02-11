@@ -137,7 +137,7 @@ window.addEventListener('message', ({ data }) => {
 })
 
 function attachClientInstance() {
-  window.client = Client.testnet({ autoConnect: false, url: 'ws://47.109.49.30:8090' })
+  window.client = new Client(config.value.url, { autoConnect: false })
   window.client.addEventListener('open', () => {
     postToConnectingBC(true)
   })
