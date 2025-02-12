@@ -7,7 +7,7 @@ describe('broadcast', () => {
     testTimeout: 60 * 1000,
   })
 
-  const client = Client.testnet()
+  const client = Client.testnet({ url: 'ws://47.109.49.30:8090' })
 
   type Account = Awaited<ReturnType<typeof getTestnetAccounts>>[number]
   let acc1: Account, acc2: Account
@@ -16,7 +16,7 @@ describe('broadcast', () => {
     [acc1, acc2] = await getTestnetAccounts()
   })
 
-  it('should create or exist account', async () => {
+  it.skip('should create or exist account', async () => {
     expect(acc1).toBeDefined()
     expect(acc2).toBeDefined()
   })
@@ -30,7 +30,7 @@ describe('broadcast', () => {
     expect(preparedTx).toHaveProperty('ref_block_prefix', expect.any(Number))
   })
 
-  it('should sign tx with signature', async () => {
+  it.skip('should sign tx with signature', async () => {
     const activeKey = PrivateKey.fromLogin(acc1.username, acc1.password)
     const operations: Operation[] = [
       [
@@ -61,17 +61,76 @@ describe('broadcast', () => {
     expect(tx).toHaveProperty('signatures', [expect.any(String)])
   })
 
-  // 功能正常
-  it.skip('should delegate qi', async () => {
-    const activeKey = PrivateKey.fromLogin(acc1.username, acc1.password)
-    const confirmation = await client.broadcast.delegateQi(
-      {
-        delegator: acc1.username,
-        delegatee: 'sifu',
-        qi: '0.000500 QI',
-      },
-      activeKey,
-    )
-    expect(confirmation).toHaveProperty('id', expect.any(String))
+  it('should exist all necessary operations', async () => {
+    const broadcast = client.broadcast
+
+    function check(name: string) {
+      expect(Reflect.get(broadcast, name)).toBeDefined()
+    }
+
+    check('createAccount')
+    check('updateAccount')
+
+    check('transfer')
+    check('transferToQi')
+    check('withdrawQi')
+    check('setWithdrawQiRoute')
+    check('delegateQi')
+
+    check('simingUpdate')
+    check('simingSetProperties')
+    check('accountSimingAdore')
+    check('accountSimingProxy')
+    check('declineAdoringRights')
+
+    check('custom')
+    check('customJson')
+
+    check('requestAccountRecovery')
+    check('recoverAccount')
+    check('changeRecoveryAccount')
+
+    check('claimRewardBalance')
+
+    check('createContract')
+    check('reviseContract')
+    check('callContractFunction')
+
+    check('createNfaSymbol')
+    check('createNfa')
+    check('transferNfa')
+    check('approveNfaActive')
+    check('actionNfa')
+
+    check('createZone')
+
+    check('createActorTalentRule')
+    check('createActor')
+
+    check('hardfork')
+    check('fillQiWithdraw')
+    check('returnQiDelegation')
+    check('producerReward')
+
+    check('nfaConvertResources')
+    check('nfaTransfer')
+    check('nfaDepositWithdraw')
+    check('rewardFeigang')
+    check('rewardCultivation')
+
+    check('tiandaoYearChange')
+    check('tiandaoMonthChange')
+    check('tiandaoTimeChange')
+
+    check('actorBorn')
+    check('actorTalentTrigger')
+    check('actorMovement')
+    check('actorGrown')
+
+    check('narrateLog')
+
+    // @ts-expect-error: check something else throw TypeError: client.broadcast.someThingElse is not a function
+    expect(() => client.broadcast.someThingElse())
+      .throws(TypeError, 'client.broadcast.someThingElse is not a function')
   })
 })

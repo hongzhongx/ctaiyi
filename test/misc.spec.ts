@@ -2,7 +2,7 @@ import { utils } from '../src'
 
 describe('misc', () => {
   vi.setConfig({
-    testTimeout: 60 * 1000
+    testTimeout: 60 * 1000,
   })
   describe('iteratorStream', () => {
     async function* counter(to: number) {
@@ -24,31 +24,32 @@ describe('misc', () => {
       await new Promise<void>((resolve, reject) => {
         const transformStream = new TransformStream({
           transform(chunk, controller) {
-            controller.enqueue(chunk);
-          }
-        });
-        const s2 = utils.iteratorStream(counter(100));
+            controller.enqueue(chunk)
+          },
+        })
+        const s2 = utils.iteratorStream(counter(100))
 
-        let c = 0;
-        const reader = transformStream.readable.getReader();
+        let c = 0
+        const reader = transformStream.readable.getReader()
 
         s2.pipeTo(transformStream.writable);
 
         (async () => {
           try {
             while (true) {
-              const { done, value } = await reader.read();
+              const { done, value } = await reader.read()
               if (done) {
                 assert(c === 99)
                 resolve()
                 break
               }
-              c = value.i;
+              c = value.i
             }
-          } catch (err) {
-            reject(err);
           }
-        })();
+          catch (err) {
+            reject(err)
+          }
+        })()
       })
     })
 
@@ -64,9 +65,11 @@ describe('misc', () => {
             while (true) {
               try {
                 const { done, value } = await reader.read()
-                if (done) break
+                if (done)
+                  break
                 last = value.i
-              } catch {
+              }
+              catch {
                 assert(last === 2)
                 sawError = true
                 break
@@ -74,7 +77,8 @@ describe('misc', () => {
             }
             assert(sawError)
             resolve()
-          } catch (err) {
+          }
+          catch (err) {
             console.error('Stream reading error:', err)
           }
         })()

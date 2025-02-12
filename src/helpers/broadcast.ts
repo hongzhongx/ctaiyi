@@ -1,14 +1,8 @@
+/* eslint-disable ts/no-unsafe-declaration-merging */
 import type { Client } from '../client'
 
 import type { AuthorityType } from '../taiyi/account'
-import type {
-  AccountCreateOperation,
-  AccountUpdateOperation,
-  CustomJsonOperation,
-  DelegateQiOperation,
-  Operation,
-  TransferOperation,
-} from '../taiyi/operation'
+import type * as operations from '../taiyi/operation'
 import type { SignedTransaction, Transaction, TransactionConfirmation } from '../taiyi/transaction'
 import { hexToBytes } from '@noble/hashes/utils'
 
@@ -51,6 +45,154 @@ export interface CreateAccountOptions {
   metadata?: { [key: string]: any }
 }
 
+const allOperations: (operations.Operation[0] | [name: operations.Operation[0], alias: string])[] = [
+  // 'account_create',
+  ['account_update', 'updateAccount'],
+
+  'transfer',
+  'transfer_to_qi',
+  'withdraw_qi',
+  'set_withdraw_qi_route',
+  'delegate_qi',
+
+  'siming_update',
+  'siming_set_properties',
+  'account_siming_adore',
+  'account_siming_proxy',
+  'decline_adoring_rights',
+
+  'custom',
+  'custom_json',
+
+  'request_account_recovery',
+  'recover_account',
+  'change_recovery_account',
+
+  'claim_reward_balance',
+
+  'create_contract',
+  'revise_contract',
+  'call_contract_function',
+
+  'create_nfa_symbol',
+  'create_nfa',
+  'transfer_nfa',
+  'approve_nfa_active',
+  'action_nfa',
+
+  'create_zone',
+
+  'create_actor_talent_rule',
+  'create_actor',
+
+  'hardfork',
+  'fill_qi_withdraw',
+  'return_qi_delegation',
+  'producer_reward',
+
+  'nfa_convert_resources',
+  'nfa_transfer',
+  'nfa_deposit_withdraw',
+  'reward_feigang',
+  'reward_cultivation',
+
+  'tiandao_year_change',
+  'tiandao_month_change',
+  'tiandao_time_change',
+
+  'actor_born',
+  'actor_talent_trigger',
+  'actor_movement',
+  'actor_grown',
+
+  'narrate_log',
+]
+
+function methodToOperationName(methodName: string): string {
+  return methodName.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
+}
+
+export interface BroadcastAPI {
+  // createAccount: (options: CreateAccountOptions, key: PrivateKey) => Promise<TransactionConfirmation>
+  /** 更新账户 */
+  updateAccount: (data: operations.AccountUpdateOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  /** 广播转账操作 */
+  transfer: (data: operations.TransferOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  /** 广播以QI发送交易 */
+  transferToQi: (data: operations.TransferToQiOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  /** 广播提现QI操作 */
+  withdrawQi: (data: operations.WithdrawQiOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  /** 广播设置提现QI路由 */
+  setWithdrawQiRoute: (data: operations.SetWithdrawQiRouteOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  /**
+   * 将气从一个账户委托给另一个账户。气仍由原始账户拥有，
+   * 但司命崇拜权和带宽分配将转移到接收账户。
+   * 这将委托设置为`qi`，根据需要增加或减少它。
+   * (即委托为0时会移除委托)
+   *
+   * 当委托被移除时，气会被置于一周的清算期，以防止同一个司命被重复投票。
+   */
+  delegateQi: (data: operations.DelegateQiOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  simingUpdate: (data: operations.SimingUpdateOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  simingSetProperties: (data: operations.SimingSetPropertiesOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  accountSimingAdore: (data: operations.AccountSimingAdoreOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  accountSimingProxy: (data: operations.AccountSimingProxyOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  declineAdoringRights: (data: operations.DeclineAdoringRightsOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  /** 广播自定义数据 */
+  custom: (data: operations.CustomOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  /** 广播自定义JSON */
+  customJson: (data: operations.CustomJsonOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  requestAccountRecovery: (data: operations.RequestAccountRecoveryOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  recoverAccount: (data: operations.RecoverAccountOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  changeRecoveryAccount: (data: operations.ChangeRecoveryAccountOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  claimRewardBalance: (data: operations.ClaimRewardBalanceOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  createContract: (data: operations.CreateContractOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  reviseContract: (data: operations.ReviseContractOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  callContractFunction: (data: operations.CallContractFunctionOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  createNfaSymbol: (data: operations.CreateNfaSymbolOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  createNfa: (data: operations.CreateNfaOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  transferNfa: (data: operations.TransferNfaOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  approveNfaActive: (data: operations.ApproveNfaActiveOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  actionNfa: (data: operations.ActionNfaOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  /** 创建区域 */
+  createZone: (data: operations.CreateZoneOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  /** 创建角色天赋规则 */
+  createActorTalentRule: (data: operations.CreateActorTalentRuleOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  /** 创建角色 */
+  createActor: (data: operations.CreateActorOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  hardfork: (data: operations.HardforkOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  fillQiWithdraw: (data: operations.FillQiWithdrawOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  returnQiDelegation: (data: operations.ReturnQiDelegationOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  producerReward: (data: operations.ProducerRewardOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  nfaConvertResources: (data: operations.NfaConvertResourcesOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  nfaTransfer: (data: operations.NfaTransferOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  nfaDepositWithdraw: (data: operations.NfaDepositWithdrawOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  rewardFeigang: (data: operations.RewardFeigangOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  rewardCultivation: (data: operations.RewardCultivationOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  tiandaoYearChange: (data: operations.TiandaoYearChangeOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  tiandaoMonthChange: (data: operations.TiandaoMonthChangeOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  tiandaoTimeChange: (data: operations.TiandaoTimeChangeOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  actorBorn: (data: operations.ActorBornOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  actorTalentTrigger: (data: operations.ActorTalentTriggerOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  actorMovement: (data: operations.ActorMovementOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+  actorGrown: (data: operations.ActorGrownOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+
+  narrateLog: (data: operations.NarrateLogOperation[1], key: PrivateKey) => Promise<TransactionConfirmation>
+}
+
 export class BroadcastAPI {
   /**
    * 广播交易时将到期时间设置为未来多少毫秒
@@ -58,36 +200,32 @@ export class BroadcastAPI {
    */
   public expireTime = 60 * 1000
 
-  constructor(readonly client: Client) { }
+  constructor(readonly client: Client) {
+    return new Proxy(this, {
+      get(target, prop) {
+        if (typeof prop === 'string') {
+          const opName = methodToOperationName(prop)
+          const operation = allOperations.find(op => Array.isArray(op) ? op[1] === prop : op === opName)
+          if (operation) {
+            return (data: operations.Operation[1], key: PrivateKey) => {
+              const operationName = Array.isArray(operation) ? operation[0] : operation
+              const op: operations.Operation = [operationName, data]
+              return target.sendOperations([op], key)
+            }
+          }
+        }
 
-  /**
-   * 广播转账操作
-   * @param data 转账操作的内容
-   * @param key 发送者的私有活动密钥
-   */
-  public async transfer(data: TransferOperation[1], key: PrivateKey) {
-    const op: Operation = ['transfer', data]
-    return this.sendOperations([op], key)
+        return Reflect.get(target, prop)
+      },
+    })
   }
 
   /**
-   * 广播自定义JSON
-   * @param data custom_json 操作的内容
-   * @param key 私有发布密钥或活动密钥
-   */
-  public async json(data: CustomJsonOperation[1], key: PrivateKey) {
-    const op: Operation = ['custom_json', data]
-    return this.sendOperations([op], key)
-  }
-
-  /**
-   * 在测试网络上创建新账户
+   * 创建新账户
    * @param options 新账户选项
    * @param key 账户创建者的私钥
    */
-  public async createTestAccount(options: CreateAccountOptions, key: PrivateKey) {
-    assert(Object.prototype.hasOwnProperty.call(globalThis, 'it'), 'helper to be used only for mocha tests')
-
+  public async createAccount(options: CreateAccountOptions, key: PrivateKey) {
     const { username, metadata, creator } = options
 
     const prefix = this.client.addressPrefix
@@ -123,7 +261,7 @@ export class BroadcastAPI {
       }
     }
 
-    const create_op: AccountCreateOperation = [
+    const create_op: operations.AccountCreateOperation = [
       'account_create',
       {
         active,
@@ -140,32 +278,6 @@ export class BroadcastAPI {
     const ops: any[] = [create_op]
 
     return this.sendOperations(ops, key)
-  }
-
-  /**
-   * 更新账户
-   * @param data account_update的载荷
-   * @param key 受影响账户的私钥，应该是相应的密钥级别或更高级别以更新账户权限
-   */
-  public async updateAccount(data: AccountUpdateOperation[1], key: PrivateKey) {
-    const op: Operation = ['account_update', data]
-    return this.sendOperations([op], key)
-  }
-
-  /**
-   * 将气从一个账户委托给另一个账户。气仍由原始账户拥有，
-   * 但司命崇拜权和带宽分配将转移到接收账户。
-   * 这将委托设置为`qi`，根据需要增加或减少它。
-   * (即委托为0时会移除委托)
-   *
-   * 当委托被移除时，气会被置于一周的清算期，以防止同一个司命被重复投票。
-   *
-   * @param options 委托选项
-   * @param key 委托人的私有活动密钥
-   */
-  public async delegateQi(options: DelegateQiOperation[1], key: PrivateKey) {
-    const op: Operation = ['delegate_qi', options]
-    return this.sendOperations([op], key)
   }
 
   /**
@@ -196,7 +308,7 @@ export class BroadcastAPI {
    * @param operations 要发送的操作列表
    * @param key 用于签名交易的私钥
    */
-  public async sendOperations(operations: Operation[], key: PrivateKey | PrivateKey[]): Promise<TransactionConfirmation> {
+  public async sendOperations(operations: operations.Operation[], key: PrivateKey | PrivateKey[]): Promise<TransactionConfirmation> {
     const props = await this.client.baiyujing.getDynamicGlobalProperties()
 
     const ref_block_num = props.head_block_number & 0xFFFF

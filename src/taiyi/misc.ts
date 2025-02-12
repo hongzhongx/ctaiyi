@@ -122,8 +122,10 @@ export function getQiPrice(): Price {
 
 /**
  * 返回指定账户的 QI 余额。
- * @param subtract_delegated 是否减去委托出去的
- * @param add_received 是否加上接收到的
+ *
+ * @param account 要获取 QI 余额的账户。
+ * @param subtract_delegated 是否减去委托出去的 QI。
+ * @param add_received 是否加上接收到的 QI。
  */
 export function getQi(account: Account, subtract_delegated: boolean = true, add_received: boolean = true) {
   let qi: Asset = Asset.from(account.qi)

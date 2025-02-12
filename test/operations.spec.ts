@@ -1,215 +1,697 @@
-import type { ChangeRecoveryAccountOperation, CustomOperation } from './../src'
-import { randomBytes } from 'crypto'
+import type { Operation, Serializer } from './../src'
 import { bytesToHex } from '@noble/hashes/utils'
 
-import { Asset, Client, HexBuffer, PrivateKey } from './../src'
-import { getTestnetAccounts, randomString } from './common'
+import ByteBuffer from 'bytebuffer'
+import { Authority, Client, PrivateKey, Types } from './../src'
+import { randomString } from './common'
 
-// 需要本地节点来处理
-describe.skip('operations', () => {
-  vi.setConfig({
-    testTimeout: 10 * 60 * 1000,
-    hookTimeout: 10 * 60 * 1000,
-  })
+async function dumpOperataionHex(op: Operation, client: Client) {
+  function tempSerialize(serializer: Serializer, data: any) {
+    const buffer = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.LITTLE_ENDIAN)
+    serializer(buffer, data)
+    buffer.flip()
+    return new Uint8Array(buffer.toArrayBuffer())
+  }
+  try {
+    const preparedTrx = await client.broadcast.prepareTransaction({
+      operations: [op],
+    })
 
-  const client = Client.testnet()
+    const serializedTrx = tempSerialize(Types.Transaction, preparedTrx)
+    const hex = await client.baiyujing.getTransactionHex(preparedTrx)
 
-  type Account = Awaited<ReturnType<typeof getTestnetAccounts>>[number]
-  let acc1: Account, acc2: Account
-  let acc1Key: PrivateKey
+    const serializedHex = bytesToHex(serializedTrx)
 
-  beforeAll(async () => {
-    [acc1, acc2] = await getTestnetAccounts()
-    acc1Key = PrivateKey.fromLogin(acc1.username, acc1.password, 'active')
-  })
+    return [hex, `${serializedHex}00`] as const
+  }
+  catch (e) {
+    // eslint-disable-next-line no-console
+    console.dir((e as Error).cause, { depth: null })
+    throw e
+  }
+}
 
-  it('should delegate qi', async () => {
-    const [user1] = await client.baiyujing.getAccounts([acc1.username])
-    const currentDelegation = Asset.from(user1.received_qi)
-    const newDelegation = Asset.from(
-      currentDelegation.amount >= 1000 ? 0 : 1000 + Math.random() * 1000,
-      'QI',
-    )
-    await client.broadcast.delegateQi(
+vi.setConfig({
+  testTimeout: 10 * 60 * 1000,
+  hookTimeout: 10 * 60 * 1000,
+})
+
+const client = Client.testnet()
+
+describe('operations', () => {
+  it('should serialize account_create operation correctly', async () => {
+    const username = `ds-${randomString(12)}`
+    const password = randomString(32)
+    const privateKey = PrivateKey.fromLogin(username, password)
+    const public_key = privateKey.createPublic('TAI').toString()
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'account_create',
       {
-        delegator: acc1.username,
-        delegatee: acc2.username,
-        qi: newDelegation,
+        fee: '0.001 YANG',
+        creator: 'initminer',
+        new_account_name: username,
+        owner: Authority.from(public_key),
+        active: Authority.from(public_key),
+        posting: Authority.from(public_key),
+        memo_key: public_key,
+        json_metadata: '{ "ctaiyi-test": true }',
       },
-      acc1Key
-    )
-    const [user2] = await client.baiyujing.getAccounts([acc2.username])
-    assert.equal(user2.received_qi, newDelegation.toString())
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
   })
 
-  it('should send custom', async () => {
-    const op: CustomOperation = [
-      'custom', {
-        required_auths: [acc1.username],
-        id: ~~(Math.random() * 65535),
-        data: new Uint8Array(randomBytes(512).buffer),
-      }
+  it('should serialize account_update operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'account_update',
+      {
+        account: 'initminer',
+        memo_key: 'TAI6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4',
+        json_metadata: '{ "ctaiyi-test": true }',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize transfer operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'transfer',
+      {
+        from: 'initminer',
+        to: 'initminer',
+        amount: '1.000000 QI',
+        memo: 'test',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize transfer_to_qi operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'transfer_to_qi',
+      {
+        from: 'initminer',
+        to: 'initminer',
+        amount: '1.000000 QI',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize withdraw_qi operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'withdraw_qi',
+      {
+        qi: '0.100000 QI',
+        account: 'initminer',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize set_withdraw_qi_route operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'set_withdraw_qi_route',
+      {
+        from_account: 'initminer',
+        to_account: 'initminer',
+        percent: 100,
+        auto_vest: true,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize delegate_qi operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'delegate_qi',
+      {
+        delegator: 'initminer',
+        delegatee: 'initminer',
+        qi: '0.100000 QI',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize siming_update operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'siming_update',
+      {
+        owner: 'initminer',
+        url: 'https://ctaiyi.com',
+        block_signing_key: 'TAI6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4',
+        props: {
+          account_creation_fee: '0.001 YANG',
+          maximum_block_size: 10240,
+        },
+        fee: '0.001 YANG',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize siming_set_properties operation correctly', async () => {
+    const op: Operation = [
+      'siming_set_properties',
+      {
+        owner: 'initminer',
+        block_signing_key: 'TAI6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4',
+        props: [
+          ['account_creation_fee', '0.001 YANG'],
+          ['key', 'TAI6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4'],
+          ['maximum_block_size', 10240],
+        ],
+        extensions: [],
+      },
     ]
-    const rv = await client.broadcast.sendOperations([op], acc1Key)
-    const tx = await client.baiyujing.getTransaction(rv.id)
-    const rop = tx.operations[0]
-    assert.equal(rop[0], 'custom')
-    assert.equal(rop[1].data, HexBuffer.from(op[1].data).toString())
+    const [dumpHex, serializedHex] = await dumpOperataionHex(op, client)
+
+    expect(dumpHex).toBe(serializedHex)
   })
 
-  it('should send custom json', async () => {
-    const data = { test: 123, string: 'unicode🐳' }
-    const rv = await client.broadcast.json({
-      required_auths: [acc1.username],
-      required_posting_auths: [],
-      id: 'something',
-      json: JSON.stringify(data),
-    }, acc1Key)
-    const tx = await client.baiyujing.getTransaction(rv.id)
-    assert.deepEqual(JSON.parse(tx.operations[0][1].json), data)
-  })
-
-  it('should transfer yang', async () => {
-    const [acc2bf] = await client.baiyujing.getAccounts([acc2.username])
-    await client.broadcast.transfer({
-      from: acc1.username,
-      to: acc2.username,
-      amount: '0.001 YANG',
-      memo: 'Hej på dig!',
-    }, acc1Key)
-    const [acc2af] = await client.baiyujing.getAccounts([acc2.username])
-    const old_bal = Asset.from(acc2bf.balance)
-    const new_bal = Asset.from(acc2af.balance)
-    assert.equal(new_bal.subtract(old_bal).toString(), '0.001 YANG')
-  })
-
-  it('should create account', async () => {
-    // ensure not testing accounts on mainnet
-    assert(bytesToHex(client.chainId) !== '0000000000000000000000000000000000000000000000000000000000000000')
-
-    const username = `ds-${randomString(12)}`
-    const password = randomString(32)
-    await client.broadcast.createTestAccount({
-      username,
-      password,
-      creator: acc1.username,
-      metadata: { date: new Date() },
-    }, acc1Key)
-
-    const [newAcc] = await client.baiyujing.getAccounts([username])
-    assert.equal(newAcc.name, username)
-    // not sure why but on the testnet the recovery account is always 'sifu'
-    // assert.equal(newAcc.recovery_account, acc1.username)
-    const postingWif = PrivateKey.fromLogin(username, password, 'posting')
-    const postingPub = postingWif.createPublic(client.addressPrefix).toString()
-    const memoWif = PrivateKey.fromLogin(username, password, 'memo')
-    const memoPub = memoWif.createPublic(client.addressPrefix).toString()
-    assert.equal(newAcc.memo_key, memoPub)
-    assert.equal(newAcc.posting.key_auths[0][0], postingPub)
-  })
-
-  it('should update account', async () => {
-    const key = PrivateKey.fromLogin(acc1.username, acc1.password, 'active')
-    const foo = Math.random()
-    await client.broadcast.updateAccount({
-      account: acc1.username,
-      memo_key: PrivateKey.fromLogin(acc1.username, acc1.password, 'memo').createPublic(client.addressPrefix),
-      json_metadata: JSON.stringify({ foo }),
-    }, key)
-    const [acc] = await client.baiyujing.getAccounts([acc1.username])
-    assert.deepEqual({ foo }, JSON.parse(acc.json_metadata))
-  })
-
-  it('should create account custom auths', async () => {
-    const key = PrivateKey.fromLogin(acc1.username, acc1.password, 'active')
-
-    const username = `ds-${randomString(12)}`
-    const password = randomString(32)
-    const metadata = { my_password_is: password }
-
-    const ownerKey = PrivateKey.fromLogin(username, password, 'owner').createPublic(client.addressPrefix)
-    const activeKey = PrivateKey.fromLogin(username, password, 'active').createPublic(client.addressPrefix)
-    const postingKey = PrivateKey.fromLogin(username, password, 'posting').createPublic(client.addressPrefix)
-    const memoKey = PrivateKey.fromLogin(username, password, 'memo').createPublic(client.addressPrefix)
-    await client.broadcast.createTestAccount({
-      creator: acc1.username,
-      username,
-      auths: {
-        owner: ownerKey,
-        active: activeKey.toString(),
-        posting: { weight_threshold: 1, account_auths: [], key_auths: [[postingKey, 1]] },
-        memoKey,
+  it('should serialize account_siming_adore operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'account_siming_adore',
+      {
+        account: 'initminer',
+        siming: 'initminer',
+        approve: true,
       },
-      metadata,
-    }, key)
-    const [newAccount] = await client.baiyujing.getAccounts([username])
-    assert.equal(newAccount.name, username)
-    assert.equal(newAccount.memo_key, memoKey.toString())
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
   })
 
-  it('should create account and calculate fees', async () => {
-    const password = randomString(32)
-    const metadata = { my_password_is: password }
-    const creator = acc1.username
+  it('should serialize account_siming_proxy operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'account_siming_proxy',
+      {
+        account: 'initminer',
+        proxy: 'initminer',
+      },
+    ], client)
 
-    // ensure not testing accounts on mainnet
-    assert(bytesToHex(client.chainId) !== '0000000000000000000000000000000000000000000000000000000000000000')
-
-    const chainProps = await client.baiyujing.getChainProperties()
-    const creationFee = Asset.from(chainProps.account_creation_fee)
-
-    // no delegation and no fee (uses RC instead)
-    await client.broadcast.createTestAccount({
-      password,
-      metadata,
-      creator,
-      username: `foo${randomString(12)}`,
-    }, acc1Key)
-
-    // fee (no RC used) and no delegation
-    await client.broadcast.createTestAccount({
-      password,
-      metadata,
-      creator,
-      username: `foo${randomString(12)}`,
-      fee: creationFee,
-    }, acc1Key)
-
-    // fee plus delegation
-    await client.broadcast.createTestAccount({
-      password,
-      creator,
-      username: `foo${randomString(12)}`,
-      fee: creationFee,
-    }, acc1Key)
-
-    // invalid (inexact) fee must fail
-    try {
-      await client.broadcast.createTestAccount({ password, metadata, creator, username: 'foo', fee: '1.111 YANG' }, acc1Key)
-      assert(false, 'should not be reached')
-    }
-    catch (error) {
-      assert(error instanceof Error)
-      assert.equal(error.message, `Fee must be exactly ${creationFee.toString()}`)
-    }
-
-    try {
-      await client.broadcast.createTestAccount({ metadata, creator, username: 'foo' }, acc1Key)
-      assert(false, 'should not be reached')
-    }
-    catch (error) {
-      assert(error instanceof Error)
-      assert.equal(error.message, 'Must specify either password or auths')
-    }
+    expect(dumpHex).toBe(serializedHex)
   })
 
-  it('should change recovery account', async () => {
-    const op: ChangeRecoveryAccountOperation = ['change_recovery_account', {
-      account_to_recover: acc1.username,
-      new_recovery_account: acc2.username,
-      extensions: [],
-    }]
-    const key = PrivateKey.fromLogin(acc1.username, acc1.password, 'active')
-    await client.broadcast.sendOperations([op], key)
+  it('should serialize decline_adoring_rights operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'decline_adoring_rights',
+      {
+        account: 'initminer',
+        decline: true,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize custom operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'custom',
+      {
+        required_auths: ['initminer'],
+        required_posting_auths: [],
+        id: 0,
+        data: new TextEncoder().encode('{"foo":"bar"}'),
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize custom_json operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'custom_json',
+      {
+        required_auths: ['initminer'],
+        required_posting_auths: [],
+        id: 'something',
+        json: JSON.stringify({ foo: 'bar' }),
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize request_account_recovery operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'request_account_recovery',
+      {
+        recovery_account: 'initminer',
+        account_to_recover: 'initminer',
+        new_owner_authority: Authority.from('TAI6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4'),
+        extensions: [],
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize recover_account operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'recover_account',
+      {
+        account_to_recover: 'initminer',
+        new_owner_authority: Authority.from('TAI6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4'),
+        recent_owner_authority: Authority.from('TAI6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4'),
+        extensions: [],
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize change_recovery_account operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'change_recovery_account',
+      {
+        account_to_recover: 'initminer',
+        new_recovery_account: 'initminer',
+        extensions: [],
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize claim_reward_balance operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'claim_reward_balance',
+      {
+        account: 'initminer',
+        // NOTE: if account reward is 0, the asset symbol will be treat as YANG
+        reward_qi: '0.000 YANG',
+        reward_yang: '0.000 YANG',
+        reward_feigang: '0.000000 QI',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize create_contract operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'create_contract',
+      {
+        owner: 'initminer',
+        name: 'contract.nfa.base',
+        data: '0x',
+        contract_authority: 'TAI6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4',
+        extensions: [],
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize revise_contract operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'revise_contract',
+      {
+        reviser: 'initminer',
+        contract_name: 'contract.nfa.base',
+        data: '0x',
+        extensions: [],
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize call_contract_function operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'call_contract_function',
+      {
+        caller: 'initminer',
+        creator: 'initminer',
+        contract_name: 'contract.nfa.base',
+        function_name: '0x',
+        value_list: [],
+        extensions: [],
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize create_nfa_symbol operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'create_nfa_symbol',
+      {
+        creator: 'initminer',
+        symbol: '0x',
+        describe: '0x',
+        default_contract: 'contract.nfa.base',
+        extensions: [],
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize transfer_to_nfa operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'create_nfa',
+      {
+        creator: 'initminer',
+        symbol: '0x',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize transfer_nfa operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'transfer_nfa',
+      {
+        from: 'initminer',
+        to: 'initminer',
+        id: 0,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize approve_nfa_active operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'approve_nfa_active',
+      {
+        owner: 'initminer',
+        active_account: 'initminer',
+        id: 0,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize action_nfa operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'action_nfa',
+      {
+        caller: 'initminer',
+        id: 0,
+        action: '0x',
+        value_list: [],
+        extensions: [],
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize create_actor_talent_rule operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'create_actor_talent_rule',
+      {
+        creator: 'initminer',
+        contract: '0x',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize create_actor operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'create_actor',
+      {
+        fee: '0.001 YANG',
+        creator: 'initminer',
+        family_name: '0x',
+        last_name: '0x',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize create_zone operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'create_zone',
+      {
+        fee: '1.000000 QI',
+        creator: 'initminer',
+        name: '0x',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+})
+
+describe('virtual operations', () => {
+  it('should serialize hardfork operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'hardfork',
+      {
+        hardfork_id: 0,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize fill_qi_withdraw operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'fill_qi_withdraw',
+      {
+        from_account: 'initminer',
+        to_account: 'initminer',
+        withdrawn: '1.000000 QI',
+        deposited: '1.000000 QI',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize return_qi_delegation operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'return_qi_delegation',
+      {
+        account: 'initminer',
+        qi: '1.000000 QI',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize producer_reward operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'producer_reward',
+      {
+        producer: 'initminer',
+        qi: '1.000000 QI',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize nfa_convert_resources operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'nfa_convert_resources',
+      {
+        nfa: 1,
+        owner: 'initminer',
+        qi: '1.000000 QI',
+        resource: '1.000000 QI',
+        is_qi_to_resource: true,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize nfa_transfer operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'nfa_transfer',
+      {
+        from: 1,
+        from_owner: 'initminer',
+        to: 2,
+        to_owner: 'initminer',
+        amount: '1.000000 QI',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize nfa_deposit_withdraw operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'nfa_deposit_withdraw',
+      {
+        nfa: 1,
+        account: 'initminer',
+        deposited: '1.000000 QI',
+        withdrawn: '1.000000 QI',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize reward_feigang operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'reward_feigang',
+      {
+        account: 'initminer',
+        qi: '1.000000 QI',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize reward_cultivation operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'reward_cultivation',
+      {
+        account: 'initminer',
+        nfa: 1,
+        qi: '1.000000 QI',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize tiandao_year_change operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'tiandao_year_change',
+      {
+        messager: 'initminer',
+        years: 1,
+        months: 1,
+        times: 1,
+        live_num: 100,
+        dead_num: 10,
+        born_this_year: 20,
+        dead_this_year: 5,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize tiandao_month_change operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'tiandao_month_change',
+      {
+        messager: 'initminer',
+        years: 1,
+        months: 1,
+        times: 1,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize tiandao_time_change operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'tiandao_time_change',
+      {
+        messager: 'initminer',
+        years: 1,
+        months: 1,
+        times: 1,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize actor_born operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'actor_born',
+      {
+        owner: 'initminer',
+        name: 'actor1',
+        zone: 'zone1',
+        nfa: 1,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize actor_talent_trigger operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'actor_talent_trigger',
+      {
+        owner: 'initminer',
+        name: 'actor1',
+        nfa: 1,
+        tid: 1,
+        title: 'talent1',
+        desc: 'description',
+        age: 18,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize actor_movement operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'actor_movement',
+      {
+        owner: 'initminer',
+        name: 'actor1',
+        from_zone: 'zone1',
+        to_zone: 'zone2',
+        nfa: 1,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize actor_grown operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'actor_grown',
+      {
+        owner: 'initminer',
+        name: 'actor1',
+        nfa: 1,
+        years: 1,
+        months: 1,
+        times: 1,
+        age: 18,
+        health: 100,
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
+  })
+
+  it('should serialize narrate_log operation correctly', async () => {
+    const [dumpHex, serializedHex] = await dumpOperataionHex([
+      'narrate_log',
+      {
+        narrator: 'initminer',
+        years: 1,
+        months: 1,
+        times: 1,
+        log: 'test log',
+      },
+    ], client)
+
+    expect(dumpHex).toBe(serializedHex)
   })
 })

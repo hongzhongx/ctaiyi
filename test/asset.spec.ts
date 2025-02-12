@@ -30,7 +30,8 @@ describe('asset', () => {
   })
 
   it('should max and min', () => {
-    const a = Asset.from(1); const b = Asset.from(2)
+    const a = Asset.from(1)
+    const b = Asset.from(2)
     assert.equal(Asset.min(a, b), a)
     assert.equal(Asset.min(b, a), a)
     assert.equal(Asset.max(a, b), b)

@@ -11,6 +11,14 @@ export interface FaiAsset {
  */
 export type AssetSymbol = 'YANG' | 'YIN' | 'QI' | 'GOLD' | 'FOOD' | 'WOOD' | 'FABR' | 'HERB'
 
+export interface MaterialAssets {
+  gold: Asset | string
+  food: Asset | string
+  wood: Asset | string
+  fabric: Asset | string
+  herb: Asset | string
+}
+
 /**
  * 表示太乙资产的类，例如 `1.000 QI` 或 `12.112233 YANG`。
  */

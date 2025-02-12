@@ -133,9 +133,8 @@ export interface TransferToQiOperation extends Operation {
 export interface WithdrawQiOperation extends Operation {
   0: 'withdraw_qi'
   1: {
-    from: string
-    to: string
-    amount: Asset | string
+    account: string
+    qi: Asset | string
   }
 }
 
@@ -182,7 +181,7 @@ export interface SimingSetPropertiesOperation extends Operation {
 export interface AccountSimingAdoreOperation extends Operation {
   0: 'account_siming_adore'
   1: {
-    amount: string
+    account: string
     siming: string
     approve: boolean
   }
@@ -200,8 +199,7 @@ export interface DeclineAdoringRightsOperation extends Operation {
   0: 'decline_adoring_rights'
   1: {
     account: string
-    /** 暂未使用  */
-    extensions: Array<unknown>
+    decline: boolean
   }
 }
 
@@ -257,8 +255,9 @@ export interface ClaimRewardBalanceOperation extends Operation {
   0: 'claim_reward_balance'
   1: {
     account: string
+    reward_yang: Asset | string
     reward_qi: Asset | string
-    extensions: Array<unknown>
+    reward_feigang: Asset | string
   }
 }
 
@@ -267,20 +266,19 @@ export interface CreateContractOperation extends Operation {
   1: {
     owner: string
     name: string
-    code: string
-    abi: string
-    fee: Asset | string
+    data: string
+    contract_authority: PublicKey | string
+    extensions: Array<unknown>
   }
 }
 
 export interface ReviseContractOperation extends Operation {
   0: 'revise_contract'
   1: {
-    owner: string
-    name: string
-    code: string
-    abi: string
-    fee: Asset | string
+    reviser: string
+    contract_name: string
+    data: string
+    extensions: Array<string>
   }
 }
 
@@ -288,20 +286,21 @@ export interface CallContractFunctionOperation extends Operation {
   0: 'call_contract_function'
   1: {
     caller: string
-    contract: string
-    function: string
-    params: string
-    fee: Asset | string
+    creator: string
+    contract_name: string
+    function_name: string
+    value_list: Array<string>
+    extensions: Array<string>
   }
 }
 
 export interface CreateNfaSymbolOperation extends Operation {
   0: 'create_nfa_symbol'
   1: {
-    owner: string
-    name: string
-    maximum_supply: number
-    json_metadata: string
+    creator: string
+    symbol: string
+    describe: string
+    default_contract: string
   }
 }
 
@@ -310,9 +309,6 @@ export interface CreateNfaOperation extends Operation {
   1: {
     creator: string
     symbol: string
-    to: string
-    uri: string
-    json_metadata: string
   }
 }
 
@@ -321,8 +317,7 @@ export interface TransferNfaOperation extends Operation {
   1: {
     from: string
     to: string
-    token_id: number
-    memo: string
+    id: number
   }
 }
 
@@ -330,9 +325,8 @@ export interface ApproveNfaActiveOperation extends Operation {
   0: 'approve_nfa_active'
   1: {
     owner: string
-    approved: string
-    token_id: number
-    approve: boolean
+    active_account: string
+    id: number
   }
 }
 
@@ -342,26 +336,25 @@ export interface ActionNfaOperation extends Operation {
     caller: string
     id: number
     action: string
-    value_list: string[]
-    extensions: unknown[]
+    value_list: Array<string>
+    extensions: Array<string>
   }
 }
 
 export interface CreateZoneOperation extends Operation {
   0: 'create_zone'
   1: {
-    owner: string
+    fee: Asset | string
+    creator: string
     name: string
-    json_metadata: string
   }
 }
 
 export interface CreateActorTalentRuleOperation extends Operation {
   0: 'create_actor_talent_rule'
   1: {
-    owner: string
-    name: string
-    rule: string
+    creator: string
+    contract: string
   }
 }
 
@@ -396,7 +389,7 @@ export interface ReturnQiDelegationOperation extends Operation {
   0: 'return_qi_delegation'
   1: {
     account: string
-    return_qi_delegation: Asset | string
+    qi: Asset | string
   }
 }
 
@@ -404,35 +397,39 @@ export interface ProducerRewardOperation extends Operation {
   0: 'producer_reward'
   1: {
     producer: string
-    qi_reward: Asset | string
+    qi: Asset | string
   }
 }
 
 export interface NfaConvertResourcesOperation extends Operation {
   0: 'nfa_convert_resources'
   1: {
+    nfa: number
     owner: string
-    token_id: number
-    resources: string
+    qi: Asset | string
+    resource: Asset | string
+    is_qi_to_resource: boolean
   }
 }
 
 export interface NfaTransferOperation extends Operation {
   0: 'nfa_transfer'
   1: {
-    from: string
-    to: string
-    token_id: number
-    memo: string
+    from: number
+    from_owner: string
+    to: number
+    to_owner: string
+    amount: Asset | string
   }
 }
 
 export interface NfaDepositWithdrawOperation extends Operation {
   0: 'nfa_deposit_withdraw'
   1: {
-    owner: string
-    token_id: number
-    amount: Asset | string
+    nfa: number
+    account: string
+    deposited: Asset | string
+    withdrawn: Asset | string
   }
 }
 
@@ -440,7 +437,7 @@ export interface RewardFeigangOperation extends Operation {
   0: 'reward_feigang'
   1: {
     account: string
-    reward: Asset | string
+    qi: Asset | string
   }
 }
 
@@ -448,63 +445,90 @@ export interface RewardCultivationOperation extends Operation {
   0: 'reward_cultivation'
   1: {
     account: string
-    reward: Asset | string
+    nfa: number
+    qi: Asset | string
   }
 }
 
 export interface TiandaoYearChangeOperation extends Operation {
   0: 'tiandao_year_change'
   1: {
-    year: number
+    messager: string
+    years: number
+    months: number
+    times: number
+    live_num: number
+    dead_num: number
+    born_this_year: number
+    dead_this_year: number
   }
 }
 
 export interface TiandaoMonthChangeOperation extends Operation {
   0: 'tiandao_month_change'
   1: {
-    month: number
+    messager: string
+    years: number
+    months: number
+    times: number
   }
 }
 
 export interface TiandaoTimeChangeOperation extends Operation {
   0: 'tiandao_time_change'
   1: {
-    time: number
+    messager: string
+    years: number
+    months: number
+    times: number
   }
 }
 
 export interface ActorBornOperation extends Operation {
   0: 'actor_born'
   1: {
-    actor_id: number
     owner: string
-    json_metadata: string
+    name: string
+    zone: string
+    nfa: number
   }
 }
 
 export interface ActorTalentTriggerOperation extends Operation {
   0: 'actor_talent_trigger'
   1: {
-    actor_id: number
-    talent: string
-    params: string
+    owner: string
+    name: string
+    nfa: number
+    tid: number
+    title: string
+    desc: string
+    age: number
   }
 }
 
 export interface ActorMovementOperation extends Operation {
   0: 'actor_movement'
   1: {
-    actor_id: number
-    from_zone: number
-    to_zone: number
+    owner: string
+    name: string
+    from_zone: string
+    to_zone: string
+    nfa: number
   }
 }
 
 export interface ActorGrownOperation extends Operation {
   0: 'actor_grown'
   1: {
-    actor_id: number
-    growth: string
+    owner: string
+    name: string
+    nfa: number
+    years: number
+    months: number
+    times: number
+    age: number
+    health: number
   }
 }
 
@@ -512,6 +536,9 @@ export interface NarrateLogOperation extends Operation {
   0: 'narrate_log'
   1: {
     narrator: string
-    content: string
+    years: number
+    months: number
+    times: number
+    log: string
   }
 }

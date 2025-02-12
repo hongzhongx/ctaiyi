@@ -291,6 +291,8 @@ export class Signature {
 
 /**
  * 返回交易的 sha256 摘要。
+ *
+ * @param transaction 要获取摘要的交易。
  * @param chainId 用于创建哈希的链 ID。
  */
 function transactionDigest(
@@ -316,7 +318,7 @@ function transactionDigest(
  * 返回带有签名附加到签名数组的交易副本。
  * @param transaction 要签名的交易。
  * @param keys 用于签名的密钥。
- * @param options 链 ID 和地址前缀，与 {@link Client} 兼容。
+ * @param chainId 链 ID 和地址前缀，与 {@link Client} 兼容。
  */
 function signTransaction(
   transaction: Transaction,

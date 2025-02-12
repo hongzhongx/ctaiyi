@@ -1,4 +1,5 @@
-import type { Asset } from './asset'
+import type { Asset, MaterialAssets } from './asset'
+import type { AppliedOperation } from './operation'
 import { PublicKey } from './../crypto'
 
 export interface AuthorityType {
@@ -29,16 +30,16 @@ export class Authority implements AuthorityType {
 
   public weight_threshold: number
   public account_auths: Array<[string, number]>
-  public key_auths: Array<[string | PublicKey, number]>
+  public key_auths: Array<[string, number]>
 
   constructor({ weight_threshold, account_auths, key_auths }: AuthorityType) {
     this.weight_threshold = weight_threshold
     this.account_auths = account_auths
-    this.key_auths = key_auths
+    this.key_auths = key_auths.map(([key, weight]) => [key.toString(), weight])
   }
 }
 
-export interface Account {
+export interface Account extends MaterialAssets {
   id: number // account_id_type
   name: string // account_name_type
   owner: Authority
@@ -73,16 +74,11 @@ export interface Account {
   proxied_vsf_adores: number[]
   simings_adored_for: number
 
-  gold: Asset | string
-  food: Asset | string
-  wood: Asset | string
-  fabric: Asset | string
-  herb: Asset | string
   qi_balance: Asset | string
 }
 
 export interface ExtendedAccount extends Account {
-  transfer_history: any[]
-  other_history: any[]
-  siming_adores: any[]
+  transfer_history: [nonce: number, AppliedOperation][]
+  other_history: [nonce: number, AppliedOperation][]
+  siming_adores: [nonce: number, AppliedOperation][]
 }

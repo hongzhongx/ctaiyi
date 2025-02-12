@@ -42,7 +42,7 @@
     "test": "vitest",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "prepare": "simple-git-hooks && pnpm build",
+    "prepare": "simple-git-hooks",
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
