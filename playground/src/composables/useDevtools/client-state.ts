@@ -1,6 +1,11 @@
-import { useBroadcastChannel, useLocalStorage } from '@vueuse/core'
+import { useLocalStorage } from '@vueuse/core'
 
-export const useClientState = () => useBroadcastChannel<boolean | undefined, boolean>({ name: 'ctaiyi-client:connecting' })
+export function useClientState() {
+  return useLocalStorage<'connected' | 'connecting' | 'disconnected'>(
+    'ctaiyi-client:connecting',
+    'disconnected',
+  )
+}
 
 interface Config {
   url: string

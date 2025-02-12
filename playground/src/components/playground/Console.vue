@@ -13,7 +13,7 @@ const {
 type Events = { type: 'EXECUTE_CODE', data: string } | { type: 'COMPILE_CODE' }
 
 const eventBus = useEventBus<Events>('code')
-const { data: connectState } = useClientState()
+const clientState = useClientState()
 
 eventBus.on((e) => {
   if (e.type === 'EXECUTE_CODE') {
@@ -26,7 +26,7 @@ function onClick() {
 }
 
 function onConnectButtonClick() {
-  runnerIframe.value?.contentWindow?.postMessage({ event: !connectState.value ? 'CONNECT' : 'DISCONNECT' }, '*')
+  clientState.value = clientState.value === 'connected' ? 'disconnected' : 'connecting'
 }
 </script>
 
@@ -45,23 +45,30 @@ function onConnectButtonClick() {
       </button>
     </template>
     <template #controls>
-      <div px-2 flex="inline items-center gap-2">
+      <div px-2 flex="inline items-center gap-2" capitalize>
         <div
           size-2 rounded-full class="bg-dark-300"
           :class="{
-            'animate-flash animate-iteration-infinite animate-duration-3000 bg-emerald': !!connectState,
+            'animate-flash animate-iteration-infinite animate-duration-3000 bg-emerald': clientState !== 'disconnected',
           }"
         />
-        {{ !!connectState ? 'Connected' : 'Disconnected' }}
+        {{ clientState }}
       </div>
       <button
-        :title="connectState ? 'Disconnect' : 'Connect'"
+        :title="clientState ? 'Disconnect' : 'Connect'"
+        :disabled="clientState === 'connecting'"
         h-8 px-2
         flex="inline items-center gap-2"
         bg="hover:dark-200 active:dark-300"
         @click="onConnectButtonClick"
       >
-        <div size-4 rounded-full :class="!connectState ? 'i-carbon:plug' : 'i-carbon:unlink'" />
+        <div
+          size-4 rounded-full :class="{
+            'i-carbon:plug': clientState === 'disconnected',
+            'i-carbon:unlink': clientState === 'connected',
+            'i-carbon:circle-dash animate-spin': clientState === 'connecting',
+          }"
+        />
       </button>
     </template>
     <iframe

@@ -2,6 +2,7 @@
 import type Chobitsu from 'chobitsu'
 import { Client, WebSocketTransport } from '@taiyinet/ctaiyi'
 import { debouncedWatch, useEventListener, useTimeoutFn } from '@vueuse/core'
+import { watch } from 'vue'
 import { useClientConfig, useClientState } from '../client-state'
 
 declare const chobitsu: typeof Chobitsu
@@ -13,7 +14,7 @@ declare global {
   }
 }
 
-const { post: postToConnectingBC } = useClientState()
+const clientState = useClientState()
 
 const config = useClientConfig()
 
@@ -146,7 +147,7 @@ function attachClientInstance() {
       if (import.meta.env.DEV) {
         console.log('[ctaiyi-repl] client connected')
       }
-      postToConnectingBC(true)
+      clientState.value = 'connected'
       if (config.value.autoDisconnect !== 0) {
         start()
       }
@@ -156,8 +157,16 @@ function attachClientInstance() {
       if (import.meta.env.DEV) {
         console.log('[ctaiyi-repl] client disconnected')
       }
-      postToConnectingBC(false)
+      clientState.value = 'disconnected'
       stop()
+    })
+    watch(clientState, (value) => {
+      if (value === 'disconnected') {
+        window.client?.disconnect()
+      }
+      else if (value === 'connecting') {
+        window.client?.connect()
+      }
     })
   }
 }
