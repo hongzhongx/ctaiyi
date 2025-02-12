@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Field } from '@ark-ui/vue/field'
 import { createListCollection, Select } from '@ark-ui/vue/select'
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { useClientConfig } from '~/composables/useDevtools/client-state'
 import Pane from './Pane.vue'
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type Chobitsu from 'chobitsu'
 import { Client } from '@taiyinet/ctaiyi'
 import { debouncedWatch, useTimeoutFn } from '@vueuse/core'
@@ -21,6 +22,10 @@ const {
   stop,
 } = useTimeoutFn(
   () => {
+    if (import.meta.env.DEV) {
+      console.log('[ctaiyi-repl] auto disconnect client')
+    }
+
     if (!window.client) {
       console.warn('[ctaiyi-repl] ctaiyi client not initialized yet')
       return
@@ -34,7 +39,6 @@ const {
 
 debouncedWatch(config, (value) => {
   if (import.meta.env.DEV) {
-    // eslint-disable-next-line no-console
     console.log('[ctaiyi-repl] update runner config', value)
   }
   if (!window.client) {
@@ -70,7 +74,6 @@ window.addEventListener('message', ({ data }) => {
   window.dispose?.()
   window.dispose = undefined
 
-  // eslint-disable-next-line no-console
   console.clear()
 
   if (!window.client) {
@@ -139,9 +142,19 @@ window.addEventListener('message', ({ data }) => {
 function attachClientInstance() {
   window.client = new Client(config.value.url, { autoConnect: false })
   window.client.addEventListener('open', () => {
+    if (import.meta.env.DEV) {
+      console.log('[ctaiyi-repl] client connected')
+    }
     postToConnectingBC(true)
+    if (config.value.autoDisconnect !== 0) {
+      start()
+    }
   })
   window.client.addEventListener('close', () => {
+    if (import.meta.env.DEV) {
+      console.log('[ctaiyi-repl] client disconnected')
+    }
     postToConnectingBC(false)
+    stop()
   })
 }
