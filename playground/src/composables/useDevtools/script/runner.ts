@@ -1,20 +1,18 @@
 /* eslint-disable no-console */
 import type Chobitsu from 'chobitsu'
+import type { RunnerClientConfig } from '../client-state'
 import { Client, WebSocketTransport } from '@taiyinet/ctaiyi'
 import { debouncedWatch, useEventListener, useTimeoutFn } from '@vueuse/core'
-import { watch } from 'vue'
-import { useClientConfig, useClientState } from '../client-state'
-
-declare const chobitsu: typeof Chobitsu
+import { useClientConfig } from '../client-state'
 
 declare global {
   interface Window {
     dispose?: () => void
     client?: import('@taiyinet/ctaiyi').Client
   }
-}
 
-const clientState = useClientState()
+  const chobitsu: typeof Chobitsu
+}
 
 const config = useClientConfig()
 
@@ -32,30 +30,46 @@ const {
       return
     }
 
-    window.client.disconnect()
+    window.client?.disconnect()
   },
   () => config.value.autoDisconnect ?? Number.POSITIVE_INFINITY,
   { immediate: false },
 )
 
-debouncedWatch(config, (value) => {
-  if (import.meta.env.DEV) {
-    console.log('[ctaiyi-repl] update runner config', value)
+async function onConfigChange(
+  newConfig: RunnerClientConfig,
+  oldConfig: RunnerClientConfig | undefined,
+) {
+  if (newConfig.url !== oldConfig?.url) {
+    attachClientInstance(newConfig.url)
   }
+
   if (!window.client) {
     console.warn('[ctaiyi-repl] ctaiyi client not initialized yet')
     return
   }
-  // @ts-expect-error: override url
-  window.client.url = value.url
+  if (window.client?.transport instanceof WebSocketTransport) {
+    if (newConfig.state === 'disconnected' && window.client.isConnected()) {
+      window.client?.disconnect()
+    }
+    else if (newConfig.state === 'connecting' && !window.client.isConnected()) {
+      window.client?.connect()
+    }
+    if (newConfig.autoDisconnect === 0) {
+      stop()
+    }
+    else {
+      start()
+    }
+  }
+}
 
-  if (value.autoDisconnect === 0) {
-    stop()
+debouncedWatch(config, (newConfig, oldConfig) => {
+  if (import.meta.env.DEV) {
+    console.log('[ctaiyi-repl] update runner config', { newConfig, oldConfig })
   }
-  else {
-    start()
-  }
-}, { debounce: 500 })
+  onConfigChange(newConfig, oldConfig)
+}, { debounce: 1000, deep: true, immediate: true })
 
 function sendToDevtools(message: Record<string, any>) {
   window.parent.postMessage(JSON.stringify(message), '*')
@@ -132,7 +146,6 @@ window.addEventListener('message', ({ data }) => {
       sendToChobitsu({ method: 'CSS.enable' })
       sendToChobitsu({ method: 'Overlay.enable' })
       sendToDevtools({ method: 'DOM.documentUpdated' })
-      attachClientInstance()
     }
   }
   catch (e) {
@@ -140,14 +153,23 @@ window.addEventListener('message', ({ data }) => {
   }
 })
 
-function attachClientInstance() {
-  window.client = new Client(config.value.url, { autoConnect: false })
+function attachClientInstance(url: string) {
+  if (import.meta.env.DEV) {
+    console.log('[ctaiyi-repl] attach client instance', url)
+  }
+  if (window.client && window.client.transport instanceof WebSocketTransport) {
+    window.client.disconnect()
+  }
+  window.client = new Client(url, { autoConnect: false })
   if (window.client.transport instanceof WebSocketTransport) {
-    useEventListener(window.client.transport, 'open', () => {
+    if (import.meta.env.DEV) {
+      console.log('[ctaiyi-repl] setup event listeners')
+    }
+    window.client.transport.addEventListener('open', () => {
       if (import.meta.env.DEV) {
         console.log('[ctaiyi-repl] client connected')
       }
-      clientState.value = 'connected'
+      config.value.state = 'connected'
       if (config.value.autoDisconnect !== 0) {
         start()
       }
@@ -157,16 +179,12 @@ function attachClientInstance() {
       if (import.meta.env.DEV) {
         console.log('[ctaiyi-repl] client disconnected')
       }
-      clientState.value = 'disconnected'
+      config.value.state = 'disconnected'
       stop()
     })
-    watch(clientState, (value) => {
-      if (value === 'disconnected') {
-        window.client?.disconnect()
-      }
-      else if (value === 'connecting') {
-        window.client?.connect()
-      }
-    })
+  }
+  else if (config.value.state !== 'disconnected') {
+    config.value.state = 'disconnected'
+    stop()
   }
 }

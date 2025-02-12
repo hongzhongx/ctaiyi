@@ -24,7 +24,9 @@ const autoDisconnect = computed<string[]>({
     config.value.autoDisconnect = value.at(0) ? Number.parseInt(value.at(0)!) : 0
   },
 })
-
+const isWS = computed(() => {
+  return ['ws:', 'wss:'].includes(new URL(config.value.url).protocol)
+})
 </script>
 
 <template>
@@ -45,7 +47,7 @@ const autoDisconnect = computed<string[]>({
           The RPC endpoint of the node you are using
         </Field.HelperText>
       </Field.Root>
-      <Field.Root>
+      <Field.Root v-if="isWS">
         <Select.Root v-model="autoDisconnect" :collection="collection">
           <Select.Label text-sm>
             Auto Disconnect
