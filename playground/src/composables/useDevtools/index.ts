@@ -2,8 +2,8 @@ import ctaiyiUrl from '@taiyinet/ctaiyi?url'
 import { useEventListener } from '@vueuse/core'
 import { onScopeDispose, ref, watchPostEffect } from 'vue'
 import { isDark } from '../dark'
-import devtoolsInjectUrl from './script/devtools?url'
-import runnerScriptUrl from './script/runner?url'
+import devtoolsInjectRaw from './script/devtools?raw'
+import runnerScriptRaw from './script/runner?raw'
 
 import devtoolsTemplate from './templates/devtools.html?raw'
 import runnerTemplate from './templates/runner.html?raw'
@@ -22,14 +22,14 @@ const DEFAULT_IMPORT_MAP = {
 const parser = new DOMParser()
 const serializer = new XMLSerializer()
 
-function generateHTML(importMap: Record<string, string> = DEFAULT_IMPORT_MAP) {
+function generateRunnerHTML(importMap: Record<string, string> = DEFAULT_IMPORT_MAP) {
   const runnerDOM = parser.parseFromString(runnerTemplate, 'text/html')
 
   const importMapScript = runnerDOM.querySelector<HTMLScriptElement>('script[type="importmap"]')!
   importMapScript.textContent = JSON.stringify({ imports: importMap })
 
-  const script = runnerDOM.querySelector<HTMLScriptElement>('script[src="__RUNNER_SCRIPT_URL__"]')!
-  script.src = new URL(runnerScriptUrl, import.meta.url).href
+  const script = runnerDOM.querySelector<HTMLScriptElement>('script#__RUNNER_SCRIPT_URL__')!
+  script.src = runnerScriptRaw
 
   return serializer.serializeToString(runnerDOM)
 }
@@ -37,16 +37,18 @@ function generateHTML(importMap: Record<string, string> = DEFAULT_IMPORT_MAP) {
 function generateDevtoolsHTML() {
   const devtoolsDOM = parser.parseFromString(devtoolsTemplate, 'text/html')
 
-  const script = devtoolsDOM.querySelector<HTMLScriptElement>('script[src="__DEVTOOLS_SCRIPT_URL__"]')!
-  script.src = new URL(devtoolsInjectUrl, import.meta.url).href
+  const script = devtoolsDOM.querySelector<HTMLScriptElement>('script#__DEVTOOLS_SCRIPT_URL__')!
+  script.src = devtoolsInjectRaw
 
   return serializer.serializeToString(devtoolsDOM)
 }
 export function useDevtoolsSrc() {
-  const html = generateDevtoolsHTML()
-  const devtoolsRawUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }))
+  const devtoolsHTML = generateDevtoolsHTML()
+  const runnerHTML = generateRunnerHTML()
 
-  const runnerIframeSrcUrl = URL.createObjectURL(new Blob([generateHTML()], { type: 'text/html' }))
+  const devtoolsRawUrl = URL.createObjectURL(new Blob([devtoolsHTML], { type: 'text/html' }))
+
+  const runnerIframeSrcUrl = URL.createObjectURL(new Blob([runnerHTML], { type: 'text/html' }))
 
   onScopeDispose(() => {
     URL.revokeObjectURL(devtoolsRawUrl)
