@@ -65,7 +65,7 @@ export interface WebSocketClientOptions extends ClientOptions {
 /**
  * RPC client
  */
-export class Client extends EventTarget {
+export class Client {
   /**
    * 创建测试网客户端
    * @param options 客户端选项
@@ -100,7 +100,6 @@ export class Client extends EventTarget {
   constructor(url: `http://${string}` | `https://${string}`, options: HTTPClientOptions)
   constructor(url: `ws://${string}` | `wss://${string}`, options: WebSocketClientOptions)
   constructor(url: string, options: WebSocketClientOptions | HTTPClientOptions = {}) {
-    super()
     this.url = url
     this.chainId = options.chainId ? hexToBytes(options.chainId) : DEFAULT_CHAIN_ID
     invariant(this.chainId.length === 32, 'invalid chain id')
@@ -116,12 +115,6 @@ export class Client extends EventTarget {
       const { retry, autoConnect = true } = options as WebSocketClientOptions
       const retryOptions: RetryOptions = typeof retry === 'object' ? retry : { retry }
       this.transport = new WebSocketTransport(this, retryOptions)
-
-      // 绑定事件处理器
-      this.transport.addEventListener('message', this.onMessage)
-      this.transport.addEventListener('open', this.onOpen)
-      this.transport.addEventListener('close', this.onClose)
-      this.transport.addEventListener('error', this.onError)
 
       if (autoConnect) {
         this.connect()
@@ -154,41 +147,6 @@ export class Client extends EventTarget {
     }
     console.error('[ctaiyi] disconnect isn\'t for http transport')
   }
-
-  override addEventListener(
-    type: 'open' | 'close',
-    callback: (() => void) | { handleEvent: () => void } | null,
-    options?: AddEventListenerOptions | boolean
-  ): void
-  override addEventListener(
-    type: 'notice' | 'error' | 'open' | 'close',
-    callback: EventListenerOrEventListenerObject | null,
-    options?: AddEventListenerOptions | boolean,
-  ): void {
-    super.addEventListener(type, callback, options)
-  }
-
-  // #region Event Handlers
-  private onMessage = (event: Event) => {
-    if (event instanceof MessageEvent) {
-      this.dispatchEvent(new MessageEvent('message', { data: event.data }))
-    }
-  }
-
-  private onOpen = () => {
-    this.dispatchEvent(new Event('open'))
-  }
-
-  private onClose = () => {
-    this.dispatchEvent(new Event('close'))
-  }
-
-  private onError = (event: Event) => {
-    if (event instanceof CustomEvent) {
-      this.dispatchEvent(new CustomEvent('error', { detail: event.detail }))
-    }
-  }
-  // #endregion
 
   public call<Response = any>(api: string, method: string, params: any[] = []): Promise<Response> {
     const request: RPCCall = {

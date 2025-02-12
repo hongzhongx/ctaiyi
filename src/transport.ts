@@ -196,6 +196,29 @@ export class WebSocketTransport extends EventTarget {
     })
   }
 
+  override addEventListener(
+    type: 'open' | 'close',
+    callback: (() => void) | { handleEvent: () => void } | null,
+    options?: AddEventListenerOptions | boolean
+  ): void
+  override addEventListener(
+    type: 'error',
+    callback: ((e: ErrorEvent) => void) | { handleEvent: (e: ErrorEvent) => void } | null,
+    options?: AddEventListenerOptions | boolean
+  ): void
+  override addEventListener(
+    type: 'notice',
+    callback: ((e: CustomEvent) => void) | { handleEvent: (e: CustomEvent) => void } | null,
+    options?: AddEventListenerOptions | boolean
+  ): void
+  override addEventListener(
+    type: 'notice' | 'error' | 'open' | 'close',
+    callback: EventListenerOrEventListenerObject | null,
+    options?: AddEventListenerOptions | boolean,
+  ): void {
+    super.addEventListener(type, callback, options)
+  }
+
   private onMessage = (event: MessageEvent) => {
     if (event instanceof MessageEvent) {
       try {
