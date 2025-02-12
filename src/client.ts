@@ -130,23 +130,22 @@ export class Client {
     if (this.transport instanceof WebSocketTransport) {
       return this.transport.isConnected()
     }
-    console.error('[ctaiyi] isConnected isn\'t for http transport')
+    console.warn('[ctaiyi] isConnected() is useless for HTTP transport')
     return true
   }
 
-  public connect(): Promise<void> {
+  public async connect(): Promise<void> {
     if (this.transport instanceof WebSocketTransport) {
       return this.transport.connect()
     }
-    console.error('[ctaiyi] connect isn\'t for http transport')
-    return Promise.resolve()
+    console.warn('[ctaiyi] connect() is useless for HTTP transport')
   }
 
   public async disconnect(): Promise<void> {
     if (this.transport instanceof WebSocketTransport) {
-      await this.transport.disconnect()
+      return this.transport.disconnect()
     }
-    console.error('[ctaiyi] disconnect isn\'t for http transport')
+    console.warn('[ctaiyi] disconnect() is useless for HTTP transport')
   }
 
   public call<Response = any>(api: string, method: string, params: any[] = []): Promise<Response> {
