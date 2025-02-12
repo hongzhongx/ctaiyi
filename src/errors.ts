@@ -3,9 +3,6 @@
  */
 export class ClientMessageError extends Error {
   override name = 'MessageError'
-  constructor(message: string, init?: ErrorOptions) {
-    super(message, init)
-  }
 }
 
 /**
@@ -23,7 +20,11 @@ export class ClientWebSocketError extends Error {
  */
 export class ClientHTTPError extends Error {
   override name = 'HTTPError'
-  constructor(message: string, init?: ErrorOptions) {
-    super(message, init)
-  }
+}
+
+/**
+ * RPC 错误
+ */
+export class RPCError extends Error {
+  override name = 'RPCError'
 }

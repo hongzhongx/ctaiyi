@@ -2,7 +2,7 @@ import type { Client } from './client'
 import { bytesToHex } from '@noble/hashes/utils'
 import defu from 'defu'
 import { ClientHTTPError, ClientMessageError, ClientWebSocketError } from './errors'
-import { waitForEvent } from './utils'
+import { normalizeRpcError, waitForEvent } from './utils'
 
 export interface RPCRequest {
   /**
@@ -28,7 +28,7 @@ export interface RPCCall extends RPCRequest {
   params: [number | string, string, any[]]
 }
 
-export interface RPCError {
+export interface RPCResponseError {
   code: number
   message: string
   data?: any
@@ -39,7 +39,7 @@ export interface RPCResponse {
    * 响应序列号,对应请求序列号
    */
   id: number
-  error?: RPCError
+  error?: RPCResponseError
   result?: any
 }
 
@@ -231,29 +231,7 @@ export class WebSocketTransport extends EventTarget {
         const response = rpcMessage as RPCResponse
         let error: Error | undefined
         if (response.error) {
-          const { data } = response.error
-          let { message } = response.error
-          if (data && data.stack && data.stack.length > 0) {
-            const top = data.stack[0]
-            const topData = structuredClone(top.data)
-            message = top.format.replace(/\$\{([a-z_]+)\}/gi, (match: string, key: string) => {
-              let rv = match
-              if (topData[key]) {
-                rv = topData[key]
-                delete topData[key]
-              }
-              return rv
-            })
-            const unformattedData = Object.keys(topData)
-              .map(key => ({ key, value: topData[key] }))
-              .filter(item => typeof item.value === 'string')
-              .map(item => `${item.key}=${item.value}`)
-            if (unformattedData.length > 0) {
-              message += ` ${unformattedData.join(' ')}`
-            }
-          }
-          error = new Error(message, { cause: data })
-          error.name = 'RPCError'
+          throw normalizeRpcError(response.error)
         }
         this.rpcHandler(response.id, error, response.result)
       }
@@ -320,7 +298,13 @@ export class HTTPTransport {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      return response.json()
+      const rpcResponse = await response.json() as RPCResponse
+
+      if (rpcResponse.error) {
+        throw normalizeRpcError(rpcResponse.error)
+      }
+
+      return rpcResponse.result
     }
     catch (error) {
       throw new ClientHTTPError('HTTP request failed', { cause: error })
