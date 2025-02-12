@@ -71,13 +71,13 @@ export class Client {
    * @param options 客户端选项
    * @returns 测试网客户端实例
    */
-  public static testnet(options?: ClientOptions & { url?: string }) {
+  public static testnet(options?: (WebSocketClientOptions | HTTPClientOptions) & { url?: string }) {
     const opts: HTTPClientOptions = defu(options, {
       addressPrefix: 'TAI',
       chainId: '18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e',
     })
     const url = options?.url ?? 'http://127.0.0.1:8090'
-    return new Client(url as `http://${string}`, opts)
+    return new Client(url, opts)
   }
 
   // #region Client Properties
@@ -99,6 +99,7 @@ export class Client {
 
   constructor(url: `http://${string}` | `https://${string}`, options: HTTPClientOptions)
   constructor(url: `ws://${string}` | `wss://${string}`, options: WebSocketClientOptions)
+  constructor(url: string, options: WebSocketClientOptions | HTTPClientOptions)
   constructor(url: string, options: WebSocketClientOptions | HTTPClientOptions = {}) {
     this.url = url
     this.chainId = options.chainId ? hexToBytes(options.chainId) : DEFAULT_CHAIN_ID
