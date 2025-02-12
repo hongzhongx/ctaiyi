@@ -11,4 +11,11 @@ export default defineConfig({
     },
   },
   plugins: [vue(), unocss()],
+  build: {
+    target: 'esnext',
+    minify: false,
+  },
+  worker: {
+    format: 'es',
+  },
 })

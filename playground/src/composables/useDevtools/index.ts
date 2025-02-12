@@ -2,8 +2,8 @@ import ctaiyiUrl from '@taiyinet/ctaiyi?url'
 import { useEventListener } from '@vueuse/core'
 import { onScopeDispose, ref, watchPostEffect } from 'vue'
 import { isDark } from '../dark'
-import devtoolsInjectRaw from './script/devtools?raw'
-import runnerScriptRaw from './script/runner?raw'
+import devtoolsScriptURL from './script/devtools?worker&url'
+import runnerScriptURL from './script/runner?worker&url'
 
 import devtoolsTemplate from './templates/devtools.html?raw'
 import runnerTemplate from './templates/runner.html?raw'
@@ -29,7 +29,7 @@ function generateRunnerHTML(importMap: Record<string, string> = DEFAULT_IMPORT_M
   importMapScript.textContent = JSON.stringify({ imports: importMap })
 
   const script = runnerDOM.querySelector<HTMLScriptElement>('script#__RUNNER_SCRIPT_URL__')!
-  script.src = runnerScriptRaw
+  script.src = new URL(runnerScriptURL, import.meta.url).href
 
   return serializer.serializeToString(runnerDOM)
 }
@@ -38,7 +38,7 @@ function generateDevtoolsHTML() {
   const devtoolsDOM = parser.parseFromString(devtoolsTemplate, 'text/html')
 
   const script = devtoolsDOM.querySelector<HTMLScriptElement>('script#__DEVTOOLS_SCRIPT_URL__')!
-  script.src = devtoolsInjectRaw
+  script.src = new URL(devtoolsScriptURL, import.meta.url).href
 
   return serializer.serializeToString(devtoolsDOM)
 }
