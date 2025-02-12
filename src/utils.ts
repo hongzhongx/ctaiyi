@@ -72,6 +72,5 @@ export function normalizeRpcError(responseError: RPCResponseError): Error {
       message += ` ${unformattedData.join(' ')}`
     }
   }
-
   return new RPCError(message, { cause: data })
 }

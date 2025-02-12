@@ -20,6 +20,9 @@ export class ClientWebSocketError extends Error {
  */
 export class ClientHTTPError extends Error {
   override name = 'HTTPError'
+  constructor(message: string, init?: ErrorOptions) {
+    super(message, init)
+  }
 }
 
 /**
@@ -27,4 +30,15 @@ export class ClientHTTPError extends Error {
  */
 export class RPCError extends Error {
   override name = 'RPCError'
+  override cause?: {
+    code: number
+    name: string
+    message: string
+    stack: any[]
+  }
+
+  constructor(message: string, init?: ErrorOptions) {
+    super(message, init)
+    this.cause = init?.cause as this['cause']
+  }
 }

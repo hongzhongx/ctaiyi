@@ -87,7 +87,7 @@ export class Client {
 
   public pending = new Map<number, PendingRequest>()
   public seqNo = 0
-  private transport: HTTPTransport | WebSocketTransport
+  public readonly transport: HTTPTransport | WebSocketTransport
 
   sendTimeout: number
 
