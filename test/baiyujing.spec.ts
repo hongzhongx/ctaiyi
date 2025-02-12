@@ -1,18 +1,21 @@
 import type { SignedTransaction, Transaction } from '../src'
 import { Client } from '../src'
-import { INITMINER_PRIVATE_KEY } from './common'
+import { WebSocketTransport } from '../src/transport'
+import { INITMINER_PRIVATE_KEY, TEST_CONFIG } from './common'
 
 vi.setConfig({
   testTimeout: 100000,
 })
-const client = Client.testnet({ autoConnect: false })
+
+const client = Client.testnet(TEST_CONFIG)
+
+if (client.transport instanceof WebSocketTransport) {
+  beforeAll(async () => {
+    await client.connect()
+  })
+}
 
 describe('client instance base status', () => {
-  it('should connect', async () => {
-    await client.connect()
-    expect(client.isConnected()).toBe(true)
-  })
-
   it('should exist baiyujing', () => {
     expect(client).toHaveProperty('baiyujing')
   })

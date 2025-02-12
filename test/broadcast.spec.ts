@@ -1,14 +1,21 @@
 import type { Operation } from '../src'
 import { Client, PrivateKey } from '../src'
-import { getTestnetAccounts, randomString } from './common'
+import { WebSocketTransport } from '../src/transport'
+import { getTestnetAccounts, randomString, TEST_CONFIG } from './common'
+
+vi.setConfig({
+  testTimeout: 60 * 1000,
+})
+
+const client = Client.testnet(TEST_CONFIG)
+
+if (client.transport instanceof WebSocketTransport) {
+  beforeAll(async () => {
+    await client.connect()
+  })
+}
 
 describe('broadcast', () => {
-  vi.setConfig({
-    testTimeout: 60 * 1000,
-  })
-
-  const client = Client.testnet({ url: 'ws://47.109.49.30:8090' })
-
   type Account = Awaited<ReturnType<typeof getTestnetAccounts>>[number]
   let acc1: Account, acc2: Account
 
@@ -16,7 +23,7 @@ describe('broadcast', () => {
     [acc1, acc2] = await getTestnetAccounts()
   })
 
-  it.skip('should create or exist account', async () => {
+  it('should create or exist account', async () => {
     expect(acc1).toBeDefined()
     expect(acc2).toBeDefined()
   })
@@ -30,7 +37,7 @@ describe('broadcast', () => {
     expect(preparedTx).toHaveProperty('ref_block_prefix', expect.any(Number))
   })
 
-  it.skip('should sign tx with signature', async () => {
+  it.runIf(import.meta.env.VITE_TEST_TRANSITIONS === 'true')('should sign tx with signature', async () => {
     const activeKey = PrivateKey.fromLogin(acc1.username, acc1.password)
     const operations: Operation[] = [
       [

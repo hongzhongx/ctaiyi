@@ -2,8 +2,9 @@ import type { Operation, Serializer } from './../src'
 import { bytesToHex } from '@noble/hashes/utils'
 
 import ByteBuffer from 'bytebuffer'
+import { WebSocketTransport } from '../src/transport'
 import { Authority, Client, PrivateKey, Types } from './../src'
-import { randomString } from './common'
+import { randomString, TEST_CONFIG } from './common'
 
 async function dumpOperataionHex(op: Operation, client: Client) {
   function tempSerialize(serializer: Serializer, data: any) {
@@ -32,11 +33,16 @@ async function dumpOperataionHex(op: Operation, client: Client) {
 }
 
 vi.setConfig({
-  testTimeout: 10 * 60 * 1000,
-  hookTimeout: 10 * 60 * 1000,
+  testTimeout: 60 * 1000,
 })
 
-const client = Client.testnet()
+const client = Client.testnet(TEST_CONFIG)
+
+describe.runIf(client.transport instanceof WebSocketTransport)('websocket transport', () => {
+  it('should connect', async () => {
+    await client.connect()
+  })
+})
 
 describe('operations', () => {
   it('should serialize account_create operation correctly', async () => {

@@ -1,8 +1,10 @@
+import type { ClientOptions } from '../src'
 import { randomBytes } from 'crypto'
 import * as fs from 'node:fs/promises'
 import process from 'node:process'
 import { Authority, Client, PrivateKey } from '../src'
 
+export const TEST_CONFIG = JSON.parse(import.meta.env.VITE_RPC_CLIENT_CONFIG!) as ClientOptions
 export const NUM_TEST_ACCOUNTS = 2
 export const TEST_NODE = process.env.TEST_NODE || 'http://127.0.0.1:8091'
 
