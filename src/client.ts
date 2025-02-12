@@ -65,7 +65,7 @@ export interface WebSocketClientOptions extends ClientOptions {
 /**
  * RPC client
  */
-export class Client {
+export class Client<const URL extends string> {
   /**
    * 创建测试网客户端
    * @param options 客户端选项
@@ -87,7 +87,7 @@ export class Client {
 
   public pending = new Map<number, PendingRequest>()
   public seqNo = 0
-  public readonly transport: HTTPTransport | WebSocketTransport
+  public readonly transport: URL extends `wss://${string}` | `ws://${string}` ? WebSocketTransport : HTTPTransport
 
   sendTimeout: number
 
@@ -97,10 +97,10 @@ export class Client {
   public readonly broadcast: BroadcastAPI
   // #endregion
 
-  constructor(url: `http://${string}` | `https://${string}`, options: HTTPClientOptions)
-  constructor(url: `ws://${string}` | `wss://${string}`, options: WebSocketClientOptions)
-  constructor(url: string, options: WebSocketClientOptions | HTTPClientOptions)
-  constructor(url: string, options: WebSocketClientOptions | HTTPClientOptions = {}) {
+  constructor(url: URL, options?: URL extends `wss://${string}` | `ws://${string}` ? WebSocketClientOptions : HTTPClientOptions)
+  constructor(url: `http://${string}` | `https://${string}`, options?: HTTPClientOptions)
+  constructor(url: `ws://${string}` | `wss://${string}`, options?: WebSocketClientOptions)
+  constructor(url: URL, options: WebSocketClientOptions | HTTPClientOptions = {}) {
     this.url = url
     this.chainId = options.chainId ? hexToBytes(options.chainId) : DEFAULT_CHAIN_ID
     invariant(this.chainId.length === 32, 'invalid chain id')
@@ -115,14 +115,14 @@ export class Client {
     if (isWebSocketProtocol(url)) {
       const { retry, autoConnect = true } = options as WebSocketClientOptions
       const retryOptions: RetryOptions = typeof retry === 'object' ? retry : { retry }
-      this.transport = new WebSocketTransport(this, retryOptions)
+      this.transport = new WebSocketTransport(this, retryOptions) as URL extends `wss://${string}` | `ws://${string}` ? WebSocketTransport : HTTPTransport
 
       if (autoConnect) {
         this.connect()
       }
     }
     else {
-      this.transport = new HTTPTransport(this)
+      this.transport = new HTTPTransport(this) as URL extends `wss://${string}` | `ws://${string}` ? WebSocketTransport : HTTPTransport
     }
   }
 
@@ -130,7 +130,7 @@ export class Client {
     if (this.transport instanceof WebSocketTransport) {
       return this.transport.isConnected()
     }
-    console.warn('[ctaiyi] isConnected() is useless for HTTP transport')
+    console.warn('[ctaiyi] isConnected() is unnecessary for HTTP transport')
     return true
   }
 
@@ -138,14 +138,14 @@ export class Client {
     if (this.transport instanceof WebSocketTransport) {
       return this.transport.connect()
     }
-    console.warn('[ctaiyi] connect() is useless for HTTP transport')
+    console.warn('[ctaiyi] connect() is unnecessary for HTTP transport')
   }
 
   public async disconnect(): Promise<void> {
     if (this.transport instanceof WebSocketTransport) {
       return this.transport.disconnect()
     }
-    console.warn('[ctaiyi] disconnect() is useless for HTTP transport')
+    console.warn('[ctaiyi] disconnect() is unnecessary for HTTP transport')
   }
 
   public call<Response = any>(api: string, method: string, params: any[] = []): Promise<Response> {

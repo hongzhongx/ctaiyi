@@ -43,8 +43,7 @@ export function iteratorStream<T>(iterator: AsyncIterableIterator<T>): ReadableS
 }
 
 export function isWebSocketProtocol(url: string): url is `ws://${string}` | `wss://${string}` {
-  const protocol = new URL(url).protocol
-  return ['ws:', 'wss:'].includes(protocol)
+  return url.match(/^wss?:\/\//) !== null
 }
 
 export function normalizeRpcError(responseError: RPCResponseError): Error {
