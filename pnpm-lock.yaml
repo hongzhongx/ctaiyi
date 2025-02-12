@@ -149,6 +149,9 @@ importers:
       '@unocss/reset':
         specifier: ^65.4.3
         version: 65.4.3
+      '@vee-validate/zod':
+        specifier: ^4.15.0
+        version: 4.15.0(vue@3.5.13(typescript@5.7.3))(zod@3.24.2)
       '@vueuse/core':
         specifier: ^12.5.0
         version: 12.5.0(typescript@5.7.3)
@@ -179,9 +182,15 @@ importers:
       theme-vitesse:
         specifier: ^0.8.3
         version: 0.8.3
+      vee-validate:
+        specifier: ^4.15.0
+        version: 4.15.0(vue@3.5.13(typescript@5.7.3))
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.7.3)
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@babel/types':
         specifier: ^7.26.8
@@ -1541,6 +1550,11 @@ packages:
     resolution: {integrity: sha512-YajF8Z2J/KvXdnC5BsGJjt3fm4D14vmYaHdlTyzi92Rkh/67JtaCz2OhElDoF6k4S4fm9B8uLRP10p+smRe9Fw==}
     peerDependencies:
       vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0-0
+
+  '@vee-validate/zod@4.15.0':
+    resolution: {integrity: sha512-MpvIKiyg9X5yD8bJW0no2AU7wtR2T5mrvD9tuPRiie951sU2n6QKgMV38qKKOiqFBCxsMSjIuLLLV3V5kVE4nQ==}
+    peerDependencies:
+      zod: ^3.24.0
 
   '@vitejs/plugin-vue@5.2.1':
     resolution: {integrity: sha512-cxh314tzaWwOLqVes2gnnCtvBDcM1UMdn+iFR+UjAn411dPT3tOmqrJjbMd7koZpMAmBM/GqeV4n9ge7JSiJJQ==}
@@ -4089,6 +4103,11 @@ packages:
   vanilla-picker@2.12.3:
     resolution: {integrity: sha512-qVkT1E7yMbUsB2mmJNFmaXMWE2hF8ffqzMMwe9zdAikd8u2VfnsVY2HQcOUi2F38bgbxzlJBEdS1UUhOXdF9GQ==}
 
+  vee-validate@4.15.0:
+    resolution: {integrity: sha512-PGJh1QCFwCBjbHu5aN6vB8macYVWrajbDvgo1Y/8fz9n/RVIkLmZCJDpUgu7+mUmCOPMxeyq7vXUOhbwAqdXcA==}
+    peerDependencies:
+      vue: ^3.4.26
+
   vfile-message@4.0.2:
     resolution: {integrity: sha512-jRDZ1IMLttGj41KcZvlrYAaI3CfqpLpfpf+Mfig13viT6NKvRzWZ+lXz0Y5D60w6uJIBAOGq9mSHf0gktF0duw==}
 
@@ -4325,6 +4344,9 @@ packages:
 
   zimmerframe@1.1.2:
     resolution: {integrity: sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w==}
+
+  zod@3.24.2:
+    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -5723,6 +5745,14 @@ snapshots:
     transitivePeerDependencies:
       - rollup
       - supports-color
+      - vue
+
+  '@vee-validate/zod@4.15.0(vue@3.5.13(typescript@5.7.3))(zod@3.24.2)':
+    dependencies:
+      type-fest: 4.33.0
+      vee-validate: 4.15.0(vue@3.5.13(typescript@5.7.3))
+      zod: 3.24.2
+    transitivePeerDependencies:
       - vue
 
   '@vitejs/plugin-vue@5.2.1(vite@5.4.14(@types/node@22.13.1))(vue@3.5.13(typescript@5.7.3))':
@@ -8878,6 +8908,12 @@ snapshots:
     dependencies:
       '@sphinxxxx/color-conversion': 2.2.2
 
+  vee-validate@4.15.0(vue@3.5.13(typescript@5.7.3)):
+    dependencies:
+      '@vue/devtools-api': 7.7.1
+      type-fest: 4.33.0
+      vue: 3.5.13(typescript@5.7.3)
+
   vfile-message@4.0.2:
     dependencies:
       '@types/unist': 3.0.3
@@ -9128,5 +9164,7 @@ snapshots:
   zhead@2.2.4: {}
 
   zimmerframe@1.1.2: {}
+
+  zod@3.24.2: {}
 
   zwitch@2.0.4: {}

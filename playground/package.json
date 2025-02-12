@@ -15,6 +15,7 @@
     "@taiyinet/ctaiyi": "workspace:*",
     "@unhead/vue": "^1.11.18",
     "@unocss/reset": "^65.4.3",
+    "@vee-validate/zod": "^4.15.0",
     "@vueuse/core": "^12.5.0",
     "comlink": "^4.4.2",
     "convert-source-map": "^2.0.0",
@@ -25,7 +26,9 @@
     "monaco-editor-core": "^0.52.2",
     "serialize-error": "^12.0.0",
     "theme-vitesse": "^0.8.3",
-    "vue": "^3.5.13"
+    "vee-validate": "^4.15.0",
+    "vue": "^3.5.13",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@babel/types": "^7.26.8",
