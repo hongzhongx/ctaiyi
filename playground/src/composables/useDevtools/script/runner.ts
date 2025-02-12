@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import type Chobitsu from 'chobitsu'
-import { Client } from '@taiyinet/ctaiyi'
-import { debouncedWatch, useTimeoutFn } from '@vueuse/core'
+import { Client, WebSocketTransport } from '@taiyinet/ctaiyi'
+import { debouncedWatch, useEventListener, useTimeoutFn } from '@vueuse/core'
 import { useClientConfig, useClientState } from '../client-state'
 
 declare const chobitsu: typeof Chobitsu
@@ -141,20 +141,23 @@ window.addEventListener('message', ({ data }) => {
 
 function attachClientInstance() {
   window.client = new Client(config.value.url, { autoConnect: false })
-  window.client.addEventListener('open', () => {
-    if (import.meta.env.DEV) {
-      console.log('[ctaiyi-repl] client connected')
-    }
-    postToConnectingBC(true)
-    if (config.value.autoDisconnect !== 0) {
-      start()
-    }
-  })
-  window.client.addEventListener('close', () => {
-    if (import.meta.env.DEV) {
-      console.log('[ctaiyi-repl] client disconnected')
-    }
-    postToConnectingBC(false)
-    stop()
-  })
+  if (window.client.transport instanceof WebSocketTransport) {
+    useEventListener(window.client.transport, 'open', () => {
+      if (import.meta.env.DEV) {
+        console.log('[ctaiyi-repl] client connected')
+      }
+      postToConnectingBC(true)
+      if (config.value.autoDisconnect !== 0) {
+        start()
+      }
+    })
+
+    useEventListener(window.client.transport, 'close', () => {
+      if (import.meta.env.DEV) {
+        console.log('[ctaiyi-repl] client disconnected')
+      }
+      postToConnectingBC(false)
+      stop()
+    })
+  }
 }
