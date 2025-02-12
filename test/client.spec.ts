@@ -6,9 +6,15 @@ import { waitForEvent } from './../src/utils'
 import { TEST_CONFIG } from './common'
 
 vi.setConfig({
-  testTimeout: 100000,
+  testTimeout: 60 * 1000,
 })
 const client = Client.testnet(TEST_CONFIG)
+
+if (client.transport instanceof WebSocketTransport) {
+  beforeAll(async () => {
+    await client.connect()
+  })
+}
 
 describe('client', () => {
   it('should make rpc call', async () => {
@@ -36,67 +42,67 @@ describe('client', () => {
       expect(error.cause.cause?.stack[0]?.data.method).toBe('method_does_exist')
     }
   })
+
+  describe.runIf(client.transport instanceof WebSocketTransport)(
+    'websocket transport',
+    async () => {
+      it('should connected', async () => {
+        expect(client.isConnected()).toBe(true)
+      })
+
+      it('should reconnect on disconnection', async () => {
+        assert(client.transport instanceof WebSocketTransport)
+        // @ts-expect-error test usage
+        client.transport.socket!.close()
+        await waitForEvent(client.transport, 'open')
+      })
+
+      it('should handle garbled data from server', async () => {
+        assert(client.transport instanceof WebSocketTransport)
+        const errorPromise = waitForEvent<CustomEvent<ClientMessageError>>(client.transport, 'error')
+        const e = new MessageEvent('message', { data: 'this}}is notJSON!' })
+        // @ts-expect-error test usage
+        client.transport.onMessage(e)
+        const error = await errorPromise
+        expect(error.detail.name).toBe('MessageError')
+      })
+
+      it('should handle write errors', async () => {
+        // @ts-expect-error test usage
+        const socketSend = client.transport.socket!.send
+        // @ts-expect-error test usage
+        client.transport.socket!.send = () => {
+          throw new Error('Send fail')
+        }
+        try {
+          await client.call('database_api', 'i_like_turtles')
+          assert(false, 'should not be reached')
+        }
+        catch (error) {
+          expect((error as Error).message).toBe('Send fail')
+        }
+        // @ts-expect-error test usage
+        client.transport.socket!.send = socketSend
+      })
+
+      it('should time out when loosing connection', async () => {
+        client.sendTimeout = 100
+        await client.disconnect()
+        try {
+          await client.call('baiyujing_api', 'get_accounts', [['initminer']]) as any[]
+          assert(false, 'should not be reached')
+        }
+        catch (error) {
+          assert.equal((error as Error).name, 'TimeoutError')
+        }
+        client.sendTimeout = 5000
+        await client.connect()
+      })
+
+      it('should disconnect', async () => {
+        await client.disconnect()
+        assert(!client.isConnected())
+      })
+    },
+  )
 })
-
-it.runIf(client.transport instanceof WebSocketTransport)(
-  'websocket transport',
-  async () => {
-    it('should connect', async () => {
-      await client.connect()
-      expect(client.isConnected()).toBe(true)
-    })
-
-    it('should reconnect on disconnection', async () => {
-      assert(client.transport instanceof WebSocketTransport)
-      // @ts-expect-error test usage
-      client.transport.socket!.close()
-      await waitForEvent(client.transport, 'open')
-    })
-
-    it('should handle garbled data from server', async () => {
-      assert(client.transport instanceof WebSocketTransport)
-      const errorPromise = waitForEvent<CustomEvent<ClientMessageError>>(client.transport, 'error')
-      // @ts-expect-error test usage
-      client.onMessage({ data: 'this}}is notJSON!' })
-      const error = await errorPromise
-      expect(error.detail.name).toBe('MessageError')
-    })
-
-    it('should time out when loosing connection', async () => {
-      client.sendTimeout = 100
-      await client.disconnect()
-      try {
-        await client.call('baiyujing_api', 'get_accounts', [['initminer']]) as any[]
-        assert(false, 'should not be reached')
-      }
-      catch (error) {
-        assert.equal((error as Error).name, 'TimeoutError')
-      }
-      client.sendTimeout = 5000
-      await client.connect()
-    })
-
-    it('should handle write errors', async () => {
-      // @ts-expect-error test usage
-      const socketSend = client.transport.socket!.send
-      // @ts-expect-error test usage
-      client.transport.socket!.send = () => {
-        throw new Error('Send fail')
-      }
-      try {
-        await client.call('database_api', 'i_like_turtles')
-        assert(false, 'should not be reached')
-      }
-      catch (error) {
-        expect((error as Error).message).toBe('Send fail')
-      }
-      // @ts-expect-error test usage
-      client.transport.socket!.send = socketSend
-    })
-
-    it('should disconnect', async () => {
-      await client.disconnect()
-      assert(!client.isConnected())
-    })
-  },
-)

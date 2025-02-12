@@ -25,6 +25,13 @@ export class ClientHTTPError extends Error {
   }
 }
 
+export class ClientTimeoutError extends Error {
+  override name = 'TimeoutError'
+  constructor(message: string, init?: ErrorOptions) {
+    super(message, init)
+  }
+}
+
 /**
  * RPC 错误
  */

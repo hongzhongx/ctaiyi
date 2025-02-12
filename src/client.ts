@@ -34,14 +34,15 @@ export interface ClientOptions {
    * @default 'TAI'
    */
   addressPrefix?: string
-}
 
-export interface HTTPClientOptions extends ClientOptions {
   /**
    * 请求超时，单位：毫秒
    * @default 14000
    */
   timeout?: number
+}
+
+export interface HTTPClientOptions extends ClientOptions {
 }
 
 export interface WebSocketClientOptions extends ClientOptions {
@@ -52,12 +53,6 @@ export interface WebSocketClientOptions extends ClientOptions {
    */
   autoConnect?: boolean
 
-  /**
-   * 请求超时，单位：毫秒
-   * @default 14000
-   */
-  timeout?: number
-
   retry?: number | ((failureCount: number, error: Error) => boolean) | RetryOptions
 }
 
@@ -65,7 +60,7 @@ export interface WebSocketClientOptions extends ClientOptions {
 /**
  * RPC client
  */
-export class Client<const URL extends string> {
+export class Client {
   /**
    * 创建测试网客户端
    * @param options 客户端选项
@@ -77,7 +72,7 @@ export class Client<const URL extends string> {
       chainId: '18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e',
     })
     const url = options?.url ?? 'http://127.0.0.1:8090'
-    return new Client(url, opts)
+    return new Client(url, opts) as Client
   }
 
   // #region Client Properties
@@ -87,7 +82,7 @@ export class Client<const URL extends string> {
 
   public pending = new Map<number, PendingRequest>()
   public seqNo = 0
-  public readonly transport: URL extends `wss://${string}` | `ws://${string}` ? WebSocketTransport : HTTPTransport
+  public readonly transport: WebSocketTransport | HTTPTransport
 
   sendTimeout: number
 
@@ -97,10 +92,10 @@ export class Client<const URL extends string> {
   public readonly broadcast: BroadcastAPI
   // #endregion
 
-  constructor(url: URL, options?: URL extends `wss://${string}` | `ws://${string}` ? WebSocketClientOptions : HTTPClientOptions)
   constructor(url: `http://${string}` | `https://${string}`, options?: HTTPClientOptions)
   constructor(url: `ws://${string}` | `wss://${string}`, options?: WebSocketClientOptions)
-  constructor(url: URL, options: WebSocketClientOptions | HTTPClientOptions = {}) {
+  constructor(url: string, options?: WebSocketClientOptions | HTTPClientOptions)
+  constructor(url: string, options: WebSocketClientOptions | HTTPClientOptions = {}) {
     this.url = url
     this.chainId = options.chainId ? hexToBytes(options.chainId) : DEFAULT_CHAIN_ID
     invariant(this.chainId.length === 32, 'invalid chain id')
@@ -115,14 +110,14 @@ export class Client<const URL extends string> {
     if (isWebSocketProtocol(url)) {
       const { retry, autoConnect = true } = options as WebSocketClientOptions
       const retryOptions: RetryOptions = typeof retry === 'object' ? retry : { retry }
-      this.transport = new WebSocketTransport(this, retryOptions) as URL extends `wss://${string}` | `ws://${string}` ? WebSocketTransport : HTTPTransport
+      this.transport = new WebSocketTransport(this, retryOptions)
 
       if (autoConnect) {
         this.connect()
       }
     }
     else {
-      this.transport = new HTTPTransport(this) as URL extends `wss://${string}` | `ws://${string}` ? WebSocketTransport : HTTPTransport
+      this.transport = new HTTPTransport(this)
     }
   }
 

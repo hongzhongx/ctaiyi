@@ -1,7 +1,7 @@
 import type { Client } from './client'
 import { bytesToHex } from '@noble/hashes/utils'
 import defu from 'defu'
-import { ClientHTTPError, ClientMessageError, ClientWebSocketError } from './errors'
+import { ClientHTTPError, ClientMessageError, ClientTimeoutError, ClientWebSocketError } from './errors'
 import { normalizeRpcError, waitForEvent } from './utils'
 
 export interface RPCRequest {
@@ -135,9 +135,6 @@ export class WebSocketTransport extends EventTarget {
   }
 
   public async send<T>(request: RPCRequest): Promise<T> {
-    if (!this.isConnected()) {
-      throw new Error('Not connected')
-    }
     if (this.isConnected()) {
       this.write(request).catch((error: Error) => {
         this.rpcHandler(request.id, error)
@@ -147,8 +144,7 @@ export class WebSocketTransport extends EventTarget {
 
     if (signal) {
       signal.onabort = () => {
-        const error = new Error(`Timed out after ${this.client.sendTimeout}ms`)
-        error.name = 'TimeoutError'
+        const error = new ClientTimeoutError(`Timed out after ${this.client.sendTimeout}ms`)
         this.rpcHandler(request.id, error)
       }
     }
@@ -248,7 +244,7 @@ export class WebSocketTransport extends EventTarget {
   private onOpen = () => {
     this.failureCount = 0
     this.flushPending()
-    this.dispatchEvent(new Event('open'))
+    this.dispatchEvent(new CustomEvent('open'))
   }
 
   private onClose = () => {
@@ -256,7 +252,7 @@ export class WebSocketTransport extends EventTarget {
     if (this.active) {
       setTimeout(this.retryHandler, this.retryOptions.backoff(this.failureCount++))
     }
-    this.dispatchEvent(new Event('close'))
+    this.dispatchEvent(new CustomEvent('close'))
   }
 
   private errorEventHandler = (e: Event) => {
@@ -280,6 +276,7 @@ export class HTTPTransport {
 
   public async send<T>(request: RPCRequest): Promise<T> {
     try {
+      const { signal } = this.client.pending.get(request.id)!
       const body = JSON.stringify(request, (key, value) => {
         if (value instanceof Uint8Array) {
           return bytesToHex(value)
@@ -292,6 +289,7 @@ export class HTTPTransport {
           'Content-Type': 'application/json',
         },
         body,
+        signal,
       })
 
       if (!response.ok) {
@@ -307,7 +305,12 @@ export class HTTPTransport {
       return rpcResponse.result
     }
     catch (error) {
-      throw new ClientHTTPError('HTTP request failed', { cause: error })
+      if (error instanceof DOMException && error.name === 'TimeoutError') {
+        throw new ClientTimeoutError(`Timed out after ${this.client.sendTimeout}ms`)
+      }
+      else {
+        throw new ClientHTTPError('HTTP request failed', { cause: error })
+      }
     }
   }
 }
