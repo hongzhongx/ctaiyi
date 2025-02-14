@@ -1,13 +1,11 @@
-import type { PendingRequest, RetryOptions, RPCCall, RPCRequest } from './transport'
+import type { CreateTransport, PendingRequest, RetryOptions, RPCCall, RPCRequest, Transport } from './transport'
 import { hexToBytes } from '@noble/hashes/utils'
-import defu from 'defu'
 import invariant from 'tiny-invariant'
 import { version } from '../package.json' with { type: 'json' }
 import { BaiYuJingAPI } from './helpers/baiyujing'
 import { Blockchain } from './helpers/blockchain'
 import { BroadcastAPI } from './helpers/broadcast'
-import { HTTPTransport, WebSocketTransport } from './transport'
-import { isWebSocketProtocol } from './utils'
+import { WebSocketTransport } from './transport'
 
 /**
  * 包版本
@@ -40,6 +38,8 @@ export interface ClientOptions {
    * @default 14000
    */
   timeout?: number
+
+  transport: CreateTransport
 }
 
 export interface HTTPClientOptions extends ClientOptions {
@@ -61,28 +61,13 @@ export interface WebSocketClientOptions extends ClientOptions {
  * RPC client
  */
 export class Client {
-  /**
-   * 创建测试网客户端
-   * @param options 客户端选项
-   * @returns 测试网客户端实例
-   */
-  public static testnet(options?: (WebSocketClientOptions | HTTPClientOptions) & { url?: string }) {
-    const opts: HTTPClientOptions = defu(options, {
-      addressPrefix: 'TAI',
-      chainId: '18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e',
-    })
-    const url = options?.url ?? 'http://127.0.0.1:8090'
-    return new Client(url, opts) as Client
-  }
-
   // #region Client Properties
-  public readonly url: string
   public readonly chainId: Uint8Array
   public readonly addressPrefix: string
 
   public pending = new Map<number, PendingRequest>()
-  public seqNo = 0
-  public readonly transport: WebSocketTransport | HTTPTransport
+  private seqNo = 0
+  public readonly transport: Transport
 
   sendTimeout: number
 
@@ -92,11 +77,7 @@ export class Client {
   public readonly broadcast: BroadcastAPI
   // #endregion
 
-  constructor(url: `http://${string}` | `https://${string}`, options?: HTTPClientOptions)
-  constructor(url: `ws://${string}` | `wss://${string}`, options?: WebSocketClientOptions)
-  constructor(url: string, options?: WebSocketClientOptions | HTTPClientOptions)
-  constructor(url: string, options: WebSocketClientOptions | HTTPClientOptions = {}) {
-    this.url = url
+  constructor(options: WebSocketClientOptions | HTTPClientOptions) {
     this.chainId = options.chainId ? hexToBytes(options.chainId) : DEFAULT_CHAIN_ID
     invariant(this.chainId.length === 32, 'invalid chain id')
     this.addressPrefix = options.addressPrefix || DEFAULT_ADDRESS_PREFIX
@@ -107,18 +88,7 @@ export class Client {
     this.blockchain = new Blockchain(this)
     this.broadcast = new BroadcastAPI(this)
 
-    if (isWebSocketProtocol(url)) {
-      const { retry, autoConnect = true } = options as WebSocketClientOptions
-      const retryOptions: RetryOptions = typeof retry === 'object' ? retry : { retry }
-      this.transport = new WebSocketTransport(this, retryOptions)
-
-      if (autoConnect) {
-        this.connect()
-      }
-    }
-    else {
-      this.transport = new HTTPTransport(this)
-    }
+    this.transport = options.transport()
   }
 
   public isConnected(): boolean {
@@ -154,14 +124,6 @@ export class Client {
   }
 
   private send<T = any>(request: RPCRequest): Promise<T> {
-    let signal: AbortSignal | undefined
-    if (this.sendTimeout > 0) {
-      signal = AbortSignal.timeout(this.sendTimeout)
-    }
-
-    const { promise, reject, resolve } = Promise.withResolvers<T>()
-    this.pending.set(request.id, { promise, request, resolve, reject, signal })
-
     return this.transport.send<T>(request)
   }
 }

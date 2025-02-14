@@ -1,4 +1,3 @@
-import type { Client } from './client'
 import { bytesToHex } from '@noble/hashes/utils'
 import defu from 'defu'
 import { ClientHTTPError, ClientMessageError, ClientTimeoutError, ClientWebSocketError } from './errors'
@@ -68,24 +67,51 @@ function defaultBackoff(failureCount: number): number {
   return Math.min((failureCount * 10) ** 2, 10 * 1000)
 }
 
+export interface Transport {
+  send: <T>(request: RPCRequest) => Promise<T>
+}
+
+export interface CreateTransport<T extends Transport = Transport> {
+  (): T
+}
+
+export interface TransportConfig {
+  /**
+   * 请求超时时间（毫秒）
+   * @default 14000
+   */
+  timeout?: number
+}
+
+export interface HTTPTransportConfig extends TransportConfig {}
+
+export interface WebSocketTransportConfig extends TransportConfig {
+  /**
+   * 重试选项
+   */
+  retry?: RetryOptions
+}
+
 /**
  * WebSocket 传输层
  */
-export class WebSocketTransport extends EventTarget {
+export class WebSocketTransport extends EventTarget implements Transport {
   private socket?: WebSocket
   private connectPromise: Promise<void> | null = null
   private active = false
   private failureCount = 0
+  private readonly timeout: number
+  private readonly pending = new Map<number, PendingRequest>()
 
   readonly retryOptions: Required<RetryOptions>
-  readonly client: Client
+
   constructor(
-    client: Client,
-    options: RetryOptions = {},
+    public url: string,
+    config: WebSocketTransportConfig = {},
   ) {
     super()
-    this.retryOptions = defu(options, defaultRetryOptions)
-    this.client = client
+    this.timeout = config.timeout ?? 14000
+    this.retryOptions = defu(config.retry, defaultRetryOptions)
   }
 
   public isConnected = (): boolean => {
@@ -96,7 +122,7 @@ export class WebSocketTransport extends EventTarget {
     this.active = true
 
     if (!this.socket) {
-      this.socket = new WebSocket(this.client.url)
+      this.socket = new WebSocket(this.url)
       this.socket.addEventListener('message', this.onMessage)
       this.socket.addEventListener('open', this.onOpen)
       this.socket.addEventListener('close', this.onClose)
@@ -135,16 +161,23 @@ export class WebSocketTransport extends EventTarget {
   }
 
   public async send<T>(request: RPCRequest): Promise<T> {
+    let signal: AbortSignal | undefined
+    if (this.timeout > 0) {
+      signal = AbortSignal.timeout(this.timeout)
+    }
+
+    const { promise, reject, resolve } = Promise.withResolvers<T>()
+    this.pending.set(request.id, { promise, request, resolve, reject, signal })
+
     if (this.isConnected()) {
       this.write(request).catch((error: Error) => {
         this.rpcHandler(request.id, error)
       })
     }
-    const { promise, signal } = this.client.pending.get(request.id)!
 
     if (signal) {
       signal.onabort = () => {
-        const error = new ClientTimeoutError(`Timed out after ${this.client.sendTimeout}ms`)
+        const error = new ClientTimeoutError(`Timed out after ${this.timeout}ms`)
         this.rpcHandler(request.id, error)
       }
     }
@@ -153,12 +186,12 @@ export class WebSocketTransport extends EventTarget {
   }
 
   private rpcHandler = (seq: number, error?: Error, response?: any) => {
-    if (this.client.pending.has(seq)) {
-      const { resolve, reject, signal } = this.client.pending.get(seq) as PendingRequest
+    if (this.pending.has(seq)) {
+      const { resolve, reject, signal } = this.pending.get(seq) as PendingRequest
       if (signal) {
         signal.onabort = null
       }
-      this.client.pending.delete(seq)
+      this.pending.delete(seq)
       if (error) {
         reject(error)
       }
@@ -180,7 +213,7 @@ export class WebSocketTransport extends EventTarget {
   }
 
   private flushPending = () => {
-    const toSend: PendingRequest[] = Array.from(this.client.pending.values())
+    const toSend: PendingRequest[] = Array.from(this.pending.values())
     toSend.sort((a, b) => a.request.id - b.request.id)
     toSend.map(async (pending) => {
       try {
@@ -270,20 +303,34 @@ export class WebSocketTransport extends EventTarget {
 /**
  * HTTP 传输层
  */
-export class HTTPTransport {
-  constructor(private readonly client: Client) {
+export class HTTPTransport implements Transport {
+  private readonly timeout: number
+  private readonly pending = new Map<number, PendingRequest>()
+
+  constructor(
+    public url: string,
+    config: HTTPTransportConfig = {},
+  ) {
+    this.timeout = config.timeout ?? 14000
   }
 
   public async send<T>(request: RPCRequest): Promise<T> {
     try {
-      const { signal } = this.client.pending.get(request.id)!
+      let signal: AbortSignal | undefined
+      if (this.timeout > 0) {
+        signal = AbortSignal.timeout(this.timeout)
+      }
+
+      const { promise, reject, resolve } = Promise.withResolvers<T>()
+      this.pending.set(request.id, { promise, request, resolve, reject, signal })
+
       const body = JSON.stringify(request, (key, value) => {
         if (value instanceof Uint8Array) {
           return bytesToHex(value)
         }
         return value
       })
-      const response = await fetch(this.client.url, {
+      const response = await fetch(this.url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -306,11 +353,21 @@ export class HTTPTransport {
     }
     catch (error) {
       if (error instanceof DOMException && error.name === 'TimeoutError') {
-        throw new ClientTimeoutError(`Timed out after ${this.client.sendTimeout}ms`)
+        throw new ClientTimeoutError(`Timed out after ${this.timeout}ms`)
       }
       else {
         throw new ClientHTTPError('HTTP request failed', { cause: error })
       }
     }
   }
+}
+
+export function http(url: string, config?: HTTPTransportConfig): CreateTransport<HTTPTransport> {
+  return () => {
+    return new HTTPTransport(url, config)
+  }
+}
+
+export function webSocket(url: string, config?: WebSocketTransportConfig): CreateTransport<WebSocketTransport> {
+  return () => new WebSocketTransport(url, config)
 }
