@@ -1,11 +1,11 @@
 # 白玉京 API
 
-调用节点提供的白玉京接口获取一些只读数据。
+通过访问白玉京 API 的接口，可以获取区块链上的数据。
 
 ```ts twoslash
 import { Client } from '@taiyinet/ctaiyi'
 
-const client = Client.testnet()
-const baiyujing = client.baiyujing // [!code focus]
-//    ^?
+const client = new Client('https://<rpc-url>')
+// ---cut---
+const accounts = await client.baiyujing.getAccounts(['initminer'])
 ```

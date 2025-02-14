@@ -1,8 +1,12 @@
-# 广播
-
-向区块链节点广播交易和操作。
+# 广播交易
 
 ```ts twoslash
-declare const broadcast: import('@taiyinet/ctaiyi').BroadcastAPI
-//            ^?
+import { Client, PrivateKey, TransferOperation } from '@taiyinet/ctaiyi'
+
+const client = new Client('https://<rpc-url>')
+
+declare const tx: TransferOperation[1]
+declare const pk: PrivateKey
+// ---cut---
+const confirm = await client.broadcast.transfer(tx, pk)
 ```

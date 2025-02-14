@@ -251,6 +251,34 @@ const baiyujingItems: DefaultTheme.SidebarItem = {
   ],
 }
 
+const broadcastItems: DefaultTheme.SidebarItem = {
+  text: '广播交易',
+  base: '/broadcast/',
+  collapsed: true,
+  items: [
+    { text: '介绍', link: '/intro' },
+  ],
+}
+
+const blockchainItems: DefaultTheme.SidebarItem = {
+  text: '区块链信息',
+  base: '/blockchain/',
+  collapsed: true,
+  items: [
+    { text: '介绍', link: '/intro' },
+  ],
+}
+
+const utilitiesItems: DefaultTheme.SidebarItem = {
+  text: '工具函数 & 类',
+  base: '/utilities/',
+  collapsed: true,
+  items: [
+    { text: 'PublicKey', link: '/public-key' },
+    { text: 'PrivateKey', link: '/private-key' },
+  ],
+}
+
 const guideSidebar: DefaultTheme.SidebarMulti['/guide/'] = {
   base: '/guide/',
   items: [
@@ -271,30 +299,9 @@ const guideSidebar: DefaultTheme.SidebarMulti['/guide/'] = {
     },
     clientItems,
     baiyujingItems,
-    {
-      text: '广播交易',
-      base: '/broadcast/',
-      collapsed: true,
-      items: [
-        { text: '介绍', link: '/intro' },
-      ],
-    },
-    {
-      text: '区块链信息',
-      base: '/blockchain/',
-      collapsed: true,
-      items: [
-        { text: '介绍', link: '/intro' },
-      ],
-    },
-    {
-      text: '工具函数 & 类',
-      base: '/utilities/',
-      collapsed: true,
-      items: [
-        { text: 'PublicKey', link: '/public-key' },
-      ],
-    },
+    broadcastItems,
+    blockchainItems,
+    utilitiesItems,
     {
       text: '类型',
       link: '/types',
