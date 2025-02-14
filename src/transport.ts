@@ -67,12 +67,9 @@ function defaultBackoff(failureCount: number): number {
   return Math.min((failureCount * 10) ** 2, 10 * 1000)
 }
 
-export interface Transport {
+export interface Transport<type extends string = string> {
+  type: type
   send: <T>(request: RPCRequest) => Promise<T>
-}
-
-export interface CreateTransport<T extends Transport = Transport> {
-  (): T
 }
 
 export interface TransportConfig {
@@ -83,19 +80,25 @@ export interface TransportConfig {
   timeout?: number
 }
 
-export interface HTTPTransportConfig extends TransportConfig {}
+export interface HTTPTransportConfig extends TransportConfig { }
 
 export interface WebSocketTransportConfig extends TransportConfig {
+
   /**
-   * 重试选项
+   * 自动连接
+   * @default true
    */
-  retry?: RetryOptions
+  autoConnect?: boolean
+
+  retry?: number | ((failureCount: number, error: Error) => boolean) | RetryOptions
 }
 
 /**
  * WebSocket 传输层
  */
-export class WebSocketTransport extends EventTarget implements Transport {
+export class WebSocketTransport extends EventTarget implements Transport<'websocket'> {
+  readonly type = 'websocket'
+
   private socket?: WebSocket
   private connectPromise: Promise<void> | null = null
   private active = false
@@ -112,6 +115,10 @@ export class WebSocketTransport extends EventTarget implements Transport {
     super()
     this.timeout = config.timeout ?? 14000
     this.retryOptions = defu(config.retry, defaultRetryOptions)
+
+    if (config.autoConnect) {
+      this.connect()
+    }
   }
 
   public isConnected = (): boolean => {
@@ -303,7 +310,8 @@ export class WebSocketTransport extends EventTarget implements Transport {
 /**
  * HTTP 传输层
  */
-export class HTTPTransport implements Transport {
+export class HTTPTransport implements Transport<'http'> {
+  readonly type = 'http'
   private readonly timeout: number
   private readonly pending = new Map<number, PendingRequest>()
 
@@ -362,12 +370,10 @@ export class HTTPTransport implements Transport {
   }
 }
 
-export function http(url: string, config?: HTTPTransportConfig): CreateTransport<HTTPTransport> {
-  return () => {
-    return new HTTPTransport(url, config)
-  }
+export function http(url: string, config?: HTTPTransportConfig): HTTPTransport {
+  return new HTTPTransport(url, config)
 }
 
-export function webSocket(url: string, config?: WebSocketTransportConfig): CreateTransport<WebSocketTransport> {
-  return () => new WebSocketTransport(url, config)
+export function webSocket(url: string, config?: WebSocketTransportConfig): WebSocketTransport {
+  return new WebSocketTransport(url, config)
 }

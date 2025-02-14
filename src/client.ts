@@ -1,11 +1,12 @@
-import type { CreateTransport, PendingRequest, RetryOptions, RPCCall, RPCRequest, Transport } from './transport'
+import type { HTTPTransport, PendingRequest, RPCCall, RPCRequest, Transport } from './transport'
 import { hexToBytes } from '@noble/hashes/utils'
+import defu from 'defu'
 import invariant from 'tiny-invariant'
 import { version } from '../package.json' with { type: 'json' }
 import { BaiYuJingAPI } from './helpers/baiyujing'
 import { Blockchain } from './helpers/blockchain'
 import { BroadcastAPI } from './helpers/broadcast'
-import { WebSocketTransport } from './transport'
+import { http } from './transport'
 
 /**
  * 包版本
@@ -22,7 +23,7 @@ export const DEFAULT_CHAIN_ID = hexToBytes('000000000000000000000000000000000000
  */
 export const DEFAULT_ADDRESS_PREFIX = 'TAI'
 
-export interface ClientOptions {
+export interface ClientOptions<T extends Transport> {
   /**
    * 链ID
    */
@@ -39,37 +40,28 @@ export interface ClientOptions {
    */
   timeout?: number
 
-  transport: CreateTransport
-}
-
-export interface HTTPClientOptions extends ClientOptions {
-}
-
-export interface WebSocketClientOptions extends ClientOptions {
-
-  /**
-   * 自动连接
-   * @default true
-   */
-  autoConnect?: boolean
-
-  retry?: number | ((failureCount: number, error: Error) => boolean) | RetryOptions
+  transport: T
 }
 
 // MARK: Client
 /**
  * RPC client
  */
-export class Client {
+export class Client<T extends Transport> {
+  static testnet<T extends Transport = HTTPTransport>(options: Omit<ClientOptions<T>, 'transport'> = {}) {
+    const o = defu(options, {
+      transport: http('https://127.0.0.1:8090'),
+    })
+    return new Client(o)
+  }
+
   // #region Client Properties
   public readonly chainId: Uint8Array
   public readonly addressPrefix: string
 
   public pending = new Map<number, PendingRequest>()
   private seqNo = 0
-  public readonly transport: Transport
-
-  sendTimeout: number
+  public readonly transport: T
 
   // #region Helper
   public readonly baiyujing: BaiYuJingAPI
@@ -77,40 +69,16 @@ export class Client {
   public readonly broadcast: BroadcastAPI
   // #endregion
 
-  constructor(options: WebSocketClientOptions | HTTPClientOptions) {
+  constructor(options: ClientOptions<T>) {
     this.chainId = options.chainId ? hexToBytes(options.chainId) : DEFAULT_CHAIN_ID
     invariant(this.chainId.length === 32, 'invalid chain id')
     this.addressPrefix = options.addressPrefix || DEFAULT_ADDRESS_PREFIX
-
-    this.sendTimeout = options.timeout ?? 14 * 1000
 
     this.baiyujing = new BaiYuJingAPI(this)
     this.blockchain = new Blockchain(this)
     this.broadcast = new BroadcastAPI(this)
 
-    this.transport = options.transport()
-  }
-
-  public isConnected(): boolean {
-    if (this.transport instanceof WebSocketTransport) {
-      return this.transport.isConnected()
-    }
-    console.warn('[ctaiyi] isConnected() is unnecessary for HTTP transport')
-    return true
-  }
-
-  public async connect(): Promise<void> {
-    if (this.transport instanceof WebSocketTransport) {
-      return this.transport.connect()
-    }
-    console.warn('[ctaiyi] connect() is unnecessary for HTTP transport')
-  }
-
-  public async disconnect(): Promise<void> {
-    if (this.transport instanceof WebSocketTransport) {
-      return this.transport.disconnect()
-    }
-    console.warn('[ctaiyi] disconnect() is unnecessary for HTTP transport')
+    this.transport = options.transport
   }
 
   public call<Response = any>(api: string, method: string, params: any[] = []): Promise<Response> {
