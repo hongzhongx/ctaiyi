@@ -15,8 +15,8 @@ export type * from './helpers/baiyujing'
 export type * from './helpers/blockchain'
 export type * from './helpers/broadcast'
 export * from './taiyi/account'
-
 export * from './taiyi/actor'
+
 export * from './taiyi/asset'
 export * from './taiyi/block'
 export * from './taiyi/misc'

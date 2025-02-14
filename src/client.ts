@@ -47,7 +47,7 @@ export interface ClientOptions<T extends Transport> {
 /**
  * RPC client
  */
-export class Client<T extends Transport> {
+export class Client<T extends Transport = Transport> {
   static testnet<T extends Transport = HTTPTransport>(options: Omit<ClientOptions<T>, 'transport'> = {}) {
     const o = defu(options, {
       transport: http('https://127.0.0.1:8090'),
