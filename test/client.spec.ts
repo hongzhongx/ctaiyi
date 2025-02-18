@@ -1,22 +1,19 @@
 import type { ClientMessageError } from '../src/errors'
 import { RPCError } from '../src/errors'
 import { WebSocketTransport } from '../src/transport'
-import { Client } from './../src'
 import { waitForEvent } from './../src/utils'
-import { TEST_CONFIG } from './common'
+import { runForBothTransports } from './fixture'
 
 vi.setConfig({
   testTimeout: 60 * 1000,
 })
-const client = Client.testnet(TEST_CONFIG)
 
-if (client.transport instanceof WebSocketTransport) {
-  beforeAll(async () => {
-    await client.connect()
+runForBothTransports('client for transport $transport.type', (client) => {
+  beforeEach(async () => {
+    if (client.transport instanceof WebSocketTransport) {
+      await (<WebSocketTransport>client.transport).connect()
+    }
   })
-}
-
-describe('client', () => {
   it('should make rpc call', async () => {
     const config = await client.call('baiyujing_api', 'get_config')
     expect(config)
@@ -47,7 +44,8 @@ describe('client', () => {
     'websocket transport',
     async () => {
       it('should connected', async () => {
-        expect(client.isConnected()).toBe(true)
+        assert(client.transport instanceof WebSocketTransport)
+        expect(client.transport.isConnected()).toBe(true)
       })
 
       it('should reconnect on disconnection', async () => {
@@ -86,8 +84,9 @@ describe('client', () => {
       })
 
       it('should time out when loosing connection', async () => {
+        assert(client.transport instanceof WebSocketTransport)
         client.sendTimeout = 100
-        await client.disconnect()
+        await client.transport.disconnect()
         try {
           await client.call('baiyujing_api', 'get_accounts', [['initminer']]) as any[]
           assert(false, 'should not be reached')
@@ -96,12 +95,13 @@ describe('client', () => {
           assert.equal((error as Error).name, 'TimeoutError')
         }
         client.sendTimeout = 5000
-        await client.connect()
+        await client.transport.connect()
       })
 
       it('should disconnect', async () => {
-        await client.disconnect()
-        assert(!client.isConnected())
+        assert(client.transport instanceof WebSocketTransport)
+        await client.transport.disconnect()
+        assert(!client.transport.isConnected())
       })
     },
   )

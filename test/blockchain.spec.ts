@@ -1,22 +1,18 @@
-import { Client } from '../src'
-import { WebSocketTransport } from '../src/transport'
-import { TEST_CONFIG } from './common'
-
-// 后续等正式测试网上线可以换成一些测试网上的数据快照
+import { WebSocketTransport } from '../src'
+import { runForBothTransports } from './fixture'
 
 vi.setConfig({
   testTimeout: 60 * 1000,
 })
 
-const client = Client.testnet(TEST_CONFIG)
-
-if (client.transport instanceof WebSocketTransport) {
+// 后续等正式测试网上线可以换成一些测试网上的数据快照
+runForBothTransports('blockchain data for transport $transport.type', (client) => {
   beforeAll(async () => {
-    await client.connect()
+    if (client.transport instanceof WebSocketTransport) {
+      await (<WebSocketTransport>client.transport).connect()
+    }
   })
-}
 
-describe('blockchain', () => {
   it('should yield blocks', async () => {
     const ids: string[] = []
     for await (const block of client.blockchain.getBlocks({ from: 1, to: 2 })) {

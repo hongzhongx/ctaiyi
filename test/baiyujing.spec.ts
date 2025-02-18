@@ -1,39 +1,19 @@
-import type { SignedTransaction, Transaction, WebSocketTransport } from '../src'
-import { Client } from '../src'
-import { http, webSocket } from '../src/transport'
+import type { SignedTransaction, Transaction } from '../src'
+import { WebSocketTransport } from '../src'
 import { INITMINER_PRIVATE_KEY } from './common'
+import { runForBothTransports } from './fixture'
 
 vi.setConfig({
   testTimeout: 100000,
 })
 
-const client = Client.testnet({
-  transport: webSocket('ws://47.109.49.30:8090'),
-})
-
-beforeAll(async () => {
-  await client.transport.connect()
-})
-
-const clients = [
-  Client.testnet({
-    transport: webSocket('ws://127.0.0.1:8090'),
-  }),
-  Client.testnet({
-    transport: http('http://127.0.0.1:8090'),
-  }),
-] as const
-
-describe.each(clients)('client instance base status', (client) => {
-  if (client.transport.type === 'websocket') {
-    beforeAll(async () => {
+runForBothTransports('client instance base status for transport $transport.type', (client) => {
+  beforeAll(async () => {
+    if (client.transport instanceof WebSocketTransport) {
       await (<WebSocketTransport>client.transport).connect()
-    })
-  }
-  runTestSuit(client)
-})
+    }
+  })
 
-function runTestSuit(client: Client) {
   describe('client instance base status', () => {
     it('should exist baiyujing', () => {
       expect(client).toHaveProperty('baiyujing')
@@ -260,14 +240,14 @@ function runTestSuit(client: Client) {
     it('should get qi delegations', async () => {
       const delegations = await client.baiyujing.getQiDelegations('initminer', 10, 10)
 
-      expect(delegations).toMatchInlineSnapshot(`[]`)
+      expect(delegations).toEqual([])
     })
 
     // TODO(@enpitsulin): 记录下报错
     it.skip('should get expiring qi delegations', async () => {
       try {
         const delegations = await client.baiyujing.getExpiringQiDelegations('ctaiyi-kxdbofbdnctaiyi-kxdbofbdn', 0, 10)
-        expect(delegations).toMatchInlineSnapshot(`[]`)
+        expect(delegations).toEqual([])
       }
       catch (e) {
         expect(e).toBeInstanceOf(Error)
@@ -420,7 +400,7 @@ function runTestSuit(client: Client) {
         signedTrx!,
         [],
       )
-      expect(signatures).toMatchInlineSnapshot(`[]`)
+      expect(signatures).toEqual([])
     })
 
     it('should get potential signatures', async () => {
@@ -583,4 +563,4 @@ function runTestSuit(client: Client) {
       })
     })
   })
-}
+})

@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  VITE_RPC_CLIENT_CONFIG?: string
+  VITE_TEST_TRANSITIONS?: string
 }
 
 interface ImportMeta {

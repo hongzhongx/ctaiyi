@@ -68,7 +68,7 @@ function defaultBackoff(failureCount: number): number {
 }
 
 export interface Transport<type extends string = string> {
-  type: type
+  readonly type: type
   send: <T>(request: RPCRequest) => Promise<T>
 }
 
