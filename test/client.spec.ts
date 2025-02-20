@@ -102,6 +102,8 @@ runForBothTransports('client for transport $transport.type', (client) => {
 
       it('should disconnect', async () => {
         assert(client.transport instanceof WebSocketTransport)
+        await client.transport.connect()
+        assert(client.transport.isConnected())
         await client.transport.disconnect()
         assert(!client.transport.isConnected())
       })

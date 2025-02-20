@@ -165,6 +165,7 @@ export class WebSocketTransport extends EventTarget implements Transport<'websoc
       this.socket.close()
       await waitForEvent(this, 'close')
       this.socket = undefined
+      this.connectPromise = null
     }
   }
 
