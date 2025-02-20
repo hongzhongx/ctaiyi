@@ -34,12 +34,6 @@ export interface ClientOptions<T extends Transport> {
    */
   addressPrefix?: string
 
-  /**
-   * 请求超时，单位：毫秒
-   * @default 14000
-   */
-  timeout?: number
-
   transport: T
 }
 

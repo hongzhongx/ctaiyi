@@ -98,12 +98,12 @@ export interface WebSocketTransportConfig extends TransportConfig {
  */
 export class WebSocketTransport extends EventTarget implements Transport<'websocket'> {
   readonly type = 'websocket'
+  readonly timeout: number
 
   private socket?: WebSocket
   private connectPromise: Promise<void> | null = null
   private active = false
   private failureCount = 0
-  private readonly timeout: number
   private readonly pending = new Map<number, PendingRequest>()
 
   readonly retryOptions: Required<RetryOptions>
@@ -125,7 +125,7 @@ export class WebSocketTransport extends EventTarget implements Transport<'websoc
     return this.socket !== undefined && this.socket.readyState === WebSocket.OPEN
   }
 
-  public connect = async (): Promise<void> => {
+  public connect = (): Promise<void> => {
     this.active = true
 
     if (!this.socket) {
@@ -164,6 +164,7 @@ export class WebSocketTransport extends EventTarget implements Transport<'websoc
     ) {
       this.socket.close()
       await waitForEvent(this, 'close')
+      this.socket = undefined
     }
   }
 
@@ -267,7 +268,7 @@ export class WebSocketTransport extends EventTarget implements Transport<'websoc
         const response = rpcMessage as RPCResponse
         let error: Error | undefined
         if (response.error) {
-          throw normalizeRpcError(response.error)
+          error = new ClientWebSocketError('WebSocket request error', { cause: normalizeRpcError(response.error) })
         }
         this.rpcHandler(response.id, error, response.result)
       }
@@ -312,7 +313,7 @@ export class WebSocketTransport extends EventTarget implements Transport<'websoc
  */
 export class HTTPTransport implements Transport<'http'> {
   readonly type = 'http'
-  private readonly timeout: number
+  readonly timeout: number
   private readonly pending = new Map<number, PendingRequest>()
 
   constructor(

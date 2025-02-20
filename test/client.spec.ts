@@ -9,9 +9,9 @@ vi.setConfig({
 })
 
 runForBothTransports('client for transport $transport.type', (client) => {
-  beforeEach(async () => {
+  beforeAll(async () => {
     if (client.transport instanceof WebSocketTransport) {
-      await (<WebSocketTransport>client.transport).connect()
+      await client.transport.connect()
     }
   })
   it('should make rpc call', async () => {
@@ -29,7 +29,7 @@ runForBothTransports('client for transport $transport.type', (client) => {
       assert(error instanceof Error)
 
       expect(error.name).toBe(client.transport instanceof WebSocketTransport ? 'WebSocketError' : 'HTTPError')
-      expect(error.message).toBe(`HTTP request failed`)
+      expect(error.message).toBe(client.transport instanceof WebSocketTransport ? `WebSocket request error` : `HTTP request failed`)
 
       assert(error.cause instanceof RPCError)
       expect(error.cause.message).toBe(`method_itr != api_itr->second.end(): Could not find method method_does_exist`)
@@ -85,7 +85,8 @@ runForBothTransports('client for transport $transport.type', (client) => {
 
       it('should time out when loosing connection', async () => {
         assert(client.transport instanceof WebSocketTransport)
-        client.sendTimeout = 100
+        // @ts-expect-error test usage
+        client.transport.timeout = 100
         await client.transport.disconnect()
         try {
           await client.call('baiyujing_api', 'get_accounts', [['initminer']]) as any[]
@@ -94,7 +95,8 @@ runForBothTransports('client for transport $transport.type', (client) => {
         catch (error) {
           assert.equal((error as Error).name, 'TimeoutError')
         }
-        client.sendTimeout = 5000
+        // @ts-expect-error test usage
+        client.transport.timeout = 5000
         await client.transport.connect()
       })
 
