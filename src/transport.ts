@@ -67,8 +67,8 @@ function defaultBackoff(failureCount: number): number {
   return Math.min((failureCount * 10) ** 2, 10 * 1000)
 }
 
-export interface Transport<type extends string = string> {
-  readonly type: type
+export interface Transport {
+  readonly type: string
   send: <T>(request: RPCRequest) => Promise<T>
 }
 
@@ -96,7 +96,7 @@ export interface WebSocketTransportConfig extends TransportConfig {
 /**
  * WebSocket 传输层
  */
-export class WebSocketTransport extends EventTarget implements Transport<'websocket'> {
+export class WebSocketTransport extends EventTarget implements Transport {
   readonly type = 'websocket'
   readonly timeout: number
 
@@ -312,7 +312,7 @@ export class WebSocketTransport extends EventTarget implements Transport<'websoc
 /**
  * HTTP 传输层
  */
-export class HTTPTransport implements Transport<'http'> {
+export class HTTPTransport implements Transport {
   readonly type = 'http'
   readonly timeout: number
   private readonly pending = new Map<number, PendingRequest>()
