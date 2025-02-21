@@ -1,4 +1,5 @@
 import type { SignedTransaction, Transaction } from '../src'
+import { setTimeout } from 'timers/promises'
 import { INITMINER_PRIVATE_KEY } from './common'
 import { runForBothTransports } from './fixture'
 
@@ -7,6 +8,13 @@ vi.setConfig({
 })
 
 runForBothTransports('client instance base status for transport $transport.type', (client) => {
+  afterEach(async () => {
+    // avoid HTTP 503 `TaiyiRateLimit` that rate limit 50rps by nginx frontend
+    if (client.transport.type === 'http') {
+      await setTimeout(100)
+    }
+  })
+
   describe('client instance base status', () => {
     it('should exist baiyujing', () => {
       expect(client).toHaveProperty('baiyujing')

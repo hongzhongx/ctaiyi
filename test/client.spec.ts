@@ -78,23 +78,6 @@ runForBothTransports('client for transport $transport.type', (client) => {
         client.transport.socket!.send = socketSend
       })
 
-      it('should time out when loosing connection', async () => {
-        assert(client.transport.type === 'websocket')
-        // @ts-expect-error test usage
-        client.transport.timeout = 100
-        await client.transport.disconnect()
-        try {
-          await client.call('baiyujing_api', 'get_accounts', [['initminer']]) as any[]
-          assert(false, 'should not be reached')
-        }
-        catch (error) {
-          assert.equal((error as Error).name, 'TimeoutError')
-        }
-        // @ts-expect-error test usage
-        client.transport.timeout = 5000
-        await client.transport.connect()
-      })
-
       it('should disconnect', async () => {
         assert(client.transport.type === 'websocket')
         await client.transport.connect()

@@ -1,8 +1,8 @@
 import type { Client, Operation, Serializer } from './../src'
+import { setTimeout } from 'timers/promises'
 import { bytesToHex } from '@noble/hashes/utils'
 
 import ByteBuffer from 'bytebuffer'
-import { WebSocketTransport } from '../src/transports/transport'
 import { Authority, PrivateKey, Types } from './../src'
 import { randomString } from './common'
 import { runForBothTransports } from './fixture'
@@ -38,9 +38,10 @@ vi.setConfig({
 })
 
 runForBothTransports('serialize operations for transport $transport.type', (client) => {
-  beforeAll(async () => {
-    if (client.transport instanceof WebSocketTransport) {
-      await (<WebSocketTransport>client.transport).connect()
+  afterEach(async () => {
+    // avoid HTTP 503 `TaiyiRateLimit` that rate limit 50rps by nginx frontend
+    if (client.transport.type === 'http') {
+      await setTimeout(100)
     }
   })
 
