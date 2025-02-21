@@ -5,7 +5,6 @@ vi.setConfig({
   testTimeout: 60 * 1000,
 })
 
-// 后续等正式测试网上线可以换成一些测试网上的数据快照
 runForBothTransports('blockchain data for transport $transport.type', (client) => {
   beforeAll(async () => {
     if (client.transport instanceof WebSocketTransport) {
