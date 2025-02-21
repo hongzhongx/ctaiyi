@@ -1,6 +1,5 @@
 import type { Operation } from '../src'
 import { PrivateKey } from '../src'
-import { WebSocketTransport } from '../src/transport'
 import { getTestnetAccounts, INITMINER_PRIVATE_KEY, randomString } from './common'
 import { runForBothTransports } from './fixture'
 
@@ -11,9 +10,6 @@ vi.setConfig({
 })
 
 runForBothTransports('broadcast for transport $transport.type', async (client) => {
-  if (client.transport instanceof WebSocketTransport) {
-    await (<WebSocketTransport>client.transport).connect()
-  }
   const [acc1, acc2] = await getTestnetAccounts(client)
 
   describe('broadcast helper', () => {

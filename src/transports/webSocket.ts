@@ -1,86 +1,8 @@
+import type { PendingRequest, RetryOptions, RPCRequest, RPCResponse, Transport, TransportConfig } from './transport'
 import { bytesToHex } from '@noble/hashes/utils'
 import defu from 'defu'
-import { ClientHTTPError, ClientMessageError, ClientTimeoutError, ClientWebSocketError } from './errors'
-import { normalizeRpcError, waitForEvent } from './utils'
-
-export interface RPCRequest {
-  /**
-   * 请求序列号
-   */
-  id: number
-  /**
-   * RPC method.
-   */
-  method: 'call' | 'notice' | 'callback'
-  jsonrpc: '2.0'
-  params: any[]
-}
-
-export interface RPCCall extends RPCRequest {
-  method: 'call'
-  /**
-   * 1. 要调用的API,你可以传入通过调用'get_api_by_name'获得的API数字ID,
-   *    或者直接传入API名称字符串。
-   * 2. 要在该API上调用的方法。
-   * 3. 传递给该方法的参数。
-   */
-  params: [number | string, string, any[]]
-}
-
-export interface RPCResponseError {
-  code: number
-  message: string
-  data?: any
-}
-
-export interface RPCResponse {
-  /**
-   * 响应序列号,对应请求序列号
-   */
-  id: number
-  error?: RPCResponseError
-  result?: any
-}
-
-export interface PendingRequest {
-  request: RPCRequest
-  /**
-   * 超时 AbortSignal
-   */
-  signal?: AbortSignal
-  promise: Promise<any>
-  resolve: (response: any) => void
-  reject: (error: Error) => void
-}
-
-export interface RetryOptions {
-  retry?: number | ((failureCount: number, error: Error) => boolean)
-  backoff?: (failureCount: number) => number
-}
-
-const defaultRetryOptions: Required<RetryOptions> = {
-  retry: 3,
-  backoff: defaultBackoff,
-}
-
-function defaultBackoff(failureCount: number): number {
-  return Math.min((failureCount * 10) ** 2, 10 * 1000)
-}
-
-export interface Transport {
-  readonly type: string
-  send: <T>(request: RPCRequest) => Promise<T>
-}
-
-export interface TransportConfig {
-  /**
-   * 请求超时时间（毫秒）
-   * @default 14000
-   */
-  timeout?: number
-}
-
-export interface HTTPTransportConfig extends TransportConfig { }
+import { ClientMessageError, ClientTimeoutError, ClientWebSocketError } from '../errors'
+import { normalizeRpcError, waitForEvent } from '../utils'
 
 export interface WebSocketTransportConfig extends TransportConfig {
 
@@ -91,6 +13,15 @@ export interface WebSocketTransportConfig extends TransportConfig {
   autoConnect?: boolean
 
   retry?: number | ((failureCount: number, error: Error) => boolean) | RetryOptions
+}
+
+const defaultRetryOptions: Required<RetryOptions> = {
+  retry: 3,
+  backoff: defaultBackoff,
+}
+
+function defaultBackoff(failureCount: number): number {
+  return Math.min((failureCount * 10) ** 2, 10 * 1000)
 }
 
 /**
@@ -170,6 +101,9 @@ export class WebSocketTransport extends EventTarget implements Transport {
   }
 
   public async send<T>(request: RPCRequest): Promise<T> {
+    if (!this.isConnected()) {
+      await this.connect()
+    }
     let signal: AbortSignal | undefined
     if (this.timeout > 0) {
       signal = AbortSignal.timeout(this.timeout)
@@ -307,73 +241,6 @@ export class WebSocketTransport extends EventTarget implements Transport {
       this.connect()
     }
   }
-}
-
-/**
- * HTTP 传输层
- */
-export class HTTPTransport implements Transport {
-  readonly type = 'http'
-  readonly timeout: number
-  private readonly pending = new Map<number, PendingRequest>()
-
-  constructor(
-    public url: string,
-    config: HTTPTransportConfig = {},
-  ) {
-    this.timeout = config.timeout ?? 14000
-  }
-
-  public async send<T>(request: RPCRequest): Promise<T> {
-    try {
-      let signal: AbortSignal | undefined
-      if (this.timeout > 0) {
-        signal = AbortSignal.timeout(this.timeout)
-      }
-
-      const { promise, reject, resolve } = Promise.withResolvers<T>()
-      this.pending.set(request.id, { promise, request, resolve, reject, signal })
-
-      const body = JSON.stringify(request, (key, value) => {
-        if (value instanceof Uint8Array) {
-          return bytesToHex(value)
-        }
-        return value
-      })
-      const response = await fetch(this.url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body,
-        signal,
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const rpcResponse = await response.json() as RPCResponse
-
-      if (rpcResponse.error) {
-        throw normalizeRpcError(rpcResponse.error)
-      }
-
-      return rpcResponse.result
-    }
-    catch (error) {
-      if (error instanceof DOMException && error.name === 'TimeoutError') {
-        throw new ClientTimeoutError(`Timed out after ${this.timeout}ms`)
-      }
-      else {
-        throw new ClientHTTPError('HTTP request failed', { cause: error })
-      }
-    }
-  }
-}
-
-export function http(url: string, config?: HTTPTransportConfig): HTTPTransport {
-  return new HTTPTransport(url, config)
 }
 
 export function webSocket(url: string, config?: WebSocketTransportConfig): WebSocketTransport {

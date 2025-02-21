@@ -1,4 +1,5 @@
-import type { HTTPTransport, PendingRequest, RPCCall, RPCRequest, Transport } from './transport'
+import type { HTTPTransport } from './transports'
+import type { PendingRequest, RPCCall, Transport } from './transports/transport'
 import { hexToBytes } from '@noble/hashes/utils'
 import defu from 'defu'
 import invariant from 'tiny-invariant'
@@ -6,7 +7,7 @@ import { version } from '../package.json' with { type: 'json' }
 import { BaiYuJingAPI } from './helpers/baiyujing'
 import { Blockchain } from './helpers/blockchain'
 import { BroadcastAPI } from './helpers/broadcast'
-import { http } from './transport'
+import { http } from './transports'
 
 /**
  * 包版本
@@ -83,10 +84,6 @@ export class Client<T extends Transport = Transport> {
       params: [api, method, params],
       jsonrpc: '2.0',
     }
-    return this.send(request)
-  }
-
-  private send<T = any>(request: RPCRequest): Promise<T> {
-    return this.transport.send<T>(request)
+    return this.transport.send<Response>(request)
   }
 }

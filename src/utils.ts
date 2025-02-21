@@ -2,7 +2,7 @@
  * @file Misc utility functions.
  */
 
-import type { RPCResponseError } from './transport'
+import type { RPCResponseError } from './transports/transport'
 import { RPCError } from './errors'
 
 export function waitForEvent<T>(target: EventTarget, event: string): Promise<T> {

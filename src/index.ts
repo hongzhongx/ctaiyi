@@ -27,4 +27,5 @@ export * from './taiyi/serializer'
 export * from './taiyi/siming'
 export * from './taiyi/tiandao'
 export * from './taiyi/transaction'
-export * from './transport'
+
+export * from './transports'

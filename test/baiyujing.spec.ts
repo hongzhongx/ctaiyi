@@ -1,5 +1,4 @@
 import type { SignedTransaction, Transaction } from '../src'
-import { WebSocketTransport } from '../src'
 import { INITMINER_PRIVATE_KEY } from './common'
 import { runForBothTransports } from './fixture'
 
@@ -8,12 +7,6 @@ vi.setConfig({
 })
 
 runForBothTransports('client instance base status for transport $transport.type', (client) => {
-  beforeAll(async () => {
-    if (client.transport instanceof WebSocketTransport) {
-      await (<WebSocketTransport>client.transport).connect()
-    }
-  })
-
   describe('client instance base status', () => {
     it('should exist baiyujing', () => {
       expect(client).toHaveProperty('baiyujing')
@@ -300,7 +293,7 @@ runForBothTransports('client instance base status for transport $transport.type'
           [
             'transfer_to_qi',
             {
-              amount: '0.010 YANG',
+              amount: '0.001 YANG',
               from: 'initminer',
               to: 'initminer',
             },

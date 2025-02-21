@@ -2,7 +2,7 @@ import type { Client, Operation, Serializer } from './../src'
 import { bytesToHex } from '@noble/hashes/utils'
 
 import ByteBuffer from 'bytebuffer'
-import { WebSocketTransport } from '../src/transport'
+import { WebSocketTransport } from '../src/transports/transport'
 import { Authority, PrivateKey, Types } from './../src'
 import { randomString } from './common'
 import { runForBothTransports } from './fixture'
