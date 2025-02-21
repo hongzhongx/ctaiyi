@@ -19,12 +19,7 @@ const setup = createSingletonPromise(async () => {
 
   monaco.languages.typescript.typescriptDefaults.addExtraLib(
     `declare module "@taiyinet/ctaiyi" {${ctaiyiTypes}}`,
-    'file:///ctaiyi.d.ts',
-  )
-
-  monaco.languages.typescript.typescriptDefaults.addExtraLib(
-    `declare const client: import("@taiyinet/ctaiyi").Client;`,
-    `file:///runtime.d.ts`,
+    'file:///node_modules/@taiyinet/ctaiyi/dist/index.d.ts',
   )
 
   const loadWorkers = async () => {
