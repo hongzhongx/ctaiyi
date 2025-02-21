@@ -13,10 +13,11 @@ const size = ref([
 const initialTemplate = ref('')
 
 onMounted(() => {
-  initialTemplate.value = `// playground 已经初始化好运行环境
-// 只需要访问 client 就可以使用客户端的接口来通过设置的 rpc 来与 taiyi 交互
+  initialTemplate.value = `import { Client, http } from '@taiyinet/ctaiyi'
 
-await client.connect()
+const client = Client.testnet({
+  transport: http('http://127.0.0.1:8090'),
+})
 
 const {
   head_block_number

@@ -30,10 +30,6 @@ window.addEventListener('message', ({ data }) => {
 
   console.clear()
 
-  if (!window.client) {
-    console.warn('[ctaiyi-repl] ctaiyi client not initialized yet')
-  }
-
   document.getElementById('runner')?.remove()
   const script = document.createElement('script')
   script.id = 'runner'
