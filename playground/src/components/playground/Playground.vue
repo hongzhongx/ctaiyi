@@ -4,7 +4,6 @@ import { onMounted, ref } from 'vue'
 
 import Editor from '~/components/playground/Editor.vue'
 import Console from './Console.vue'
-import Settings from './Settings.vue'
 
 const size = ref([
   { id: 'code', size: 50 },
@@ -44,6 +43,5 @@ console.log('当前块高:', head_block_number)`
         <Console />
       </Splitter.Panel>
     </Splitter.Root>
-    <Settings />
   </div>
 </template>
