@@ -1,5 +1,5 @@
 import type { ClientMessageError } from '../src/errors'
-import { ClientWebSocketError, RPCError } from '../src/errors'
+import { RPCError } from '../src/errors'
 import { waitForEvent } from './../src/utils'
 import { runForBothTransports } from './fixture'
 
@@ -72,9 +72,7 @@ runForBothTransports('client for transport $transport.type', (client) => {
           assert(false, 'should not be reached')
         }
         catch (error) {
-          assert(error instanceof ClientWebSocketError)
-          assert(error.cause instanceof Error)
-          expect(error.cause.message).toBe('Send fail')
+          expect((error as Error).message).toBe('Send fail')
         }
         // @ts-expect-error test usage
         client.transport.socket!.send = socketSend

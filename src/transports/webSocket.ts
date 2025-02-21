@@ -136,7 +136,7 @@ export class WebSocketTransport extends EventTarget implements Transport {
       }
       this.pending.delete(seq)
       if (error) {
-        reject(new ClientWebSocketError('WebSocket request error', { cause: error }))
+        reject(error)
       }
       else {
         resolve(response)
