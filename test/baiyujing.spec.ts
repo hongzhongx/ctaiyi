@@ -18,69 +18,6 @@ runForBothTransports('client instance base status for transport $transport.type'
     it('should exist baiyujing', () => {
       expect(client).toHaveProperty('baiyujing')
     })
-
-    // 创建测试合约，测试 nfa
-    afterAll(async () => {
-      const code = await client.baiyujing.getContractSourceCode('contract.nfa.base')
-      if (!code) {
-        const data = `welcome = { consequence = false }
-  function init_data()
-      return {
-          foo = 'bar',
-      } 
-  end
-  function eval_welcome()
-      return { 'hello nfa' }
-  end`
-        await client.broadcast.sendOperations(
-          [
-            [
-              'create_contract',
-              {
-                owner: 'initminer',
-                name: 'contract.nfa.base',
-                data,
-                contract_authority: INITMINER_PRIVATE_KEY.createPublic('TAI').toString(),
-                extensions: [],
-              },
-            ],
-          ],
-          INITMINER_PRIVATE_KEY,
-        )
-      }
-
-      const nfas = await client.baiyujing.listNfas('initminer', 1)
-
-      if (!nfas.length) {
-        await client.broadcast.sendOperations(
-          [
-            [
-              'create_nfa_symbol',
-              {
-                creator: 'initminer',
-                symbol: 'nfa.test',
-                describe: '测试 nfa',
-                default_contract: 'contract.nfa.base',
-              },
-            ],
-          ],
-          INITMINER_PRIVATE_KEY,
-        )
-
-        await client.broadcast.sendOperations(
-          [
-            [
-              'create_nfa',
-              {
-                symbol: 'nfa.test',
-                creator: 'initminer',
-              },
-            ],
-          ],
-          INITMINER_PRIVATE_KEY,
-        )
-      }
-    })
   })
 
   describe('node and chain information', () => {
@@ -246,7 +183,7 @@ runForBothTransports('client instance base status for transport $transport.type'
     // TODO(@enpitsulin): 记录下报错
     it.skip('should get expiring qi delegations', async () => {
       try {
-        const delegations = await client.baiyujing.getExpiringQiDelegations('ctaiyi-kxdbofbdnctaiyi-kxdbofbdn', 0, 10)
+        const delegations = await client.baiyujing.getExpiringQiDelegations('initminer', 0, 10)
         expect(delegations).toEqual([])
       }
       catch (e) {
@@ -423,10 +360,9 @@ runForBothTransports('client instance base status for transport $transport.type'
 
   describe('nfa', () => {
     it('should get nfa', async () => {
-      const nfa = await client.baiyujing.findNfa(0)
+      const nfa = await client.baiyujing.findNfa(3)
       expect(nfa).toHaveProperty('id')
-      expect(nfa).toHaveProperty('symbol')
-      expect(nfa.symbol).toBe('nfa.test')
+      expect(nfa).toHaveProperty('symbol', 'nfa.zone.default')
     })
 
     it('should list all nfas', async () => {
@@ -436,33 +372,38 @@ runForBothTransports('client instance base status for transport $transport.type'
     })
 
     it('should get nfa history', async () => {
-      const history = await client.baiyujing.getNfaHistory(0, 20, 10)
+      const history = await client.baiyujing.getNfaHistory(3, 20, 10)
       expect(history).instanceOf(Array)
     })
 
     it('nfa action', async () => {
-      const info = await client.baiyujing.getNfaActionInfo(0, 'welcome')
+      const info = await client.baiyujing.getNfaActionInfo(3, 'long')
       expect(info).toHaveProperty('exist', true)
       expect(info).toHaveProperty('consequence', false)
     })
 
     it('nfa eval action', async () => {
-      const result = await client.baiyujing.evalNfaAction(0, 'welcome', [])
+      const result = await client.baiyujing.evalNfaAction(3, 'long', [])
 
-      expect(result).toHaveProperty('eval_result', [{ type: 'lua_string', value: { v: 'hello nfa' } }])
+      expect(result).toHaveProperty('eval_result', [
+        {
+          type: 'lua_string',
+          value: {
+            v: '这是一片&CYN&XUKONG&NOR&',
+          },
+        },
+      ])
       expect(result).toHaveProperty('narrate_logs', [])
       expect(result).toHaveProperty('err', '')
     })
 
     it('nfa action with string args', async () => {
-      // reference: https://github.com/hongzhongx/taiyi-contracts/blob/main/nfas/book/book.lua
-      const res = await client.baiyujing.evalNfaActionWithStringArgs(0, 'welcome', '[]')
+      const res = await client.baiyujing.evalNfaActionWithStringArgs(3, 'long', '[]')
       expect(res).toHaveProperty('narrate_logs')
     })
   })
 
-  // 本地测试网角色和区域合约尚未部署
-  describe.skip('actor and zone contract does implement', () => {
+  describe('actor and zone contract does implement', () => {
     describe('actor', () => {
       it('should find actor', async () => {
         const actor = await client.baiyujing.findActor('李火旺')
@@ -498,7 +439,7 @@ runForBothTransports('client instance base status for transport $transport.type'
 
       it('should list actors on zone', async () => {
         const actors = await client.baiyujing.listActorsOnZone(0, 10)
-        expect(actors).toMatchInlineSnapshot(`[]`)
+        expect(actors).toMatchSnapshot()
       })
     })
 
@@ -558,8 +499,8 @@ runForBothTransports('client instance base status for transport $transport.type'
       })
 
       it('should get contract source code', async () => {
-        const code = await client.baiyujing.getContractSourceCode('contract.nfa.base')
-        await expect(code).toMatchFileSnapshot('./__snapshots__/get_contract_source_code.snap')
+        const code = await client.baiyujing.getContractSourceCode('contract.inherit.object')
+        expect(code).matchSnapshot()
       })
     })
   })

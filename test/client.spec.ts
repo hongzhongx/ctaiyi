@@ -66,6 +66,7 @@ runForBothTransports('client for transport $transport.type', (client) => {
       })
 
       it('should handle write errors', async () => {
+        assert(client.transport instanceof WebSocketTransport)
         // @ts-expect-error test usage
         const socketSend = client.transport.socket!.send
         // @ts-expect-error test usage
