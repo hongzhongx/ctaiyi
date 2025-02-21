@@ -1,5 +1,0 @@
-hello_nfa = { consequence = true }
-function init_data() return {} end
-function do_hello_nfa()
-    contract_helper:narrate('hello nfa')
-end
