@@ -1,13 +1,16 @@
-import { Client } from '../src'
+import { WebSocketTransport } from '../src'
+import { runForBothTransports } from './fixture'
 
-// 后续等正式测试网上线可以换成一些测试网上的数据快照
+vi.setConfig({
+  testTimeout: 60 * 1000,
+})
 
-describe('blockchain', () => {
-  vi.setConfig({
-    testTimeout: 60 * 1000,
+runForBothTransports('blockchain data for transport $transport.type', (client) => {
+  beforeAll(async () => {
+    if (client.transport instanceof WebSocketTransport) {
+      await (<WebSocketTransport>client.transport).connect()
+    }
   })
-
-  const client = Client.testnet()
 
   it('should yield blocks', async () => {
     const ids: string[] = []
@@ -45,7 +48,7 @@ describe('blockchain', () => {
 
   it('should yield operations', async () => {
     const ops: string[] = []
-    for await (const operation of client.blockchain.getOperations({ from: 1, to: 100 })) {
+    for await (const operation of client.blockchain.getOperations({ from: 1, to: 2 })) {
       ops.push(operation.op[0])
     }
     expect(ops).toContain('producer_reward')
@@ -54,7 +57,7 @@ describe('blockchain', () => {
   it('should stream operations', async () => {
     // eslint-disable-next-line no-async-promise-executor
     const ops = await new Promise<string[]>(async (resolve, reject) => {
-      const stream = client.blockchain.getOperationsStream({ from: 1, to: 100 })
+      const stream = client.blockchain.getOperationsStream({ from: 1, to: 2 })
       const reader = stream.getReader()
       const ops: string[] = []
       try {

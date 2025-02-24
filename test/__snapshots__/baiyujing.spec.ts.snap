@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`client instance base status for transport 'http' > actor and zone contract does implement > actor > should list actors on zone 1`] = `[]`;
+
+exports[`client instance base status for transport 'http' > actor and zone contract does implement > tiandao > should get contract source code 1`] = `
+"Object = {}
+
+function Object:new (o)
+    o = {me = o or {}}
+    o.__super = self
+    self.__index = self
+    setmetatable(o, self)
+    return o
+end
+"
+`;
+
+exports[`client instance base status for transport 'websocket' > actor and zone contract does implement > actor > should list actors on zone 1`] = `[]`;
+
+exports[`client instance base status for transport 'websocket' > actor and zone contract does implement > tiandao > should get contract source code 1`] = `
+"Object = {}
+
+function Object:new (o)
+    o = {me = o or {}}
+    o.__super = self
+    self.__index = self
+    setmetatable(o, self)
+    return o
+end
+"
+`;

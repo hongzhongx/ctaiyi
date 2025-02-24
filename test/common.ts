@@ -1,10 +1,9 @@
+import type { Client } from '../src'
 import { randomBytes } from 'crypto'
 import * as fs from 'node:fs/promises'
-import process from 'node:process'
-import { Authority, Client, PrivateKey } from '../src'
+import { Authority, PrivateKey } from '../src'
 
 export const NUM_TEST_ACCOUNTS = 2
-export const TEST_NODE = process.env.TEST_NODE || 'http://127.0.0.1:8091'
 
 export const INITMINER_PRIVATE_KEY = PrivateKey.fromString('5JNHfZYKGaomSFvd4NUdQ9qMcEAC43kujbfjueTHpVapX1Kzq2n')
 
@@ -16,9 +15,7 @@ export function randomString(length: number) {
     .toLowerCase()
 }
 
-export async function createAccount(): Promise<{ username: string, password: string }> {
-  const client = Client.testnet()
-
+export async function createAccount(client: Client): Promise<{ username: string, password: string }> {
   const password = randomString(32)
   const username = `ctaiyi-${randomString(9)}`
   const privateKey = PrivateKey.fromLogin(username, password)
@@ -48,7 +45,7 @@ export async function createAccount(): Promise<{ username: string, password: str
   return { username, password }
 }
 
-export async function getTestnetAccounts(): Promise<{ username: string, password: string }[]> {
+export async function getTestnetAccounts(client: Client): Promise<{ username: string, password: string }[]> {
   try {
     const data = await fs.readFile('.testnetrc')
     return JSON.parse(data.toString())
@@ -61,7 +58,7 @@ export async function getTestnetAccounts(): Promise<{ username: string, password
 
   const rv: { username: string, password: string }[] = []
   while (rv.length < NUM_TEST_ACCOUNTS) {
-    rv.push(await createAccount())
+    rv.push(await createAccount(client))
   }
 
   // eslint-disable-next-line no-console
