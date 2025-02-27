@@ -33,7 +33,7 @@ const signatures = await client.baiyujing.getPotentialSignatures({
 
 `string[]`
 
-返回可能需要签名的公钥数组。
+返回可能需要签名的地址(WIF 格式公钥)数组。
 
 ## 参数
 

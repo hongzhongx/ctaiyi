@@ -13,7 +13,7 @@ const simings = await client.baiyujing.getSimings([0])
 
 ## 返回值
 
-[`Siming[]`](/reference/types#siming)
+[`Siming[]`](/guide/types#siming)
 
 返回司命对象数组。每个对象包含司命的详细信息。
 

@@ -1,6 +1,6 @@
 # evalNfaAction
 
-评估 NFA 动作的执行结果。
+执行 NFA 的指定动作。
 
 ## 示例
 

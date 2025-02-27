@@ -1,6 +1,6 @@
 # findNfas
 
-批量查找 NFA 信息。
+通过 NFA id 查找多个 NFA 信息。
 
 ## 示例
 
@@ -13,7 +13,7 @@ const nfas = await client.baiyujing.findNfas([1, 2, 3])
 
 ## 返回值
 
-[`Nfa[]`](/reference/types#nfa)
+[`Nfa[]`](/guide/types#nfa)
 
 返回 NFA 对象数组。每个对象包含 NFA 的详细信息。
 

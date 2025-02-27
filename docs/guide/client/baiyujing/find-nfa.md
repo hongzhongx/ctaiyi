@@ -1,6 +1,6 @@
 # findNfa
 
-查找指定的 NFA。
+通过 NFA id 查找指定的 NFA。
 
 ## 示例
 
@@ -13,7 +13,7 @@ const nfa = await client.baiyujing.findNfa(1)
 
 ## 返回值
 
-[`Nfa`](/reference/types#nfa)
+[`Nfa`](/guide/types#nfa)
 
 返回 NFA 对象。
 

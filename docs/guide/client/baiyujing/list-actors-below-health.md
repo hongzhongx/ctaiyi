@@ -13,7 +13,7 @@ const actors = await client.baiyujing.listActorsBelowHealth(0, 1)
 
 ## 返回值
 
-[`Actor[]`](/reference/types#actor)
+[`Actor[]`](/guide/types#actor)
 
 返回健康值低于指定值的角色对象数组。
 

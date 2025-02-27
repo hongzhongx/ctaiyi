@@ -1,6 +1,6 @@
 # evalNfaActionWithStringArgs
 
-使用字符串参数评估 NFA 动作的执行结果。
+使用字符串作为参数执行 NFA 的指定动作。
 
 ## 示例
 

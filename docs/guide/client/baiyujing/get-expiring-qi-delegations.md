@@ -1,6 +1,6 @@
 # getExpiringQiDelegations
 
-获取即将到期的气力委托信息。
+获取即将到期的真气委托信息。
 
 ## 示例
 
@@ -15,7 +15,7 @@ const expiringDelegations = await client.baiyujing.getExpiringQiDelegations('ali
 
 `ExpiringQiDelegation[]`
 
-即将到期的气力委托信息数组。
+即将到期的真气委托信息数组。
 
 ```ts twoslash
 declare interface ExpiringQiDelegation {

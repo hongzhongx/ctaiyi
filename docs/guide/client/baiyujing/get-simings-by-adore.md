@@ -13,7 +13,7 @@ const simings = await client.baiyujing.getSimingsByAdore('initminer', 10)
 
 ## 返回值
 
-[`Siming[]`](/reference/types#siming)
+[`Siming[]`](/guide/types#siming)
 
 返回账户所信仰的司命对象数组。
 

@@ -1,6 +1,6 @@
 # findActors
 
-批量查找角色信息。
+通过角色 id 查找多个角色信息。
 
 ## 示例
 
@@ -13,7 +13,7 @@ const actors = await client.baiyujing.findActors([1, 2, 3])
 
 ## 返回值
 
-[`Actor[]`](/reference/types#actor)
+[`Actor[]`](/guide/types#actor)
 
 返回角色对象数组。每个对象包含角色的详细信息。
 

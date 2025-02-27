@@ -13,7 +13,7 @@ const actors = await client.baiyujing.listActors('sifu', 10)
 
 ## 返回值
 
-[`Actor[]`](/reference/types#actor)
+[`Actor[]`](/guide/types#actor)
 
 返回角色对象数组。每个对象包含角色的详细信息。
 

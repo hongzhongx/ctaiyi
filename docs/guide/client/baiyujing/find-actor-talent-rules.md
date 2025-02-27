@@ -13,7 +13,7 @@ const rules = await client.baiyujing.findActorTalentRules([0, 1])
 
 ## 返回值
 
-[`ActorTalentRule[]`](/reference/types#actortalentrule)
+[`ActorTalentRule[]`](/guide/types#actortalentrule)
 
 返回角色天赋规则对象数组。每个对象包含规则 ID、规则类型、效果等信息。
 

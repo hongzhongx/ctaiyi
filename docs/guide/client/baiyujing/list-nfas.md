@@ -1,6 +1,6 @@
 # listNfas
 
-获取 NFA 列表。
+获取指定账户的 NFA 列表。
 
 ## 示例
 
@@ -13,7 +13,7 @@ const nfas = await client.baiyujing.listNfas('sifu', 10)
 
 ## 返回值
 
-[`Nfa[]`](/reference/types#nfa)
+[`Nfa[]`](/guide/types#nfa)
 
 返回 NFA 对象数组。每个对象包含 NFA 的详细信息。
 

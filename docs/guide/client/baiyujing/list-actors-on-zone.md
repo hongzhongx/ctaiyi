@@ -13,7 +13,7 @@ const actors = await client.baiyujing.listActorsOnZone(0, 10)
 
 ## 返回值
 
-[`Actor[]`](/reference/types#actor)
+[`Actor[]`](/guide/types#actor)
 
 返回在指定区域中的角色对象数组。
 

@@ -1,6 +1,6 @@
 # getOwnerHistory
 
-获取账户的所有者权限变更历史。
+获取账户的 owner key 变更历史。
 
 ## 示例
 
@@ -26,7 +26,7 @@ declare interface OwnerHistory {
 }
 ```
 
-账户所有者权限的变更历史记录数组。
+获取账户的 owner key 变更历史数组。
 
 ## 参数
 

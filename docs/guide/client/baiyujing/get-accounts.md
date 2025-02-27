@@ -13,7 +13,7 @@ const accounts = await client.baiyujing.getAccounts(['sifu'])
 
 ## 返回值
 
-[`ExtendedAccount[]`](/reference/types#extendedaccount)
+[`ExtendedAccount[]`](/guide/types#extendedaccount)
 
 查询的账户对象数组。
 

@@ -1,6 +1,6 @@
 # getQiDelegations
 
-获取账户的 「QI」 委托信息。
+获取账户的真气委托信息。
 
 ## 示例
 
@@ -13,9 +13,9 @@ const delegations = await client.baiyujing.getQiDelegations('sifu', 10, 10)
 
 ## 返回值
 
-[`QiDelegation[]`](/reference/types#qidelegation)
+[`QiDelegation[]`](/guide/types#qidelegation)
 
-返回 「QI」 委托信息数组，包含委托人、被委托人、委托数量等信息。
+返回真气委托信息数组，包含委托人、被委托人、委托数量等信息。
 
 ## 参数
 

@@ -13,7 +13,7 @@ const siming = await client.baiyujing.getSimingByAccount('alice')
 
 ## 返回值
 
-[`Siming`](/reference/types#siming) | `null`
+[`Siming`](/guide/types#siming) | `null`
 
 返回司命节点对象。如果账户没有司命则返回 null。
 

@@ -1,6 +1,6 @@
 # getRequiredSignatures
 
-获取交易所需的签名。
+获取交易的必要签名者。
 
 ## 示例
 
