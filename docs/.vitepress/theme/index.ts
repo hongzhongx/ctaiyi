@@ -3,6 +3,7 @@ import type { EnhanceAppContext } from 'vitepress'
 // .vitepress/theme/index.ts
 import TwoslashFloatingVue from '@shikijs/vitepress-twoslash/client'
 import Theme from 'vitepress/theme'
+import 'uno.css'
 
 import '@shikijs/vitepress-twoslash/style.css'
 

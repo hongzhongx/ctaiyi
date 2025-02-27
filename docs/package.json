@@ -14,8 +14,10 @@
     "preview": "vitepress preview"
   },
   "devDependencies": {
+    "@iconify-json/logos": "^1.2.4",
     "@shikijs/vitepress-twoslash": "^2.3.2",
     "@taiyinet/ctaiyi": "workspace:*",
+    "unocss": "^65.4.3",
     "vite": "^6.1.0",
     "vite-tsconfig-paths": "^5.1.4",
     "vitepress": "^1.6.3"

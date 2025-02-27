@@ -60,12 +60,18 @@ importers:
 
   docs:
     devDependencies:
+      '@iconify-json/logos':
+        specifier: ^1.2.4
+        version: 1.2.4
       '@shikijs/vitepress-twoslash':
         specifier: ^2.3.2
         version: 2.3.2(typescript@5.7.3)
       '@taiyinet/ctaiyi':
         specifier: workspace:*
         version: link:..
+      unocss:
+        specifier: ^65.4.3
+        version: 65.4.3(postcss@8.5.1)(rollup@4.34.4)(vite@6.1.0(@types/node@22.13.1)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
       vite:
         specifier: ^6.1.0
         version: 6.1.0(@types/node@22.13.1)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0)
@@ -1027,6 +1033,9 @@ packages:
 
   '@iconify-json/carbon@1.2.6':
     resolution: {integrity: sha512-Oat/TUfu1Cpg/inoi6ZIVvNjWoKQJFugpDB6LqpahENf4f2pZKMOUR2B9MCQlje77iRRI5nWQzvUO2kJlXFStw==}
+
+  '@iconify-json/logos@1.2.4':
+    resolution: {integrity: sha512-XC4If5D/hbaZvUkTV8iaZuGlQCyG6CNOlaAaJaGa13V5QMYwYjgtKk3vPP8wz3wtTVNVEVk3LRx1fOJz+YnSMw==}
 
   '@iconify-json/simple-icons@1.2.23':
     resolution: {integrity: sha512-ySyZ0ZXdNveWnR71t7XGV7jhknxSlTtpM2TyIR1cUHTUzZLP36hYHTNqb2pYYsCzH5ed85KTTKz7vYT33FyNIQ==}
@@ -5092,6 +5101,10 @@ snapshots:
   '@humanwhocodes/retry@0.4.1': {}
 
   '@iconify-json/carbon@1.2.6':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/logos@1.2.4':
     dependencies:
       '@iconify/types': 2.0.0
 

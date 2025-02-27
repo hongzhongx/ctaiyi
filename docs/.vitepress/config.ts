@@ -1,4 +1,5 @@
 import type { DefaultTheme } from 'vitepress/theme'
+import { fileURLToPath } from 'node:url'
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 import { createFileSystemTypesCache } from '@shikijs/vitepress-twoslash/cache-fs'
 import { defineConfig } from 'vitepress'
@@ -342,4 +343,7 @@ export default defineConfig({
     codeCopyButtonTitle: '复制代码',
   },
   cleanUrls: true,
+  vite: {
+    configFile: fileURLToPath(new URL('./vite.config.ts', import.meta.url)),
+  },
 })
