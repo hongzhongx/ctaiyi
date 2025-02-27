@@ -246,6 +246,66 @@ function broadcastItems(): DefaultTheme.SidebarItem {
     collapsed: true,
     items: [
       { text: '介绍', link: 'intro' },
+      { text: 'createAccount', link: 'create-account' },
+      { text: 'updateAccount', link: 'update-account' },
+
+      { text: 'transfer', link: 'transfer' },
+      { text: 'transferToQi', link: 'transfer-to-qi' },
+      { text: 'withdrawQi', link: 'withdraw-qi' },
+      { text: 'setWithdrawQiRoute', link: 'set-withdraw-qi-route' },
+      { text: 'delegateQi', link: 'delegate-qi' },
+
+      { text: 'simingUpdate', link: 'siming-update' },
+      { text: 'simingSetProperties', link: 'siming-set-properties' },
+      { text: 'accountSimingAdore', link: 'account-siming-adore' },
+      { text: 'accountSimingProxy', link: 'account-siming-proxy' },
+      { text: 'declineAdoringRights', link: 'decline-adoring-rights' },
+
+      { text: 'custom', link: 'custom' },
+      { text: 'customJson', link: 'custom-json' },
+
+      { text: 'requestAccountRecovery', link: 'request-account-recovery' },
+      { text: 'recoverAccount', link: 'recover-account' },
+      { text: 'changeRecoveryAccount', link: 'change-recovery-account' },
+
+      { text: 'claimRewardBalance', link: 'claim-reward-balance' },
+
+      { text: 'createContract', link: 'create-contract' },
+      { text: 'reviseContract', link: 'revise-contract' },
+      { text: 'callContractFunction', link: 'call-contract-function' },
+
+      { text: 'createNfaSymbol', link: 'create-nfa-symbol' },
+      { text: 'createNfa', link: 'create-nfa' },
+      { text: 'transferNfa', link: 'transfer-nfa' },
+      { text: 'approveNfaActive', link: 'approve-nfa-active' },
+      { text: 'actionNfa', link: 'action-nfa' },
+
+      { text: 'createZone', link: 'create-zone' },
+
+      { text: 'createActorTalentRule', link: 'create-actor-talent-rule' },
+      { text: 'createActor', link: 'create-actor' },
+
+      { text: 'hardfork', link: 'hardfork' },
+      { text: 'fillQiWithdraw', link: 'fill-qi-withdraw' },
+      { text: 'returnQiDelegation', link: 'return-qi-delegation' },
+      { text: 'producerReward', link: 'producer-reward' },
+
+      { text: 'nfaConvertResources', link: 'nfa-convert-resources' },
+      { text: 'nfaTransfer', link: 'nfa-transfer' },
+      { text: 'nfaDepositWithdraw', link: 'nfa-deposit-withdraw' },
+      { text: 'rewardFeigang', link: 'reward-feigang' },
+      { text: 'rewardCultivation', link: 'reward-cultivation' },
+
+      { text: 'tiandaoYearChange', link: 'tiandao-year-change' },
+      { text: 'tiandaoMonthChange', link: 'tiandao-month-change' },
+      { text: 'tiandaoTimeChange', link: 'tiandao-time-change' },
+
+      { text: 'actorBorn', link: 'actor-born' },
+      { text: 'actorTalentTrigger', link: 'actor-talent-trigger' },
+      { text: 'actorMovement', link: 'actor-movement' },
+      { text: 'actorGrown', link: 'actor-grown' },
+
+      { text: 'narrateLog', link: 'narrate-log' },
     ],
   }
 }
