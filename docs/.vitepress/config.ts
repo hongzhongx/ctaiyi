@@ -306,7 +306,7 @@ function guideSidebar(): DefaultTheme.SidebarMulti['/guide/'] {
       },
       {
         text: '类型',
-        link: '/guide/types',
+        link: '/types',
         collapsed: true,
       },
     ],
