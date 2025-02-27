@@ -242,7 +242,7 @@ function baiyujingItems(): DefaultTheme.SidebarItem {
 function broadcastItems(): DefaultTheme.SidebarItem {
   return {
     text: '广播交易',
-    base: '/broadcast/',
+    base: '/guide/client/broadcast/',
     collapsed: true,
     items: [
       { text: '介绍', link: 'intro' },
