@@ -13,7 +13,7 @@ const zones = await client.baiyujing.listZones('sifu', 10)
 
 ## 返回值
 
-[`Zone[]`](/reference/types#zone)
+[`Zone[]`](/guide/types#zone)
 
 返回区域对象数组。每个对象包含区域的详细信息。
 

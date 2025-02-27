@@ -2,7 +2,7 @@
 
 ## 在线尝试 {#try-it-online}
 
-可以直接在 [StackBlitz](https://vitepress.new) 上进行在线尝试。
+TODO
 
 ## 安装 {#installation}
 
@@ -37,18 +37,21 @@ $ bun add -D vitepress
 通过导出的 `Client` 类快速创建一个客户端实例以通过提供的接口与太乙区块链交互。
 
 ```ts twoslash
-import { Client } from '@taiyinet/ctaiyi'
+import { Client, http } from '@taiyinet/ctaiyi'
 
-const wsClient = new Client('wss://<node-url>') // [!code focus]
-const httpClient = new Client('https://<node-url>') // [!code focus]
+const client = new Client({ // [!code focus]
+  transport: http('https://<node-url>') // [!code focus]
+}) // [!code focus]
 ```
 
 #### 2. 通过 `Client` 实例提供的接口获取区块链信息 {#get-blockchain-info}
 
 ```ts twoslash
-import { Client } from '@taiyinet/ctaiyi'
+import { Client, http } from '@taiyinet/ctaiyi'
 
-const client = new Client('https://<node-url>')
+const client = new Client({
+  transport: http('https://<node-url>')
+})
 // ---cut---
 const dynamicGlobalProperties = await client.baiyujing.getDynamicGlobalProperties()
 

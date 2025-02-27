@@ -1,6 +1,6 @@
-# getTransactionHex
+# verifyAuthority
 
-获取交易的十六进制表示。
+验证交易的权限是否满足要求。
 
 ## 示例
 
@@ -8,7 +8,7 @@
 import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
-const hex = await client.baiyujing.getTransactionHex({
+const authority = await client.baiyujing.verifyAuthority({
   expiration: '2025-02-04T16:05:57',
   extensions: [],
   operations: [
@@ -31,14 +31,14 @@ const hex = await client.baiyujing.getTransactionHex({
 
 ## 返回值
 
-`string`
+`boolean`
 
-返回交易的十六进制字符串。
+返回布尔值，表示权限是否满足要求。
 
 ## 参数
 
-### transaction
+### trx
 
-- 类型: [`Transaction`](/reference/types#transaction)
+- 类型: [`SignedTransaction`](/guide/types#signedtransaction)
 
 交易对象

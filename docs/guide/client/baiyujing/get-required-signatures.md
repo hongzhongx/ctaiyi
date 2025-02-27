@@ -42,7 +42,7 @@ const requiredKeys = await client.baiyujing.getRequiredSignatures(
 
 ### transaction
 
-- 类型: [`SignedTransaction`](/reference/types#signedtransaction)
+- 类型: [`SignedTransaction`](/guide/types#signedtransaction)
 
 交易对象
 

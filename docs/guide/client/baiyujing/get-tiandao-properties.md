@@ -13,7 +13,7 @@ const properties = await client.baiyujing.getTiandaoProperties()
 
 ## 返回值
 
-[`TianDaoProperties`](/reference/types#tiandaoproperties)
+[`TianDaoProperties`](/guide/types#tiandaoproperties)
 
 返回天道系统属性对象。
 

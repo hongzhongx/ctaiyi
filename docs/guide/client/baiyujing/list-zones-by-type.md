@@ -13,7 +13,7 @@ const zones = await client.baiyujing.listZonesByType('XUKONG', 10)
 
 ## 返回值
 
-[`Zone[]`](/reference/types#zone)
+[`Zone[]`](/guide/types#zone)
 
 返回指定类型的区域对象数组。
 
@@ -21,7 +21,7 @@ const zones = await client.baiyujing.listZonesByType('XUKONG', 10)
 
 ### type
 
-- 类型: [`ZoneType`](/reference/types#zonetype)
+- 类型: [`ZoneType`](/guide/types#zonetype)
 
 区域类型
 

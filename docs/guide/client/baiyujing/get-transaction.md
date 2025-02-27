@@ -13,7 +13,7 @@ const transaction = await client.baiyujing.getTransaction('903430761b97a2ce7be79
 
 ## 返回值
 
-[`Transaction`](/reference/types#transaction)
+[`Transaction`](/guide/types#transaction)
 
 返回交易对象，包含交易的详细信息。
 

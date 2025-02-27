@@ -1,6 +1,6 @@
-# findZones
+# findZonesByName
 
-查找指定的区域信息。
+按名称查找区域。
 
 ## 示例
 
@@ -8,19 +8,19 @@
 import { Client } from '@taiyinet/ctaiyi'
 declare const client: Client
 // ---cut---
-const zones = await client.baiyujing.findZones([1, 2])
+const zones = await client.baiyujing.findZonesByName(['牛心村'])
 ```
 
 ## 返回值
 
-[`Zone[]`](/reference/types#zone)
+[`Zone[]`](/guide/types#zone)
 
 返回区域对象数组。每个对象包含区域的详细信息。
 
 ## 参数
 
-### zoneIds
+### names
 
-- 类型: `number[]`
+- 类型: `string[]`
 
-区域 ID 数组
+区域名称数组

@@ -13,7 +13,7 @@ const zones = await client.baiyujing.listFromZonesByTo('牛心村', 10)
 
 ## 返回值
 
-[`Zone[]`](/reference/types#zone)
+[`Zone[]`](/guide/types#zone)
 
 返回可到达目标区域的起始区域对象数组。
 

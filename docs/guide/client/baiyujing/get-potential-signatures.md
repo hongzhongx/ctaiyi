@@ -39,6 +39,6 @@ const signatures = await client.baiyujing.getPotentialSignatures({
 
 ### trx
 
-- 类型: [`SignedTransaction`](/reference/types#signedtransaction)
+- 类型: [`SignedTransaction`](/guide/types#signedtransaction)
 
 交易对象

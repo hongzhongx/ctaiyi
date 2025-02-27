@@ -13,7 +13,7 @@ const results = await client.baiyujing.getTransactionResults('abcd1234...')
 
 ## 返回值
 
-[`AppliedOperation`](/reference/types#appliedoperation)
+[`AppliedOperation`](/guide/types#appliedoperation)
 
 交易成功执行的操作数组
 
