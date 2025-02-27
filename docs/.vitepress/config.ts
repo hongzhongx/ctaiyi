@@ -12,7 +12,7 @@ function baiyujingItems(): DefaultTheme.SidebarItem {
     items: [
       {
         text: '介绍',
-        link: '/intro',
+        link: 'intro',
       },
       {
         text: '账户',
@@ -20,47 +20,47 @@ function baiyujingItems(): DefaultTheme.SidebarItem {
         items: [
           {
             text: 'getAccounts',
-            link: '/get-accounts',
+            link: 'get-accounts',
           },
           {
             text: 'lookupAccountNames',
-            link: '/lookup-account-names',
+            link: 'lookup-account-names',
           },
           {
             text: 'lookupAccounts',
-            link: '/lookup-accounts',
+            link: 'lookup-accounts',
           },
           {
             text: 'getAccountsCount',
-            link: '/get-accounts-count',
+            link: 'get-accounts-count',
           },
           {
             text: 'getAccountHistory',
-            link: '/get-account-history',
+            link: 'get-account-history',
           },
           {
             text: 'getAccountResources',
-            link: '/get-account-resources',
+            link: 'get-account-resources',
           },
           {
             text: 'getOwnerHistory',
-            link: '/get-owner-history',
+            link: 'get-owner-history',
           },
           {
             text: 'getRecoveryRequest',
-            link: '/get-recovery-request',
+            link: 'get-recovery-request',
           },
           {
             text: 'getWithdrawRoutes',
-            link: '/get-withdraw-routes',
+            link: 'get-withdraw-routes',
           },
           {
             text: 'getQiDelegations',
-            link: '/get-qi-delegations',
+            link: 'get-qi-delegations',
           },
           {
             text: 'getExpiringQiDelegations',
-            link: '/get-expiring-qi-delegations',
+            link: 'get-expiring-qi-delegations',
           },
         ],
       },
@@ -70,31 +70,31 @@ function baiyujingItems(): DefaultTheme.SidebarItem {
         items: [
           {
             text: 'findActor',
-            link: '/find-actor',
+            link: 'find-actor',
           },
           {
             text: 'findActors',
-            link: '/find-actors',
+            link: 'find-actors',
           },
           {
             text: 'listActors',
-            link: '/list-actors',
+            link: 'list-actors',
           },
           {
             text: 'getActorHistory',
-            link: '/get-actor-history',
+            link: 'get-actor-history',
           },
           {
             text: 'listActorsBelowHealth',
-            link: '/list-actors-below-health',
+            link: 'list-actors-below-health',
           },
           {
             text: 'findActorTalentRules',
-            link: '/find-actor-talent-rules',
+            link: 'find-actor-talent-rules',
           },
           {
             text: 'listActorsOnZone',
-            link: '/list-actors-on-zone',
+            link: 'list-actors-on-zone',
           },
         ],
       },
@@ -104,31 +104,31 @@ function baiyujingItems(): DefaultTheme.SidebarItem {
         items: [
           {
             text: 'findNfa',
-            link: '/find-nfa',
+            link: 'find-nfa',
           },
           {
             text: 'findNfas',
-            link: '/find-nfas',
+            link: 'find-nfas',
           },
           {
             text: 'listNfas',
-            link: '/list-nfas',
+            link: 'list-nfas',
           },
           {
             text: 'getNfaHistory',
-            link: '/get-nfa-history',
+            link: 'get-nfa-history',
           },
           {
             text: 'getNfaActionInfo',
-            link: '/get-nfa-action-info',
+            link: 'get-nfa-action-info',
           },
           {
             text: 'evalNfaAction',
-            link: '/eval-nfa-action',
+            link: 'eval-nfa-action',
           },
           {
             text: 'evalNfaActionWithStringArgs',
-            link: '/eval-nfa-action-with-string-args',
+            link: 'eval-nfa-action-with-string-args',
           },
         ],
       },
@@ -138,31 +138,31 @@ function baiyujingItems(): DefaultTheme.SidebarItem {
         items: [
           {
             text: 'getTransactionHex',
-            link: '/get-transaction-hex',
+            link: 'get-transaction-hex',
           },
           {
             text: 'getTransaction',
-            link: '/get-transaction',
+            link: 'get-transaction',
           },
           {
             text: 'getTransactionResults',
-            link: '/get-transaction-results',
+            link: 'get-transaction-results',
           },
           {
             text: 'getRequiredSignatures',
-            link: '/get-required-signatures',
+            link: 'get-required-signatures',
           },
           {
             text: 'getPotentialSignatures',
-            link: '/get-potential-signatures',
+            link: 'get-potential-signatures',
           },
           {
             text: 'verifyAuthority',
-            link: '/verify-authority',
+            link: 'verify-authority',
           },
           {
             text: 'verifyAccountAuthority',
-            link: '/verify-account-authority',
+            link: 'verify-account-authority',
           },
         ],
       },
@@ -173,23 +173,23 @@ function baiyujingItems(): DefaultTheme.SidebarItem {
         items: [
           {
             text: 'getSimings',
-            link: '/get-simings',
+            link: 'get-simings',
           },
           {
             text: 'getSimingByAccount',
-            link: '/get-siming-by-account',
+            link: 'get-siming-by-account',
           },
           {
             text: 'getSimingsByAdore',
-            link: '/get-simings-by-adore',
+            link: 'get-simings-by-adore',
           },
           {
             text: 'lookupSimingAccounts',
-            link: '/lookup-siming-accounts',
+            link: 'lookup-siming-accounts',
           },
           {
             text: 'getSimingCount',
-            link: '/get-siming-count',
+            link: 'get-siming-count',
           },
         ],
       },
@@ -199,39 +199,39 @@ function baiyujingItems(): DefaultTheme.SidebarItem {
         items: [
           {
             text: 'getTiandaoProperties',
-            link: '/get-tiandao-properties',
+            link: 'get-tiandao-properties',
           },
           {
             text: 'findZones',
-            link: '/find-zones',
+            link: 'find-zones',
           },
           {
             text: 'findZonesByName',
-            link: '/find-zones-by-name',
+            link: 'find-zones-by-name',
           },
           {
             text: 'listZones',
-            link: '/list-zones',
+            link: 'list-zones',
           },
           {
             text: 'listZonesByType',
-            link: '/list-zones-by-type',
+            link: 'list-zones-by-type',
           },
           {
             text: 'listToZonesByFrom',
-            link: '/list-to-zones-by-from',
+            link: 'list-to-zones-by-from',
           },
           {
             text: 'listFromZonesByTo',
-            link: '/list-from-zones-by-to',
+            link: 'list-from-zones-by-to',
           },
           {
             text: 'findWayToZone',
-            link: '/find-way-to-zone',
+            link: 'find-way-to-zone',
           },
           {
             text: 'getContractSourceCode',
-            link: '/get-contract-source-code',
+            link: 'get-contract-source-code',
           },
         ],
       },
@@ -245,7 +245,7 @@ function broadcastItems(): DefaultTheme.SidebarItem {
     base: '/broadcast/',
     collapsed: true,
     items: [
-      { text: '介绍', link: '/intro' },
+      { text: '介绍', link: 'intro' },
     ],
   }
 }
@@ -258,15 +258,15 @@ function blockchainItems(): DefaultTheme.SidebarItem {
     items: [
       { text: '介绍', link: '/intro' },
 
-      { text: 'getCurrentBlock', link: '/get-current-block' },
-      { text: 'getCurrentBlockHeader', link: '/get-current-block-header' },
-      { text: 'getCurrentBlockNum', link: '/get-current-block-num' },
+      { text: 'getCurrentBlock', link: 'get-current-block' },
+      { text: 'getCurrentBlockHeader', link: 'get-current-block-header' },
+      { text: 'getCurrentBlockNum', link: 'get-current-block-num' },
 
-      { text: 'getBlockStream', link: '/get-block-stream' },
+      { text: 'getBlockStream', link: 'get-block-stream' },
 
-      { text: 'getBlockNumberStream', link: '/get-block-number-stream' },
+      { text: 'getBlockNumberStream', link: 'get-block-number-stream' },
 
-      { text: 'getOperationsStream', link: '/get-operations-stream' },
+      { text: 'getOperationsStream', link: 'get-operations-stream' },
     ],
   }
 }
@@ -279,9 +279,9 @@ function guideSidebar(): DefaultTheme.SidebarMulti['/guide/'] {
         text: '简介',
         collapsed: false,
         items: [
-          { text: '快速开始', link: '/getting-started' },
-          { text: '平台兼容性', link: '/compatibility' },
-          { text: '常见问题', link: '/faq' },
+          { text: '开始使用', link: 'getting-started' },
+          { text: '平台兼容性', link: 'compatibility' },
+          { text: '常见问题', link: 'faq' },
         ],
       },
       {
@@ -289,7 +289,7 @@ function guideSidebar(): DefaultTheme.SidebarMulti['/guide/'] {
         base: '/guide/client/',
         collapsed: false,
         items: [
-          { text: '介绍', link: '/intro' },
+          { text: '介绍', link: 'intro' },
           baiyujingItems(),
           blockchainItems(),
           broadcastItems(),
@@ -314,8 +314,8 @@ function guideSidebar(): DefaultTheme.SidebarMulti['/guide/'] {
 }
 
 export default defineConfig({
-  title: 'ctaiyi',
-  description: 'taiyi 区块链的 JavaScript SDK',
+  title: 'CTaiyi',
+  description: '一个用于太乙（Taiyi）区块链的通用 JavaScript SDK',
   themeConfig: {
     nav: [
       { text: '指南', link: '/guide/getting-started', activeMatch: '/guide/' },
@@ -333,6 +333,10 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/hongzhongx/ctaiyi' },
     ],
+    footer: {
+      message: 'Released under the MIT License.',
+      copyright: 'Copyright © 2025-PRESENT ctaiyi team',
+    },
   },
   markdown: {
     codeTransformers: [

@@ -1,4 +1,4 @@
-# 快速开始 {#getting-started}
+# 开始使用 {#getting-started}
 
 ## 在线尝试 {#try-it-online}
 

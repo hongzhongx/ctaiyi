@@ -2,11 +2,11 @@
 layout: home
 sidebar: false
 
-title: ctaiyi
-titleTemplate: taiyi 区块链的 JavaScript SDK
+title: CTaiyi
+titleTemplate: 一个用于太乙（Taiyi）区块链的通用 JavaScript SDK
 
 hero:
-  name: CTAIYI
+  name: CTaiyi
   text: 太乙 JS SDK
   tagline: 一个用于太乙（Taiyi）区块链的通用 JavaScript SDK
   image:
