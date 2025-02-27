@@ -13,19 +13,19 @@ TODO
 ::: code-group
 
 ```sh [npm]
-$ npm add -D vitepress
+$ npm add -D @taiyinet/ctaiyi
 ```
 
 ```sh [pnpm]
-$ pnpm add -D vitepress
+$ pnpm add -D @taiyinet/ctaiyi
 ```
 
 ```sh [yarn]
-$ yarn add -D vitepress
+$ yarn add -D @taiyinet/ctaiyi
 ```
 
 ```sh [bun]
-$ bun add -D vitepress
+$ bun add -D @taiyinet/ctaiyi
 ```
 
 :::
