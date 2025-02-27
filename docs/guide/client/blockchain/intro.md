@@ -7,12 +7,4 @@
 - 获取区块号
 - 获取操作记录
 
-这些 API 可以帮助你实时监控区块链状态，获取历史数据等。
-
-```ts twoslash
-import { Client, http } from '@taiyinet/ctaiyi'
-
-const client = new Client({
-  transport: http('https://<node-url>')
-})
-```
+这些 API 可以帮助你获取区块链状态，获取历史数据等；同时也提供了返回 WebStream 和异步迭代器的方法可以便捷的监控链上新区块的状态。
