@@ -252,10 +252,20 @@ function broadcastItems(): DefaultTheme.SidebarItem {
 function blockchainItems(): DefaultTheme.SidebarItem {
   return {
     text: '区块链信息',
-    base: '/blockchain/',
+    base: '/guide/client/blockchain/',
     collapsed: true,
     items: [
       { text: '介绍', link: '/intro' },
+
+      { text: 'getCurrentBlock', link: '/get-current-block' },
+      { text: 'getCurrentBlockHeader', link: '/get-current-block-header' },
+      { text: 'getCurrentBlockNum', link: '/get-current-block-num' },
+
+      { text: 'getBlockStream', link: '/get-block-stream' },
+
+      { text: 'getBlockNumberStream', link: '/get-block-number-stream' },
+
+      { text: 'getOperationsStream', link: '/get-operations-stream' },
     ],
   }
 }
@@ -280,8 +290,8 @@ function guideSidebar(): DefaultTheme.SidebarMulti['/guide/'] {
         items: [
           { text: '介绍', link: '/intro' },
           baiyujingItems(),
-          broadcastItems(),
           blockchainItems(),
+          broadcastItems(),
         ],
       },
       {
