@@ -109,18 +109,14 @@ rl.on('line', async (input) => {
       const family_name = args[1]
       const last_name = args[2]
       try {
-        await client.broadcast.sendOperations(
-          [
-            [
-              'account_create',
-              {
-                // fee: chainProps.account_creation_fee,
-                family_name: `${family_name}${last_name}`,
-                last_name: private_key,
-                creator: account_name,
-              },
-            ],
-          ],
+        const chainProps = await client.baiyujing.getChainProperties()
+        await client.broadcast.createActor(
+          {
+            fee: chainProps.account_creation_fee,
+            family_name,
+            last_name,
+            creator: account_name,
+          },
           private_key,
         )
       }
@@ -191,16 +187,14 @@ rl.on('line', async (input) => {
 
       let results: string[] = []
       if (info.consequence === true) {
-        const tx = await client.broadcast.sendOperations(
-          [
-            ['action_nfa', {
-              caller: account_name,
-              id: play_nfa,
-              action,
-              value_list: [params],
-              extensions: [],
-            }],
-          ],
+        const tx = await client.broadcast.actionNfa(
+          {
+            caller: account_name,
+            id: play_nfa,
+            action,
+            value_list: [],
+            extensions: [params],
+          },
           private_key,
         )
         const tx_result = await client.baiyujing.getTransactionResults(tx.id) as any

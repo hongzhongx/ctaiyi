@@ -13,9 +13,11 @@ npm install @taiyinet/ctaiyi
 ## Usage
 
 ```typescript
-import { Client } from '@taiyinet/ctaiyi'
+import { Client, http } from '@taiyinet/ctaiyi'
 
-const client = new Client('https://api.taiyi.com')
+const client = new Client({
+  transport: http('https://<node-url>')
+})
 
 for await (const block of client.blockchain.getBlocks()) {
   console.log(`New block, id: ${block.block_id}`)

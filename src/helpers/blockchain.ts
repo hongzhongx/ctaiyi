@@ -5,7 +5,7 @@ import { iteratorStream, sleep } from '../utils'
  * 区块链模式
  *
  * - 'irreversible' - 仅获取不可逆区块。
- * - 'latest' - 获取所有区块。
+ * - 'latest' - 获取最新区块。
  */
 export type BlockchainMode = 'irreversible' | 'latest'
 
