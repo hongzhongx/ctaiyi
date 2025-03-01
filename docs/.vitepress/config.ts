@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 import { createFileSystemTypesCache } from '@shikijs/vitepress-twoslash/cache-fs'
 import { defineConfig } from 'vitepress'
+import { groupIconMdPlugin } from 'vitepress-plugin-group-icons'
 
 function baiyujingItems(): DefaultTheme.SidebarItem {
   return {
@@ -404,6 +405,9 @@ export default defineConfig({
         typesCache: createFileSystemTypesCache(),
       }),
     ],
+    config(md) {
+      md.use(groupIconMdPlugin)
+    },
     codeCopyButtonTitle: '复制代码',
   },
   cleanUrls: true,
