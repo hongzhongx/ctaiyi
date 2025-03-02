@@ -1,5 +1,12 @@
 import type { Asset } from './asset'
 
+export interface LuaBool {
+  type: 'lua_bool'
+  value: {
+    v: boolean
+  }
+}
+
 export interface LuaString {
   type: 'lua_string'
   value: {
@@ -21,7 +28,7 @@ export interface LuaTable {
   }
 }
 
-export type LuaValue = LuaString | LuaInt64T | LuaTable | (LuaString | LuaInt64T | LuaTable)[]
+export type LuaValue = LuaBool | LuaString | LuaInt64T | LuaTable | (LuaBool | LuaString | LuaInt64T | LuaTable)[]
 
 export interface Nfa {
   id: number
