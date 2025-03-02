@@ -9,7 +9,7 @@ import type { AppliedOperation } from '../taiyi/operation'
 import type { RewardFund } from '../taiyi/rewards'
 import type { ScheduleSiming, Siming } from '../taiyi/siming'
 import type { TianDaoProperties, Zone, ZoneType } from '../taiyi/tiandao'
-import type { SignedTransaction, Transaction } from '../taiyi/transaction'
+import type { SignedTransaction, Transaction, TransactionResult } from '../taiyi/transaction'
 
 export class BaiYuJingAPI {
   constructor(private readonly client: Client) { }
@@ -167,7 +167,7 @@ export class BaiYuJingAPI {
   }
 
   async getTransactionResults(trxId: string) {
-    return this.call<AppliedOperation[]>('get_transaction_results', [trxId])
+    return this.call<TransactionResult[]>('get_transaction_results', [trxId])
   }
 
   async getRequiredSignatures(trx: SignedTransaction, availableKeys: string[]) {
