@@ -19,7 +19,7 @@ export interface TransactionConfirmation {
   expired: boolean
 }
 
-export interface ContractNarrate {
+export interface AffectedContractNarrate {
   type: 'contract_narrate'
   value: {
     affected_account: string
@@ -27,6 +27,17 @@ export interface ContractNarrate {
     message: string
   }
 }
+
+export interface AffectedNfaAffected {
+  type: 'nfa_affected'
+  value: {
+    affected_account: string
+    affected_item: number
+    action: string
+  }
+}
+
+export type ContractAffectedNarrate = AffectedContractNarrate | AffectedNfaAffected
 
 export interface TransactionBaseResult {
   type: 'base_result'
@@ -40,7 +51,7 @@ export interface TransactionContractResult {
   type: 'contract_result'
   value: {
     contract_name: string
-    contract_affecteds: ContractNarrate[]
+    contract_affecteds: ContractAffectedNarrate[]
     existed_pv: boolean
     process_value: string
     relevant_datasize: number
