@@ -266,7 +266,8 @@ export class BroadcastAPI {
       {
         active,
         creator,
-        fee,
+        // 尚不支持 fai 表示
+        fee: fee.toString(),
         json_metadata: metadata ? JSON.stringify(metadata) : '',
         memo_key,
         new_account_name: username,
