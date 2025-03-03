@@ -1,11 +1,5 @@
 import invariant from 'tiny-invariant'
 
-export interface FaiAsset {
-  amount: string | number
-  precision: number
-  fai: string
-}
-
 /**
  * 资产 symbol
  */
@@ -24,30 +18,22 @@ export interface MaterialAssets {
  */
 export class Asset {
   /**
-   * 从字符串创建一个 Asset 实例，例如 `42.000 QI` 或者 `4.2 \@@000000021`。
+   * 从字符串创建一个 Asset 实例，例如 `42.000 QI`
    */
   public static fromString(string: string, expectedSymbol?: AssetSymbol) {
     const [amountString, symbol] = string.split(' ')
 
-    let _symbol = symbol as AssetSymbol
-    let isFai = false
-    // 字符串的 symbol 是 fai 表示
-    if (symbol.startsWith('@@')) {
-      _symbol = Asset.getSymbolFromFai(symbol)
-      isFai = true
+    if (!['YANG', 'YIN', 'QI', 'GOLD', 'FOOD', 'WOOD', 'FABR', 'HERB'].includes(symbol)) {
+      throw new TypeError(`Invalid asset symbol: ${symbol}`)
     }
-
-    if (!['YANG', 'YIN', 'QI', 'GOLD', 'FOOD', 'WOOD', 'FABR', 'HERB'].includes(_symbol)) {
-      throw new Error(`Invalid asset symbol: ${_symbol}`)
-    }
-    if (expectedSymbol && _symbol !== expectedSymbol) {
-      throw new Error(`Invalid asset, expected symbol: ${expectedSymbol} got: ${_symbol}`)
+    if (expectedSymbol && symbol !== expectedSymbol) {
+      throw new TypeError(`Invalid asset, expected symbol: ${expectedSymbol} got: ${symbol}`)
     }
     const amount = Number.parseFloat(amountString)
     if (!Number.isFinite(amount)) {
       throw new TypeError(`Invalid asset amount: ${amountString}`)
     }
-    return new Asset(amount, _symbol, isFai)
+    return new Asset(amount, symbol as AssetSymbol)
   }
 
   /**
@@ -55,9 +41,8 @@ export class Asset {
    *
    * @param value 资产额度。
    * @param symbol 创建时使用的 symbol。也会用于验证资产，如果传递的值具有不同的 symbol 则会抛出错误。
-   * @param isFai 是否是 fai 表示。
    */
-  public static from(value: string | Asset | number | FaiAsset, symbol?: AssetSymbol, isFai?: boolean) {
+  public static from(value: string | Asset | number, symbol?: AssetSymbol) {
     if (value instanceof Asset) {
       if (symbol && value.symbol !== symbol) {
         throw new Error(`Invalid asset, expected symbol: ${symbol} got: ${value.symbol}`)
@@ -65,20 +50,13 @@ export class Asset {
       return value
     }
     else if (typeof value === 'number' && Number.isFinite(value)) {
-      return new Asset(value, symbol || 'YANG', isFai)
+      return new Asset(value, symbol || 'YANG')
     }
     else if (typeof value === 'string') {
       return Asset.fromString(value, symbol)
     }
-    else if (typeof value === 'object' && 'amount' in value && 'precision' in value && 'fai' in value) {
-      const amount = typeof value.amount === 'string' ? Number.parseFloat(value.amount) : value.amount
-      if (!Number.isFinite(amount)) {
-        throw new TypeError(`Invalid asset amount: ${amount}`)
-      }
-      return new Asset(amount, Asset.getSymbolFromFai(value.fai), true)
-    }
     else {
-      throw new Error(`Invalid asset '${String(value)}'`)
+      throw new TypeError(`Invalid asset '${String(value)}'`)
     }
   }
 
@@ -101,7 +79,6 @@ export class Asset {
   constructor(
     public readonly amount: number,
     public readonly symbol: AssetSymbol,
-    public readonly isFai = false,
   ) { }
 
   /**
@@ -199,13 +176,6 @@ export class Asset {
    * 用于 JSON 序列化
    */
   public toJSON(): string {
-    if (this.isFai) {
-      return JSON.stringify({
-        amount: this.amount,
-        precision: this.getPrecision(),
-        fai: Asset.getFaiFromSymbol(this.symbol),
-      })
-    }
     return this.toString()
   }
 }
