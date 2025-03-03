@@ -74,20 +74,8 @@ function AssetSerializer(buffer: ByteBuffer, data: Asset | string | number) {
   const asset = Asset.from(data)
 
   const precision = asset.getPrecision()
-  if (asset.isFai) {
-    // @ts-expect-error wrong type in @type/bytebuffer package
-    const LongConstructor = ByteBuffer.Long as typeof Long
-    // const faiNumPart = Number.parseInt(Asset.getFaiFromSymbol(asset.symbol).slice(2))
 
-    // const fai = Math.floor(faiNumPart / 10)
-    const towrite = LongConstructor.fromString(asset.amount.toString())
-    buffer.writeInt64(towrite)
-    // const write32 = (fai << 5) + 16 + asset.getPrecision()
-    // buffer.writeUint32(write32)
-  }
-  else {
-    buffer.writeInt64(Math.round(asset.amount * 10 ** precision))
-  }
+  buffer.writeInt64(Math.round(asset.amount * 10 ** precision))
 
   buffer.writeUint8(precision)
   buffer.append(asset.symbol.toUpperCase(), 'binary')
