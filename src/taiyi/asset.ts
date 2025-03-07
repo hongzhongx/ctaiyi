@@ -162,7 +162,7 @@ export class Asset {
    * 返回两个资产中较小的一个。
    */
   public static min(a: Asset, b: Asset) {
-    invariant(a.fai === b.fai, 'Can\t compare assets with different type asset')
+    invariant(a.fai === b.fai, 'Can\'t compare assets with different type asset')
     return a.amount < b.amount ? a : b
   }
 
@@ -170,7 +170,7 @@ export class Asset {
    * 返回两个资产中较大的一个。
    */
   public static max(a: Asset, b: Asset) {
-    invariant(a.fai === b.fai, 'Can\t compare assets with different type asset')
+    invariant(a.fai === b.fai, 'Can\'t compare assets with different type asset')
     return a.amount > b.amount ? a : b
   }
 
@@ -178,7 +178,7 @@ export class Asset {
    * 返回一个新实例为两个资产相加。
    */
   public add(other: Asset): Asset {
-    invariant(this.fai === other.fai, 'can not add with different type asset')
+    invariant(this.fai === other.fai, 'Can\'t add with different type asset')
     const amount = BigInt(this.amount) + BigInt(other.amount)
     return new Asset(amount.toString(), this.precision, this.fai)
   }
@@ -187,7 +187,7 @@ export class Asset {
    * 返回一个新实例为两个资产相减。
    */
   public subtract(other: Asset): Asset {
-    invariant(this.fai === other.fai, 'can not subtract with different type asset')
+    invariant(this.fai === other.fai, 'Can\'t subtract with different type asset')
     const amount = BigInt(this.amount) - BigInt(other.amount)
     return new Asset(amount.toString(), this.precision, this.fai)
   }
@@ -196,7 +196,7 @@ export class Asset {
    * 返回一个新实例为两个资产相乘。
    */
   public multiply(other: Asset): Asset {
-    invariant(this.fai === other.fai, 'can not multiply with different type asset')
+    invariant(this.fai === other.fai, 'Can\'t multiply with different type asset')
     const amount = BigInt(this.amount) * BigInt(other.amount)
     return new Asset(amount.toString(), this.precision, this.fai)
   }
@@ -205,7 +205,7 @@ export class Asset {
    * 返回一个新实例为两个资产相除。
    */
   public divide(other: Asset): Asset {
-    invariant(this.fai === other.fai, 'can not divide with different type asset')
+    invariant(this.fai === other.fai, 'Can\'t divide with different type asset')
     const amount = BigInt(this.amount) / BigInt(other.amount)
     return new Asset(amount.toString(), this.precision, this.fai)
   }
