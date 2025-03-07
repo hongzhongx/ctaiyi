@@ -23,18 +23,21 @@ export interface FaiAssetObject {
  * 表示太乙资产的类，例如 `1.000 QI` 或 `12.112233 YANG`。
  */
 export class Asset {
+  public static from(asset: Asset): Asset
   public static from(object: FaiAssetObject): Asset
-  public static from(amount: string): Asset
-  public static from(amount: number, symbol: AssetSymbol): Asset
+  public static from(amount: `${string} ${AssetSymbol}`): Asset
+  public static from(amount: number | string, symbol?: AssetSymbol): Asset
   public static from(amount: bigint, precision: number, fai: `@@${string}`): Asset
   public static from(
-    args1: number | string | bigint | FaiAssetObject,
+    args1: number | string | bigint | FaiAssetObject | Asset,
     args2?: number | AssetSymbol,
     args3?: `@@${string}`,
   ) {
-    // overload 2 from legacy asset string
-    if (typeof args1 === 'string' && !args2) {
-      invariant(args1.match(/^\d+\.\d+ [A-Z]+$/), 'Invalid asset string')
+    if (args1 instanceof Asset) {
+      return args1
+    }
+    // overload 3 from legacy asset string
+    if (typeof args1 === 'string' && args1.match(/^\d+\.\d+ [A-Z]+$/)) {
       const [amount, symbol] = args1.split(' ')
       invariant(Asset.isValidSymbol(symbol), `Invalid asset symbol: ${symbol}`)
       const precision = Asset.getPrecision(symbol)
@@ -42,26 +45,31 @@ export class Asset {
       const amountBigInt = BigInt(Number(amount) * (10 ** precision))
       return new Asset(amountBigInt.toString(), precision, fai)
     }
-    // overload 3 from number and symbol
-    else if (typeof args1 === 'number' || typeof args1 === 'string') {
-      const precision = Asset.getPrecision(args2 as AssetSymbol)
+    // overload 4 from number and symbol
+    else if (typeof args1 === 'number' || (typeof args1 === 'string' && args1.match(/^\d+$/))) {
+      const symbol = (args2 as AssetSymbol) || 'YANG'
+      const precision = Asset.getPrecision(symbol)
       const amount = BigInt(Number(args1) * (10 ** precision))
-      invariant(Asset.isValidSymbol(args2), `Invalid asset symbol: ${args2}`)
-      const fai = Asset.getIdentifier(args2 as AssetSymbol)
+      invariant(Asset.isValidSymbol(symbol), `Invalid asset symbol: ${symbol}`)
+      const fai = Asset.getIdentifier(symbol)
       return new Asset(amount.toString(), precision, fai)
     }
-    // overload 1 from fai asset object
+    // overload 2 from fai asset object
     else if (typeof args1 === 'object') {
       invariant(args1.amount, 'amount must be provided')
       invariant(args1.precision, 'precision must be provided')
       invariant(args1.fai, 'fai must be provided')
       return new Asset(args1.amount.toString(), args1.precision, args1.fai)
     }
-    // overload 4 from bigint, precision and fai
-    invariant(typeof args1 === 'bigint', 'amount must be a bigint')
-    invariant(typeof args2 === 'number', 'precision must be a number')
-    invariant(args3, 'fai must be provided when using bigint amount')
-    return new Asset(args1.toString(), args2, args3)
+    // overload 5 from bigint, precision and fai
+    else if (typeof args1 === 'bigint') {
+      invariant(typeof args2 === 'number', 'precision must be a number')
+      invariant(typeof args1 === 'bigint', 'amount must be a bigint')
+      invariant(typeof args2 === 'number', 'precision must be a number')
+      invariant(args3, 'fai must be provided when using bigint amount')
+      return new Asset(args1.toString(), args2, args3)
+    }
+    throw new TypeError('Invalid asset')
   }
 
   constructor(
@@ -124,16 +132,95 @@ export class Asset {
     }
   }
 
-  toJSON() {
-    if (this.fai.startsWith('@@')) {
-      return {
-        amount: this.amount.toString(),
-        precision: this.precision,
-        fai: this.fai,
-      }
+  /**
+   * 根据 identifier 返回资产的 symbol
+   */
+  static getSymbolByIdentifier(fai: `@@${string}`): AssetSymbol {
+    switch (fai) {
+      case '@@000000013':
+        return 'YIN'
+      case '@@000000021':
+        return 'YANG'
+      case '@@000000037':
+        return 'QI'
+      case '@@000000045':
+        return 'GOLD'
+      case '@@000000059':
+        return 'FOOD'
+      case '@@000000068':
+        return 'WOOD'
+      case '@@000000076':
+        return 'FABR'
+      case '@@000000084':
+        return 'HERB'
+      default:
+        throw new Error(`Not implemented fai: ${fai}`)
     }
-    else {
-      return this.fai
+  }
+
+  /**
+   * 返回两个资产中较小的一个。
+   */
+  public static min(a: Asset, b: Asset) {
+    invariant(a.fai === b.fai, 'Can\t compare assets with different type asset')
+    return a.amount < b.amount ? a : b
+  }
+
+  /**
+   * 返回两个资产中较大的一个。
+   */
+  public static max(a: Asset, b: Asset) {
+    invariant(a.fai === b.fai, 'Can\t compare assets with different type asset')
+    return a.amount > b.amount ? a : b
+  }
+
+  /**
+   * 返回一个新实例为两个资产相加。
+   */
+  public add(other: Asset): Asset {
+    invariant(this.fai === other.fai, 'can not add with different type asset')
+    const amount = BigInt(this.amount) + BigInt(other.amount)
+    return new Asset(amount.toString(), this.precision, this.fai)
+  }
+
+  /**
+   * 返回一个新实例为两个资产相减。
+   */
+  public subtract(other: Asset): Asset {
+    invariant(this.fai === other.fai, 'can not subtract with different type asset')
+    const amount = BigInt(this.amount) - BigInt(other.amount)
+    return new Asset(amount.toString(), this.precision, this.fai)
+  }
+
+  /**
+   * 返回一个新实例为两个资产相乘。
+   */
+  public multiply(other: Asset): Asset {
+    invariant(this.fai === other.fai, 'can not multiply with different type asset')
+    const amount = BigInt(this.amount) * BigInt(other.amount)
+    return new Asset(amount.toString(), this.precision, this.fai)
+  }
+
+  /**
+   * 返回一个新实例为两个资产相除。
+   */
+  public divide(other: Asset): Asset {
+    invariant(this.fai === other.fai, 'can not divide with different type asset')
+    const amount = BigInt(this.amount) / BigInt(other.amount)
+    return new Asset(amount.toString(), this.precision, this.fai)
+  }
+
+  toString() {
+    const value = `${(Number(this.amount) / 10 ** this.precision).toFixed(this.precision)}`
+    const symbol = Asset.getSymbolByIdentifier(this.fai)
+    return `${value} ${symbol}`
+  }
+
+  toJSON() {
+    return {
+      amount: this.amount.toString(),
+      precision: this.precision,
+      fai: this.fai,
     }
   }
 }
