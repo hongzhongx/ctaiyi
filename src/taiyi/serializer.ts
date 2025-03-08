@@ -89,6 +89,7 @@ function AssetSerializer(buffer: ByteBuffer, value: SGTAsset | string) {
   }
   else {
     // TODO: 自定义 FA 的序列化
+    throw new Error('Unsupported for custom FA')
   }
 }
 

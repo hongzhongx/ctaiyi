@@ -296,7 +296,7 @@ export class Price {
     const baseAmount = BigInt(base.amount)
     const quoteAmount = BigInt(quote.amount)
     invariant(baseAmount !== 0n && quoteAmount !== 0n, 'base and quote assets must be non-zero')
-    invariant(base.fai !== quote.fai, 'base and quote can not have the same fai')
+    invariant(base.fai !== quote.fai, 'base and quote can not have the same asset')
   }
 
   /**
