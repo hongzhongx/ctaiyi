@@ -135,7 +135,7 @@ declare class Asset implements SGTAsset {
 }
 ```
 
-## FaiAsset
+## SGTAsset
 
 ```ts twoslash
 declare interface SGTAsset {

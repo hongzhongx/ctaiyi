@@ -367,6 +367,7 @@ function guideSidebar(): DefaultTheme.SidebarMulti['/guide/'] {
         base: '/guide/utilities/',
         collapsed: true,
         items: [
+          { text: 'Asset', link: '/asset' },
           { text: 'PublicKey', link: '/public-key' },
           { text: 'PrivateKey', link: '/private-key' },
         ],
