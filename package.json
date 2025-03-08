@@ -41,6 +41,11 @@
     "prepack": "unbuild",
     "test": "vitest",
     "lint": "eslint .",
+    "docs:dev": "pnpm -C docs dev",
+    "docs:build": "pnpm -C docs build",
+    "docs:preview": "pnpm -C docs preview",
+    "playground:dev": "pnpm -C playground dev",
+    "playground:build": "pnpm -C playground build",
     "lint:fix": "eslint --fix .",
     "prepare": "simple-git-hooks",
     "prepublishOnly": "pnpm build"
