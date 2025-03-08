@@ -56,24 +56,52 @@ declare interface AppliedOperation {
 ## Asset
 
 ```ts twoslash
-import { AssetSymbol, FaiAsset } from '@taiyinet/ctaiyi'
+import { AssetSymbol, SGTAsset } from '@taiyinet/ctaiyi'
 // ---cut---
-declare class Asset {
-  readonly amount: number
-  readonly symbol: AssetSymbol
-  readonly isFai: boolean
+/**
+ * 表示太乙资产的类，例如 `1.000 QI` 或 `12.112233 YANG`。
+ */
+declare class Asset implements SGTAsset {
+  amount: string
+  precision: number
+  fai: `@@${string}`
   /**
-   * 从字符串创建一个 Asset 实例，例如 `42.000 QI` 或者 `4.2 \@@000000021`。
+   * 从字符串创建资产。
+   * @param value 资产字符串，例如 `1.000 QI` 或 `12.112233 YANG`。
+   * @returns 创建的资产实例。
    */
-  static fromString(string: string, expectedSymbol?: AssetSymbol): Asset
+  static fromString(value: string): Asset
   /**
-   * 创建新的 Asset。
-   *
-   * @param value 资产额度。
-   * @param symbol 创建时使用的 symbol。也会用于验证资产，如果传递的值具有不同的 symbol 则会抛出错误。
-   * @param isFai 是否是 fai 表示。
+   * 从 bigint 创建资产。
+   * @param amount 资产数量。
+   * @param precision 资产精度。
+   * @param fai 资产 identifier。
+   * @returns 创建的资产实例。
    */
-  static from(value: string | Asset | number | FaiAsset, symbol?: AssetSymbol, isFai?: boolean): Asset
+  static fromBigInt(amount: bigint, precision: number, fai: `@@${string}`): Asset
+  /**
+   * 从 SGTAsset 对象创建资产。
+   * @param value SGTAsset 实例。
+   * @returns 创建的资产实例。
+   */
+  static fromObject(value: SGTAsset): Asset
+  static from(value: Asset): Asset
+  static from(value: string | SGTAsset): Asset
+  static from(value: number, symbol?: AssetSymbol): Asset
+  constructor(amount: string, precision: number, fai: `@@${string}`)
+  static isValidSymbol(symbol: any): symbol is AssetSymbol
+  /**
+   * 返回资产的精度。
+   */
+  static getPrecision(symbol: AssetSymbol): number
+  /**
+   * 返回资产的 identifier
+   */
+  static getIdentifier(symbol: AssetSymbol): `@@${string}`
+  /**
+   * 根据 identifier 返回资产的 symbol
+   */
+  static getSymbolByIdentifier(fai: `@@${string}`): AssetSymbol
   /**
    * 返回两个资产中较小的一个。
    */
@@ -82,94 +110,76 @@ declare class Asset {
    * 返回两个资产中较大的一个。
    */
   static max(a: Asset, b: Asset): Asset
-  constructor(amount: number, symbol: AssetSymbol, isFai?: boolean)
-  /**
-   * 返回资产的精度。
-   */
-  getPrecision(): number
-  /**
-   * 返回 fai 表示
-   */
-  static getFaiFromSymbol(symbol: string): string
-  static getSymbolFromFai(fai: string): AssetSymbol
   /**
    * 返回一个新实例为两个资产相加。
    */
-  add(amount: Asset | string | number): Asset
+  add(other: Asset): Asset
   /**
    * 返回一个新实例为两个资产相减。
    */
-  subtract(amount: Asset | string | number): Asset
+  subtract(other: Asset): Asset
   /**
    * 返回一个新实例为两个资产相乘。
    */
-  multiply(factor: Asset | string | number): Asset
+  multiply(other: Asset): Asset
   /**
    * 返回一个新实例为两个资产相除。
    */
-  divide(divisor: Asset | string | number): Asset
-  /**
-   * 返回资产的字符串表示，例如 `42.000 QI`。
-   */
+  divide(other: Asset): Asset
   toString(): string
-  /**
-   * 用于 JSON 序列化
-   */
-  toJSON(): string
+  toJSON(): {
+    amount: string
+    precision: number
+    fai: `@@${string}`
+  }
 }
 ```
 
 ## FaiAsset
 
 ```ts twoslash
-declare interface FaiAsset {
-  amount: string | number
+declare interface SGTAsset {
+  amount: bigint | string
   precision: number
-  fai: string
+  fai: `@@${string}`
 }
 ```
 
 ## Account
 
 ```ts twoslash
-import { Asset, Authority, MaterialAssets } from '@taiyinet/ctaiyi'
+import { Authority, LegacyAsset, MaterialAssets } from '@taiyinet/ctaiyi'
 // ---cut---
-declare interface Account extends MaterialAssets {
-  id: number // account_id_type
-  name: string // account_name_type
+interface Account extends MaterialAssets {
+  id: number
+  name: string
   owner: Authority
   active: Authority
   posting: Authority
   memo_key: string
   json_metadata: string
   proxy: string
-
   last_owner_update: string
   last_account_update: string
   created: string
   recovery_account: string
   last_account_recovery: string
-
   can_adore: boolean
-
-  balance: Asset | string
-  reward_yang_balance: Asset | string
-  reward_qi_balance: Asset | string
-  reward_feigang_balance: Asset | string
-  qi: Asset | string
-  delegated_qi: Asset | string
-  received_qi: Asset | string
-  qi_withdraw_rate: Asset | string
-
+  balance: LegacyAsset
+  reward_yang_balance: LegacyAsset
+  reward_qi_balance: LegacyAsset
+  reward_feigang_balance: LegacyAsset
+  qi: LegacyAsset
+  delegated_qi: LegacyAsset
+  received_qi: LegacyAsset
+  qi_withdraw_rate: LegacyAsset
   next_qi_withdrawal_time: string
   withdrawn: number
   to_withdraw: number
   withdraw_routes: number
-
   proxied_vsf_adores: number[]
   simings_adored_for: number
-
-  qi_balance: Asset | string
+  qi_balance: LegacyAsset
 }
 ```
 
@@ -200,29 +210,29 @@ declare interface AuthorityType {
 ## MaterialAssets
 
 ```ts twoslash
-import { Asset } from '@taiyinet/ctaiyi'
+import { LegacyAsset } from '@taiyinet/ctaiyi'
 // ---cut---
 declare interface MaterialAssets {
-  gold: Asset | string
-  food: Asset | string
-  wood: Asset | string
-  fabric: Asset | string
-  herb: Asset | string
+  gold: LegacyAsset
+  food: LegacyAsset
+  wood: LegacyAsset
+  fabric: LegacyAsset
+  herb: LegacyAsset
 }
 ```
 
 ## ChainProperties
 
 ```ts twoslash
-import { Asset } from '@taiyinet/ctaiyi'
+import { LegacyAsset } from '@taiyinet/ctaiyi'
 // ---cut---
-declare interface ChainProperties {
+interface ChainProperties {
   /**
    * 这笔费用以 YANG 支付，会为新账户兑换成 QI。
    * 没有 QI 的账户无法获得使用配额，因此毫无影响力。
    * 这笔最低费用要求所有账户对网络做出一定的投入，其中包括投票及进行交易的能力。
    */
-  account_creation_fee: string | Asset
+  account_creation_fee: LegacyAsset
   /**
    * 司命投票针对的是最大区块大小，网络利用该参数来调整速率限制和容量。
    */
@@ -233,31 +243,31 @@ declare interface ChainProperties {
 ## DynamicGlobalProperties
 
 ```ts twoslash
-import { Asset } from '@taiyinet/ctaiyi'
+import { LegacyAsset } from '@taiyinet/ctaiyi'
 // ---cut---
-declare interface DynamicGlobalProperties {
+interface DynamicGlobalProperties {
   id: number
   head_block_number: number
   head_block_id: string
   time: string
   /** 当前总等价阳寿供应量（包含真气、物质所有的等价阳寿总量） */
-  current_supply: Asset | string
+  current_supply: LegacyAsset
   /** 当前总的真气（自由真气） */
-  total_qi: Asset | string
+  total_qi: LegacyAsset
   /** 当前总的真气（自由真气） */
-  pending_rewarded_qi: Asset | string
-  pending_rewarded_feigang: Asset | string
-  pending_cultivation_qi: Asset | string
+  pending_rewarded_qi: LegacyAsset
+  pending_rewarded_feigang: LegacyAsset
+  pending_cultivation_qi: LegacyAsset
   /** 当前总的金石（包括NFA内含物质） */
-  total_gold: Asset | string
+  total_gold: LegacyAsset
   /** 当前总的食物（包括NFA内含物质） */
-  total_food: Asset | string
+  total_food: LegacyAsset
   /** 当前总的木材（包括NFA内含物质） */
-  total_wood: Asset | string
+  total_wood: LegacyAsset
   /** 当前总的织物（包括NFA内含物质） */
-  total_fabric: Asset | string
+  total_fabric: LegacyAsset
   /** 当前总的药材（包括NFA内含物质） */
-  total_herb: Asset | string
+  total_herb: LegacyAsset
   /** 最大区块大小 */
   maximum_block_size: number
   /** 当前绝对槽位号 */
@@ -274,9 +284,9 @@ declare interface DynamicGlobalProperties {
 ## QiDelegation
 
 ```ts twoslash
-import { Asset } from '@taiyinet/ctaiyi'
+import { LegacyAsset } from '@taiyinet/ctaiyi'
 // ---cut---
-declare interface QiDelegation {
+interface QiDelegation {
   /**
    * 委托 ID。
    */
@@ -292,7 +302,7 @@ declare interface QiDelegation {
   /**
    * 委托的 QI 数量。
    */
-  qi: Asset | string
+  qi: string
   /**
    * 最早可以移除委托的时间。
    */
@@ -428,14 +438,16 @@ declare interface ActorTalentRule {
 ## Nfa
 
 ```ts twoslash
-import { Asset, LuaValue } from '@taiyinet/ctaiyi'
+import { LegacyAsset, LuaValue } from '@taiyinet/ctaiyi'
 // ---cut---
-declare interface Nfa {
+interface Nfa {
   id: number
   symbol: string
   main_contract: string
   children: number[]
-  contract_data: [ { key: LuaValue }, LuaValue ][]
+  contract_data: [{
+    key: LuaValue
+  }, LuaValue][]
   created_time: string
   next_tick_time: string
   creator_account: string
@@ -445,17 +457,17 @@ declare interface Nfa {
   cultivation_value: number
   debt_contract: string
   debt_value: number
-  qi: Asset | string
-  fabric: Asset | string
-  food: Asset | string
-  gold: Asset | string
-  herb: Asset | string
-  wood: Asset | string
-  material_fabric: Asset | string
-  material_food: Asset | string
-  material_gold: Asset | string
-  material_herb: Asset | string
-  material_wood: Asset | string
+  qi: LegacyAsset
+  fabric: LegacyAsset
+  food: LegacyAsset
+  gold: LegacyAsset
+  herb: LegacyAsset
+  wood: LegacyAsset
+  material_fabric: LegacyAsset
+  material_food: LegacyAsset
+  material_gold: LegacyAsset
+  material_herb: LegacyAsset
+  material_wood: LegacyAsset
   five_phase: number
 }
 ```
