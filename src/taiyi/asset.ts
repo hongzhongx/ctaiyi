@@ -1,4 +1,5 @@
 import invariant from 'tiny-invariant'
+import { dammChecksum8digit } from '../utils'
 
 /**
  * 资产 symbol
@@ -18,6 +19,9 @@ export interface FaiAssetObject {
   precision: number
   fai: `@@${string}`
 }
+
+const SGT_MAX_FAI = 99999999
+const SGT_MIN_FAI = 1
 
 /**
  * 表示太乙资产的类，例如 `1.000 QI` 或 `12.112233 YANG`。
@@ -91,7 +95,11 @@ export class Asset implements FaiAssetObject {
     public precision: number,
     public fai: `@@${string}`,
   ) {
-
+    const faiNum = Number.parseInt(this.fai.slice(2))
+    const faiCheckDigit = Math.floor(faiNum % 10)
+    const faiDataDigit = Math.floor(faiNum / 10)
+    invariant(faiDataDigit >= SGT_MIN_FAI && faiDataDigit <= SGT_MAX_FAI, 'Fai out of range')
+    invariant(faiCheckDigit === dammChecksum8digit(faiDataDigit), 'Invalid check digit')
   }
 
   public static isValidSymbol(symbol: any): symbol is AssetSymbol {

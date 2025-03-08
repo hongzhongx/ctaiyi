@@ -19,11 +19,6 @@ describe('asset', () => {
       expect(result.amount).toBe(`1${'0'.repeat(asset.precision)}`)
       expect(result.precision).toBe(asset.precision)
       expect(result.fai).toBe(asset.fai)
-
-      const result2 = Asset.from('1', asset.symbol)
-      expect(result2.amount).toBe(`1${'0'.repeat(asset.precision)}`)
-      expect(result2.precision).toBe(asset.precision)
-      expect(result2.fai).toBe(asset.fai)
     })
 
     it('should create asset from legacy asset string', () => {
@@ -35,7 +30,7 @@ describe('asset', () => {
 
     it('should create asset from bigint amount, precision and symbol', () => {
       const value = `1${'0'.repeat(asset.precision)}`
-      const result = Asset.from(BigInt(value), asset.precision, asset.fai)
+      const result = Asset.from({ amount: BigInt(value), precision: asset.precision, fai: asset.fai })
       expect(result.amount).toBe(value)
       expect(result.precision).toBe(asset.precision)
       expect(result.fai).toBe(asset.fai)
@@ -43,20 +38,24 @@ describe('asset', () => {
 
     it('should toString to legacy asset string', () => {
       const value = `1${'0'.repeat(asset.precision)}`
-      const result = Asset.from(BigInt(value), asset.precision, asset.fai)
+      const result = Asset.from({ amount: BigInt(value), precision: asset.precision, fai: asset.fai })
       expect(result.toString()).toBe(`1.${'0'.repeat(asset.precision)} ${asset.symbol}`)
     })
 
     it('should serialize property', () => {
-      const result = Asset.from(1_000n, asset.precision, asset.fai)
+      const result = Asset.from({ amount: 1_000n, precision: asset.precision, fai: asset.fai })
       expect(JSON.stringify(result)).matchSnapshot()
     })
   })
 
   it('should use YANG as default symbol when no symbol provided', () => {
-    const result = Asset.from('1')
+    const result = Asset.from(1)
     expect(result.amount).toBe('1000')
     expect(result.precision).toBe(3)
     expect(result.fai).toBe('@@000000021')
+  })
+
+  it('should throw error when fai is invalid', () => {
+    expect(() => Asset.fromBigInt(1_000n, 3, '@@000000022')).toThrow()
   })
 })
