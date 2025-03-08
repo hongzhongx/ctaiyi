@@ -1,9 +1,10 @@
 import type { AuthorityType } from './account'
+import type { SGTAsset } from './asset'
 import type { Operation } from './operation'
 import ByteBuffer from 'bytebuffer'
 import { PublicKey } from '../crypto'
 import { Authority } from './account'
-import { Asset } from './asset'
+import { Asset, SGT_ASSETS_FAI } from './asset'
 import { HexBuffer } from './misc'
 
 export type Serializer<Type = any> = (buffer: ByteBuffer, data: Type) => void
@@ -70,17 +71,26 @@ function StaticVariantSerializer(itemSerializers: Serializer[]) {
  * 序列化资产。
  * @note 对于大于 `2^53-1/10^precision` 的数额会失去精度。在实际使用中不应成为问题。
  */
-function AssetSerializer(buffer: ByteBuffer, data: Asset | string | number) {
-  const asset = Asset.from(data)
+function AssetSerializer(buffer: ByteBuffer, value: SGTAsset | string) {
+  // @ts-expect-error wrong type in @type/bytebuffer package
+  const LongConstructor = ByteBuffer.Long as typeof Long
 
-  const precision = asset.getPrecision()
+  const asset = Asset.from(value)
+  buffer.writeInt64(LongConstructor.fromString(asset.amount))
+  if (SGT_ASSETS_FAI.includes(asset.fai)) {
+    buffer.writeUint8(asset.precision)
 
-  buffer.writeInt64(Math.round(asset.amount * 10 ** precision))
-
-  buffer.writeUint8(precision)
-  buffer.append(asset.symbol.toUpperCase(), 'binary')
-  for (let i = 0; i < 7 - asset.symbol.length; i++) {
-    buffer.writeUint8(0)
+    const symbol = Asset.getSymbolByIdentifier(asset.fai)
+    buffer.append(symbol.toUpperCase(), 'binary')
+    for (let i = 0; i < 7 - symbol.length; i++) {
+      buffer.writeUint8(0)
+    }
+  }
+  else {
+    // NOTE: 这里参考 taiyi-js 的实现，但是不知道为什么只写了 32 位，可能有问题，但是现在没有可以测试的自定义 FA 资产，后续再调整
+    const faiNum = Number.parseInt(asset.fai.slice(2))
+    const fai = (faiNum << 5) + 16 + asset.precision
+    buffer.writeUint32(fai)
   }
 }
 
