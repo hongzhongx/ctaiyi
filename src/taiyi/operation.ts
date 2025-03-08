@@ -1,6 +1,6 @@
 import type { PublicKey } from '../crypto'
 import type { AuthorityType } from './account'
-import type { Asset } from './asset'
+import type { LegacyAsset } from './asset'
 import type { ChainProperties, HexBuffer } from './misc'
 
 export type OperationName =
@@ -88,7 +88,7 @@ export interface AppliedOperation {
 export interface AccountCreateOperation extends Operation {
   0: 'account_create'
   1: {
-    fee: Asset | string
+    fee: LegacyAsset
     creator: string
     new_account_name: string
     owner: AuthorityType
@@ -116,7 +116,7 @@ export interface TransferOperation extends Operation {
   1: {
     from: string
     to: string
-    amount: Asset | string
+    amount: LegacyAsset
     memo?: string
   }
 }
@@ -126,7 +126,7 @@ export interface TransferToQiOperation extends Operation {
   1: {
     from: string
     to: string
-    amount: Asset | string
+    amount: LegacyAsset
   }
 }
 
@@ -134,7 +134,7 @@ export interface WithdrawQiOperation extends Operation {
   0: 'withdraw_qi'
   1: {
     account: string
-    qi: Asset | string
+    qi: LegacyAsset
   }
 }
 
@@ -153,7 +153,7 @@ export interface DelegateQiOperation extends Operation {
   1: {
     delegator: string
     delegatee: string
-    qi: Asset | string
+    qi: LegacyAsset
   }
 }
 
@@ -164,7 +164,7 @@ export interface SimingUpdateOperation extends Operation {
     url: string
     block_signing_key: PublicKey | string
     props: ChainProperties
-    fee: Asset | string
+    fee: LegacyAsset
   }
 }
 
@@ -255,9 +255,9 @@ export interface ClaimRewardBalanceOperation extends Operation {
   0: 'claim_reward_balance'
   1: {
     account: string
-    reward_yang: Asset | string
-    reward_qi: Asset | string
-    reward_feigang: Asset | string
+    reward_yang: LegacyAsset
+    reward_qi: LegacyAsset
+    reward_feigang: LegacyAsset
   }
 }
 
@@ -344,7 +344,7 @@ export interface ActionNfaOperation extends Operation {
 export interface CreateZoneOperation extends Operation {
   0: 'create_zone'
   1: {
-    fee: Asset | string
+    fee: LegacyAsset
     creator: string
     name: string
   }
@@ -361,7 +361,7 @@ export interface CreateActorTalentRuleOperation extends Operation {
 export interface CreateActorOperation extends Operation {
   0: 'create_actor'
   1: {
-    fee: Asset | string
+    fee: LegacyAsset
     creator: string
     family_name: string
     last_name: string
@@ -380,8 +380,8 @@ export interface FillQiWithdrawOperation extends Operation {
   1: {
     from_account: string
     to_account: string
-    withdrawn: Asset | string
-    deposited: Asset | string
+    withdrawn: LegacyAsset
+    deposited: LegacyAsset
   }
 }
 
@@ -389,7 +389,7 @@ export interface ReturnQiDelegationOperation extends Operation {
   0: 'return_qi_delegation'
   1: {
     account: string
-    qi: Asset | string
+    qi: LegacyAsset
   }
 }
 
@@ -397,7 +397,7 @@ export interface ProducerRewardOperation extends Operation {
   0: 'producer_reward'
   1: {
     producer: string
-    qi: Asset | string
+    qi: LegacyAsset
   }
 }
 
@@ -406,8 +406,8 @@ export interface NfaConvertResourcesOperation extends Operation {
   1: {
     nfa: number
     owner: string
-    qi: Asset | string
-    resource: Asset | string
+    qi: LegacyAsset
+    resource: LegacyAsset
     is_qi_to_resource: boolean
   }
 }
@@ -419,7 +419,7 @@ export interface NfaTransferOperation extends Operation {
     from_owner: string
     to: number
     to_owner: string
-    amount: Asset | string
+    amount: LegacyAsset
   }
 }
 
@@ -428,8 +428,8 @@ export interface NfaDepositWithdrawOperation extends Operation {
   1: {
     nfa: number
     account: string
-    deposited: Asset | string
-    withdrawn: Asset | string
+    deposited: LegacyAsset
+    withdrawn: LegacyAsset
   }
 }
 
@@ -437,7 +437,7 @@ export interface RewardFeigangOperation extends Operation {
   0: 'reward_feigang'
   1: {
     account: string
-    qi: Asset | string
+    qi: LegacyAsset
   }
 }
 
@@ -446,7 +446,7 @@ export interface RewardCultivationOperation extends Operation {
   1: {
     account: string
     nfa: number
-    qi: Asset | string
+    qi: LegacyAsset
   }
 }
 
@@ -536,6 +536,7 @@ export interface NarrateLogOperation extends Operation {
   0: 'narrate_log'
   1: {
     narrator: string
+    nfa: number
     years: number
     months: number
     times: number

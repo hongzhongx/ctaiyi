@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`asset > asset 'FABR' > should serialize property 1`] = `"{"amount":"1000","precision":6,"fai":"@@000000076"}"`;
+
+exports[`asset > asset 'FOOD' > should serialize property 1`] = `"{"amount":"1000","precision":6,"fai":"@@000000059"}"`;
+
+exports[`asset > asset 'GOLD' > should serialize property 1`] = `"{"amount":"1000","precision":6,"fai":"@@000000045"}"`;
+
+exports[`asset > asset 'HERB' > should serialize property 1`] = `"{"amount":"1000","precision":6,"fai":"@@000000084"}"`;
+
+exports[`asset > asset 'QI' > should serialize property 1`] = `"{"amount":"1000","precision":6,"fai":"@@000000037"}"`;
+
+exports[`asset > asset 'WOOD' > should serialize property 1`] = `"{"amount":"1000","precision":6,"fai":"@@000000068"}"`;
+
+exports[`asset > asset 'YANG' > should serialize property 1`] = `"{"amount":"1000","precision":3,"fai":"@@000000021"}"`;
+
+exports[`asset > asset 'YIN' > should serialize property 1`] = `"{"amount":"1000","precision":3,"fai":"@@000000013"}"`;

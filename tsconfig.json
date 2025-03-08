@@ -24,8 +24,7 @@
     }
   ],
   "include": [
-    "**/*.ts",
-    "**/*.mjs",
+    "src/**/*.ts",
     "docs/.vitepress/**/*.ts",
     "docs/.vitepress/**/*.vue",
     "eslint.config.js"

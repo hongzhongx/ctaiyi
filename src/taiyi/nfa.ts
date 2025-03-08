@@ -1,4 +1,11 @@
-import type { Asset } from './asset'
+import type { LegacyAsset } from './asset'
+
+export interface LuaBool {
+  type: 'lua_bool'
+  value: {
+    v: boolean
+  }
+}
 
 export interface LuaString {
   type: 'lua_string'
@@ -21,7 +28,7 @@ export interface LuaTable {
   }
 }
 
-export type LuaValue = LuaString | LuaInt64T | LuaTable | (LuaString | LuaInt64T | LuaTable)[]
+export type LuaValue = LuaBool | LuaString | LuaInt64T | LuaTable | (LuaBool | LuaString | LuaInt64T | LuaTable)[]
 
 export interface Nfa {
   id: number
@@ -43,19 +50,19 @@ export interface Nfa {
   debt_contract: string
   debt_value: number
 
-  qi: Asset | string
+  qi: LegacyAsset
 
-  fabric: Asset | string
-  food: Asset | string
-  gold: Asset | string
-  herb: Asset | string
-  wood: Asset | string
+  fabric: LegacyAsset
+  food: LegacyAsset
+  gold: LegacyAsset
+  herb: LegacyAsset
+  wood: LegacyAsset
 
-  material_fabric: Asset | string
-  material_food: Asset | string
-  material_gold: Asset | string
-  material_herb: Asset | string
-  material_wood: Asset | string
+  material_fabric: LegacyAsset
+  material_food: LegacyAsset
+  material_gold: LegacyAsset
+  material_herb: LegacyAsset
+  material_wood: LegacyAsset
 
   five_phase: number
 }

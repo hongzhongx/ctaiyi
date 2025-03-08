@@ -1,4 +1,4 @@
-import type { Asset, MaterialAssets } from './asset'
+import type { LegacyAsset, MaterialAssets } from './asset'
 import type { AppliedOperation } from './operation'
 import { PublicKey } from './../crypto'
 
@@ -57,14 +57,14 @@ export interface Account extends MaterialAssets {
 
   can_adore: boolean
 
-  balance: Asset | string
-  reward_yang_balance: Asset | string
-  reward_qi_balance: Asset | string
-  reward_feigang_balance: Asset | string
-  qi: Asset | string
-  delegated_qi: Asset | string
-  received_qi: Asset | string
-  qi_withdraw_rate: Asset | string
+  balance: LegacyAsset
+  reward_yang_balance: LegacyAsset
+  reward_qi_balance: LegacyAsset
+  reward_feigang_balance: LegacyAsset
+  qi: LegacyAsset
+  delegated_qi: LegacyAsset
+  received_qi: LegacyAsset
+  qi_withdraw_rate: LegacyAsset
 
   next_qi_withdrawal_time: string
   withdrawn: number
@@ -74,7 +74,7 @@ export interface Account extends MaterialAssets {
   proxied_vsf_adores: number[]
   simings_adored_for: number
 
-  qi_balance: Asset | string
+  qi_balance: LegacyAsset
 }
 
 export interface ExtendedAccount extends Account {
