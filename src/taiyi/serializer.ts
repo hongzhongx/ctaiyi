@@ -76,9 +76,8 @@ function AssetSerializer(buffer: ByteBuffer, value: SGTAsset | string) {
   const LongConstructor = ByteBuffer.Long as typeof Long
 
   const asset = Asset.from(value)
+  buffer.writeInt64(LongConstructor.fromString(asset.amount))
   if (SGT_ASSETS_FAI.includes(asset.fai)) {
-    buffer.writeInt64(LongConstructor.fromString(asset.amount))
-
     buffer.writeUint8(asset.precision)
 
     const symbol = Asset.getSymbolByIdentifier(asset.fai)
@@ -88,8 +87,10 @@ function AssetSerializer(buffer: ByteBuffer, value: SGTAsset | string) {
     }
   }
   else {
-    // TODO: 自定义 FA 的序列化
-    throw new Error('Unsupported for custom FA')
+    // NOTE: 这里参考 taiyi-js 的实现，但是不知道为什么只写了 32 位，可能有问题，但是现在没有可以测试的自定义 FA 资产，后续再调整
+    const faiNum = Number.parseInt(asset.fai.slice(2))
+    const fai = (faiNum << 5) + 16 + asset.precision
+    buffer.writeUint32(fai)
   }
 }
 
