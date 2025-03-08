@@ -1,4 +1,5 @@
 import type { AuthorityType } from './account'
+import type { FaiAssetObject } from './asset'
 import type { Operation } from './operation'
 import ByteBuffer from 'bytebuffer'
 import { PublicKey } from '../crypto'
@@ -70,17 +71,33 @@ function StaticVariantSerializer(itemSerializers: Serializer[]) {
  * 序列化资产。
  * @note 对于大于 `2^53-1/10^precision` 的数额会失去精度。在实际使用中不应成为问题。
  */
-function AssetSerializer(buffer: ByteBuffer, data: Asset | string | number) {
-  const asset = Asset.from(data)
+function AssetSerializer(buffer: ByteBuffer, value: FaiAssetObject | string) {
+  // @ts-expect-error wrong type in @type/bytebuffer package
+  const LongConstructor = ByteBuffer.Long as typeof Long
 
-  const precision = asset.getPrecision()
+  const asset = Asset.from(value)
+  if ([
+    '@@000000013',
+    '@@000000021',
+    '@@000000037',
+    '@@000000045',
+    '@@000000059',
+    '@@000000068',
+    '@@000000076',
+    '@@000000084',
+  ].includes(asset.fai)) {
+    buffer.writeInt64(LongConstructor.fromString(asset.amount))
 
-  buffer.writeInt64(Math.round(asset.amount * 10 ** precision))
+    buffer.writeUint8(asset.precision)
 
-  buffer.writeUint8(precision)
-  buffer.append(asset.symbol.toUpperCase(), 'binary')
-  for (let i = 0; i < 7 - asset.symbol.length; i++) {
-    buffer.writeUint8(0)
+    const symbol = Asset.getSymbolByIdentifier(asset.fai)
+    buffer.append(symbol.toUpperCase(), 'binary')
+    for (let i = 0; i < 7 - symbol.length; i++) {
+      buffer.writeUint8(0)
+    }
+  }
+  else {
+    // TODO: 自定义 FA 的序列化
   }
 }
 

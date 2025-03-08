@@ -1,4 +1,5 @@
 import type { Account } from './account'
+import type { FaiAssetObject } from './asset'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
 import { Asset, Price } from './asset'
 
@@ -41,7 +42,7 @@ export interface ChainProperties {
    * 没有 QI 的账户无法获得使用配额，因此毫无影响力。
    * 这笔最低费用要求所有账户对网络做出一定的投入，其中包括投票及进行交易的能力。
    */
-  account_creation_fee: string | Asset
+  account_creation_fee: string | FaiAssetObject
   /**
    * 司命投票针对的是最大区块大小，网络利用该参数来调整速率限制和容量。
    */
@@ -64,7 +65,7 @@ export interface QiDelegation {
   /**
    * 委托的 QI 数量。
    */
-  qi: Asset | string
+  qi: FaiAssetObject | string
   /**
    * 最早可以移除委托的时间。
    */
@@ -81,25 +82,25 @@ export interface DynamicGlobalProperties {
   time: string
 
   /** 当前总等价阳寿供应量（包含真气、物质所有的等价阳寿总量） */
-  current_supply: Asset | string
+  current_supply: FaiAssetObject | string
 
   /** 当前总的真气（自由真气） */
-  total_qi: Asset | string
+  total_qi: FaiAssetObject | string
   /** 当前总的真气（自由真气） */
-  pending_rewarded_qi: Asset | string
-  pending_rewarded_feigang: Asset | string
-  pending_cultivation_qi: Asset | string
+  pending_rewarded_qi: FaiAssetObject | string
+  pending_rewarded_feigang: FaiAssetObject | string
+  pending_cultivation_qi: FaiAssetObject | string
 
   /** 当前总的金石（包括NFA内含物质） */
-  total_gold: Asset | string
+  total_gold: FaiAssetObject | string
   /** 当前总的食物（包括NFA内含物质） */
-  total_food: Asset | string
+  total_food: FaiAssetObject | string
   /** 当前总的木材（包括NFA内含物质） */
-  total_wood: Asset | string
+  total_wood: FaiAssetObject | string
   /** 当前总的织物（包括NFA内含物质） */
-  total_fabric: Asset | string
+  total_fabric: FaiAssetObject | string
   /** 当前总的药材（包括NFA内含物质） */
-  total_herb: Asset | string
+  total_herb: FaiAssetObject | string
 
   /** 最大区块大小 */
   maximum_block_size: number
@@ -117,7 +118,7 @@ export interface DynamicGlobalProperties {
  * Return the qi price.
  */
 export function getQiPrice(): Price {
-  return new Price(new Asset(1, 'YANG'), new Asset(1, 'QI'))
+  return new Price(Asset.from(1, 'YANG'), Asset.from(1, 'QI'))
 }
 
 /**
@@ -128,12 +129,16 @@ export function getQiPrice(): Price {
  * @param add_received 是否加上接收到的 QI。
  */
 export function getQi(account: Account, subtract_delegated: boolean = true, add_received: boolean = true) {
-  let qi: Asset = Asset.from(account.qi)
-  const qi_delegated: Asset = Asset.from(account.delegated_qi)
-  const qi_received: Asset = Asset.from(account.received_qi)
-  const withdraw_rate: Asset = Asset.from(account.qi_withdraw_rate)
-  const already_withdrawn = (Number(account.to_withdraw) - Number(account.withdrawn)) / 1000000
-  const withdraw_qi = Math.min(withdraw_rate.amount, already_withdrawn)
+  let qi = Asset.from(account.qi)
+  const qi_delegated = Asset.from(account.delegated_qi)
+  const qi_received = Asset.from(account.received_qi)
+  const withdraw_rate = Asset.from(account.qi_withdraw_rate)
+
+  const to_withdraw = Asset.from(account.to_withdraw)
+  const withdrawn = Asset.from(account.withdrawn)
+
+  const already_withdrawn = to_withdraw.subtract(withdrawn)
+  const withdraw_qi = Asset.min(withdraw_rate, already_withdrawn)
   qi = qi.subtract(withdraw_qi)
 
   if (subtract_delegated) {

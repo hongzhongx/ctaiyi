@@ -1,6 +1,6 @@
 import type { PublicKey } from '../crypto'
 import type { AuthorityType } from './account'
-import type { Asset } from './asset'
+import type { Asset, FaiAssetObject } from './asset'
 import type { ChainProperties, HexBuffer } from './misc'
 
 export type OperationName =
@@ -116,7 +116,7 @@ export interface TransferOperation extends Operation {
   1: {
     from: string
     to: string
-    amount: Asset | string
+    amount: FaiAssetObject | string
     memo?: string
   }
 }
@@ -126,7 +126,7 @@ export interface TransferToQiOperation extends Operation {
   1: {
     from: string
     to: string
-    amount: Asset | string
+    amount: FaiAssetObject | string
   }
 }
 
@@ -134,7 +134,7 @@ export interface WithdrawQiOperation extends Operation {
   0: 'withdraw_qi'
   1: {
     account: string
-    qi: Asset | string
+    qi: FaiAssetObject | string
   }
 }
 
@@ -153,7 +153,7 @@ export interface DelegateQiOperation extends Operation {
   1: {
     delegator: string
     delegatee: string
-    qi: Asset | string
+    qi: FaiAssetObject | string
   }
 }
 
@@ -164,7 +164,7 @@ export interface SimingUpdateOperation extends Operation {
     url: string
     block_signing_key: PublicKey | string
     props: ChainProperties
-    fee: Asset | string
+    fee: FaiAssetObject | string
   }
 }
 
@@ -344,7 +344,7 @@ export interface ActionNfaOperation extends Operation {
 export interface CreateZoneOperation extends Operation {
   0: 'create_zone'
   1: {
-    fee: Asset | string
+    fee: FaiAssetObject | string
     creator: string
     name: string
   }
@@ -361,7 +361,7 @@ export interface CreateActorTalentRuleOperation extends Operation {
 export interface CreateActorOperation extends Operation {
   0: 'create_actor'
   1: {
-    fee: Asset | string
+    fee: FaiAssetObject | string
     creator: string
     family_name: string
     last_name: string
@@ -380,8 +380,8 @@ export interface FillQiWithdrawOperation extends Operation {
   1: {
     from_account: string
     to_account: string
-    withdrawn: Asset | string
-    deposited: Asset | string
+    withdrawn: FaiAssetObject | string
+    deposited: FaiAssetObject | string
   }
 }
 
@@ -389,7 +389,7 @@ export interface ReturnQiDelegationOperation extends Operation {
   0: 'return_qi_delegation'
   1: {
     account: string
-    qi: Asset | string
+    qi: FaiAssetObject | string
   }
 }
 
@@ -406,8 +406,8 @@ export interface NfaConvertResourcesOperation extends Operation {
   1: {
     nfa: number
     owner: string
-    qi: Asset | string
-    resource: Asset | string
+    qi: FaiAssetObject | string
+    resource: FaiAssetObject | string
     is_qi_to_resource: boolean
   }
 }
@@ -419,7 +419,7 @@ export interface NfaTransferOperation extends Operation {
     from_owner: string
     to: number
     to_owner: string
-    amount: Asset | string
+    amount: FaiAssetObject | string
   }
 }
 
@@ -428,8 +428,8 @@ export interface NfaDepositWithdrawOperation extends Operation {
   1: {
     nfa: number
     account: string
-    deposited: Asset | string
-    withdrawn: Asset | string
+    deposited: FaiAssetObject | string
+    withdrawn: FaiAssetObject | string
   }
 }
 
@@ -437,7 +437,7 @@ export interface RewardFeigangOperation extends Operation {
   0: 'reward_feigang'
   1: {
     account: string
-    qi: Asset | string
+    qi: FaiAssetObject | string
   }
 }
 
@@ -446,7 +446,7 @@ export interface RewardCultivationOperation extends Operation {
   1: {
     account: string
     nfa: number
-    qi: Asset | string
+    qi: FaiAssetObject | string
   }
 }
 

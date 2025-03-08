@@ -14,7 +14,7 @@ export interface MaterialAssets {
 }
 
 export interface FaiAssetObject {
-  amount: bigint
+  amount: bigint | string
   precision: number
   fai: `@@${string}`
 }
@@ -22,52 +22,66 @@ export interface FaiAssetObject {
 /**
  * 表示太乙资产的类，例如 `1.000 QI` 或 `12.112233 YANG`。
  */
-export class Asset {
-  public static from(asset: Asset): Asset
-  public static from(object: FaiAssetObject): Asset
-  public static from(amount: `${string} ${AssetSymbol}`): Asset
-  public static from(amount: number | string, symbol?: AssetSymbol): Asset
-  public static from(amount: bigint, precision: number, fai: `@@${string}`): Asset
+export class Asset implements FaiAssetObject {
+  /**
+   * 从字符串创建资产。
+   * @param value 资产字符串，例如 `1.000 QI` 或 `12.112233 YANG`。
+   * @returns 创建的资产实例。
+   */
+  public static fromString(value: string): Asset {
+    invariant(value.match(/^\d+\.\d+ [A-Z]+$/), 'Invalid asset string')
+    const [amount, symbol] = value.split(' ')
+    invariant(Asset.isValidSymbol(symbol), `Invalid asset symbol: ${symbol}`)
+    const precision = Asset.getPrecision(symbol)
+    const fai = Asset.getIdentifier(symbol)
+    return new Asset(BigInt(Number(amount) * 10 ** precision).toString(), precision, fai)
+  }
+
+  /**
+   * 从 bigint 创建资产。
+   * @param amount 资产数量。
+   * @param precision 资产精度。
+   * @param fai 资产 identifier。
+   * @returns 创建的资产实例。
+   */
+  public static fromBigInt(amount: bigint, precision: number, fai: `@@${string}`): Asset {
+    return new Asset(amount.toString(), precision, fai)
+  }
+
+  /**
+   * 从 FaiAssetObject 创建资产。
+   * @param value FaiAssetObject 实例。
+   * @returns 创建的资产实例。
+   */
+  public static fromObject(value: FaiAssetObject): Asset {
+    invariant(value.amount, 'amount must be provided')
+    invariant(value.precision, 'precision must be provided')
+    invariant(value.fai, 'fai must be provided')
+    return new Asset(value.amount.toString(), value.precision, value.fai)
+  }
+
+  public static from(value: Asset): Asset
+  public static from(value: string | FaiAssetObject): Asset
+  public static from(value: number, symbol?: AssetSymbol): Asset
   public static from(
-    args1: number | string | bigint | FaiAssetObject | Asset,
-    args2?: number | AssetSymbol,
-    args3?: `@@${string}`,
+    value: Asset | string | number | FaiAssetObject,
+    symbol?: AssetSymbol,
   ) {
-    if (args1 instanceof Asset) {
-      return args1
+    if (value instanceof Asset) {
+      return value
     }
-    // overload 3 from legacy asset string
-    if (typeof args1 === 'string' && args1.match(/^\d+\.\d+ [A-Z]+$/)) {
-      const [amount, symbol] = args1.split(' ')
-      invariant(Asset.isValidSymbol(symbol), `Invalid asset symbol: ${symbol}`)
+    else if (typeof value === 'string') {
+      return Asset.fromString(value)
+    }
+    else if (typeof value === 'object') {
+      return Asset.fromObject(value)
+    }
+    else if (typeof value === 'number') {
+      symbol = symbol || 'YANG'
       const precision = Asset.getPrecision(symbol)
-      const fai = Asset.getIdentifier(symbol)
-      const amountBigInt = BigInt(Number(amount) * (10 ** precision))
-      return new Asset(amountBigInt.toString(), precision, fai)
-    }
-    // overload 4 from number and symbol
-    else if (typeof args1 === 'number' || (typeof args1 === 'string' && args1.match(/^\d+$/))) {
-      const symbol = (args2 as AssetSymbol) || 'YANG'
-      const precision = Asset.getPrecision(symbol)
-      const amount = BigInt(Number(args1) * (10 ** precision))
+      const amount = BigInt(Number(value) * (10 ** precision))
       invariant(Asset.isValidSymbol(symbol), `Invalid asset symbol: ${symbol}`)
-      const fai = Asset.getIdentifier(symbol)
-      return new Asset(amount.toString(), precision, fai)
-    }
-    // overload 2 from fai asset object
-    else if (typeof args1 === 'object') {
-      invariant(args1.amount, 'amount must be provided')
-      invariant(args1.precision, 'precision must be provided')
-      invariant(args1.fai, 'fai must be provided')
-      return new Asset(args1.amount.toString(), args1.precision, args1.fai)
-    }
-    // overload 5 from bigint, precision and fai
-    else if (typeof args1 === 'bigint') {
-      invariant(typeof args2 === 'number', 'precision must be a number')
-      invariant(typeof args1 === 'bigint', 'amount must be a bigint')
-      invariant(typeof args2 === 'number', 'precision must be a number')
-      invariant(args3, 'fai must be provided when using bigint amount')
-      return new Asset(args1.toString(), args2, args3)
+      return new Asset(amount.toString(), precision, Asset.getIdentifier(symbol))
     }
     throw new TypeError('Invalid asset')
   }
@@ -284,7 +298,7 @@ export class Price {
 
     if (asset.fai === this.base.fai) {
       invariant(baseAmount > 0n)
-      return Asset.from(
+      return Asset.fromBigInt(
         (assetAmount * quoteAmount) / baseAmount,
         this.quote.precision,
         this.quote.fai,
@@ -292,7 +306,7 @@ export class Price {
     }
     else if (asset.fai === this.quote.fai) {
       invariant(quoteAmount > 0n)
-      return Asset.from(
+      return Asset.fromBigInt(
         (assetAmount * baseAmount) / quoteAmount,
         this.base.precision,
         this.base.fai,

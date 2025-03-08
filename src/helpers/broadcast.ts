@@ -2,10 +2,11 @@
 import type { Client } from '../client'
 
 import type { AuthorityType } from '../taiyi/account'
+import type { FaiAssetObject } from '../taiyi/asset'
 import type * as operations from '../taiyi/operation'
 import type { SignedTransaction, Transaction, TransactionConfirmation } from '../taiyi/transaction'
-import { hexToBytes } from '@noble/hashes/utils'
 
+import { hexToBytes } from '@noble/hashes/utils'
 import assert from 'tiny-invariant'
 import { cryptoUtils, PrivateKey, PublicKey } from '../crypto'
 import { Authority } from '../taiyi/account'
@@ -38,7 +39,7 @@ export interface CreateAccountOptions {
   /**
    * 账户创建费用。如果省略，费用将设置为最低可能值
    */
-  fee?: string | Asset | number
+  fee?: string | Asset | number | FaiAssetObject
   /**
    * 可选的账户元数据
    */
@@ -249,16 +250,10 @@ export class BroadcastAPI {
       throw new Error('Must specify either password or auths')
     }
 
-    let { fee } = options
-
-    fee = Asset.from(fee || 0, 'YANG')
-
-    if (fee.amount > 0) {
+    let fee = Asset.from(options.fee as any)
+    if (!fee) {
       const chainProps = await this.client.baiyujing.getChainProperties()
-      const creationFee = Asset.from(chainProps.account_creation_fee)
-      if (fee.amount !== creationFee.amount) {
-        throw new Error(`Fee must be exactly ${creationFee.toString()}`)
-      }
+      fee = Asset.from(chainProps.account_creation_fee as any)
     }
 
     const create_op: operations.AccountCreateOperation = [
@@ -266,8 +261,7 @@ export class BroadcastAPI {
       {
         active,
         creator,
-        // 尚不支持 fai 表示
-        fee: fee.toString(),
+        fee,
         json_metadata: metadata ? JSON.stringify(metadata) : '',
         memo_key,
         new_account_name: username,
