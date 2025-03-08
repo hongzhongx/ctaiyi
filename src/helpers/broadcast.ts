@@ -2,7 +2,7 @@
 import type { Client } from '../client'
 
 import type { AuthorityType } from '../taiyi/account'
-import type { FaiAssetObject } from '../taiyi/asset'
+import type { SGTAsset } from '../taiyi/asset'
 import type * as operations from '../taiyi/operation'
 import type { SignedTransaction, Transaction, TransactionConfirmation } from '../taiyi/transaction'
 
@@ -39,7 +39,7 @@ export interface CreateAccountOptions {
   /**
    * 账户创建费用。如果省略，费用将设置为最低可能值
    */
-  fee?: string | Asset | number | FaiAssetObject
+  fee?: string | Asset | number | SGTAsset
   /**
    * 可选的账户元数据
    */
@@ -250,10 +250,11 @@ export class BroadcastAPI {
       throw new Error('Must specify either password or auths')
     }
 
-    let fee = Asset.from(options.fee as any)
+    // 参数是数字的话，默认是YANG
+    let fee = Asset.from(options.fee as Asset | string | SGTAsset)
     if (!fee) {
       const chainProps = await this.client.baiyujing.getChainProperties()
-      fee = Asset.from(chainProps.account_creation_fee as any)
+      fee = Asset.from(chainProps.account_creation_fee as string | SGTAsset)
     }
 
     const create_op: operations.AccountCreateOperation = [

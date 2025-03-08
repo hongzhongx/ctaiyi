@@ -1,4 +1,4 @@
-import type { FaiAssetObject, MaterialAssets } from './asset'
+import type { MaterialAssets, SGTAsset } from './asset'
 import type { AppliedOperation } from './operation'
 import { PublicKey } from './../crypto'
 
@@ -57,14 +57,14 @@ export interface Account extends MaterialAssets {
 
   can_adore: boolean
 
-  balance: FaiAssetObject | string
-  reward_yang_balance: FaiAssetObject | string
-  reward_qi_balance: FaiAssetObject | string
-  reward_feigang_balance: FaiAssetObject | string
-  qi: FaiAssetObject | string
-  delegated_qi: FaiAssetObject | string
-  received_qi: FaiAssetObject | string
-  qi_withdraw_rate: FaiAssetObject | string
+  balance: SGTAsset | string
+  reward_yang_balance: SGTAsset | string
+  reward_qi_balance: SGTAsset | string
+  reward_feigang_balance: SGTAsset | string
+  qi: SGTAsset | string
+  delegated_qi: SGTAsset | string
+  received_qi: SGTAsset | string
+  qi_withdraw_rate: SGTAsset | string
 
   next_qi_withdrawal_time: string
   withdrawn: number
@@ -74,7 +74,7 @@ export interface Account extends MaterialAssets {
   proxied_vsf_adores: number[]
   simings_adored_for: number
 
-  qi_balance: FaiAssetObject | string
+  qi_balance: SGTAsset | string
 }
 
 export interface ExtendedAccount extends Account {

@@ -1,10 +1,10 @@
 import type { AuthorityType } from './account'
-import type { FaiAssetObject } from './asset'
+import type { SGTAsset } from './asset'
 import type { Operation } from './operation'
 import ByteBuffer from 'bytebuffer'
 import { PublicKey } from '../crypto'
 import { Authority } from './account'
-import { Asset } from './asset'
+import { Asset, SGT_ASSETS_FAI } from './asset'
 import { HexBuffer } from './misc'
 
 export type Serializer<Type = any> = (buffer: ByteBuffer, data: Type) => void
@@ -71,21 +71,12 @@ function StaticVariantSerializer(itemSerializers: Serializer[]) {
  * 序列化资产。
  * @note 对于大于 `2^53-1/10^precision` 的数额会失去精度。在实际使用中不应成为问题。
  */
-function AssetSerializer(buffer: ByteBuffer, value: FaiAssetObject | string) {
+function AssetSerializer(buffer: ByteBuffer, value: SGTAsset | string) {
   // @ts-expect-error wrong type in @type/bytebuffer package
   const LongConstructor = ByteBuffer.Long as typeof Long
 
   const asset = Asset.from(value)
-  if ([
-    '@@000000013',
-    '@@000000021',
-    '@@000000037',
-    '@@000000045',
-    '@@000000059',
-    '@@000000068',
-    '@@000000076',
-    '@@000000084',
-  ].includes(asset.fai)) {
+  if (SGT_ASSETS_FAI.includes(asset.fai)) {
     buffer.writeInt64(LongConstructor.fromString(asset.amount))
 
     buffer.writeUint8(asset.precision)

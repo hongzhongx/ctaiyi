@@ -1,5 +1,5 @@
 import type { Account } from './account'
-import type { FaiAssetObject } from './asset'
+import type { SGTAsset } from './asset'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
 import { Asset, Price } from './asset'
 
@@ -42,7 +42,7 @@ export interface ChainProperties {
    * 没有 QI 的账户无法获得使用配额，因此毫无影响力。
    * 这笔最低费用要求所有账户对网络做出一定的投入，其中包括投票及进行交易的能力。
    */
-  account_creation_fee: string | FaiAssetObject
+  account_creation_fee: string | SGTAsset
   /**
    * 司命投票针对的是最大区块大小，网络利用该参数来调整速率限制和容量。
    */
@@ -65,7 +65,7 @@ export interface QiDelegation {
   /**
    * 委托的 QI 数量。
    */
-  qi: FaiAssetObject | string
+  qi: SGTAsset | string
   /**
    * 最早可以移除委托的时间。
    */
@@ -82,25 +82,25 @@ export interface DynamicGlobalProperties {
   time: string
 
   /** 当前总等价阳寿供应量（包含真气、物质所有的等价阳寿总量） */
-  current_supply: FaiAssetObject | string
+  current_supply: SGTAsset | string
 
   /** 当前总的真气（自由真气） */
-  total_qi: FaiAssetObject | string
+  total_qi: SGTAsset | string
   /** 当前总的真气（自由真气） */
-  pending_rewarded_qi: FaiAssetObject | string
-  pending_rewarded_feigang: FaiAssetObject | string
-  pending_cultivation_qi: FaiAssetObject | string
+  pending_rewarded_qi: SGTAsset | string
+  pending_rewarded_feigang: SGTAsset | string
+  pending_cultivation_qi: SGTAsset | string
 
   /** 当前总的金石（包括NFA内含物质） */
-  total_gold: FaiAssetObject | string
+  total_gold: SGTAsset | string
   /** 当前总的食物（包括NFA内含物质） */
-  total_food: FaiAssetObject | string
+  total_food: SGTAsset | string
   /** 当前总的木材（包括NFA内含物质） */
-  total_wood: FaiAssetObject | string
+  total_wood: SGTAsset | string
   /** 当前总的织物（包括NFA内含物质） */
-  total_fabric: FaiAssetObject | string
+  total_fabric: SGTAsset | string
   /** 当前总的药材（包括NFA内含物质） */
-  total_herb: FaiAssetObject | string
+  total_herb: SGTAsset | string
 
   /** 最大区块大小 */
   maximum_block_size: number

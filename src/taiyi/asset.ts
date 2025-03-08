@@ -14,7 +14,7 @@ export interface MaterialAssets {
   herb: Asset | string
 }
 
-export interface FaiAssetObject {
+export interface SGTAsset {
   amount: bigint | string
   precision: number
   fai: `@@${string}`
@@ -23,10 +23,21 @@ export interface FaiAssetObject {
 const SGT_MAX_FAI = 99999999
 const SGT_MIN_FAI = 1
 
+export const SGT_ASSETS_FAI = [
+  '@@000000013',
+  '@@000000021',
+  '@@000000037',
+  '@@000000045',
+  '@@000000059',
+  '@@000000068',
+  '@@000000076',
+  '@@000000084',
+] as `@@${string}`[]
+
 /**
  * 表示太乙资产的类，例如 `1.000 QI` 或 `12.112233 YANG`。
  */
-export class Asset implements FaiAssetObject {
+export class Asset implements SGTAsset {
   /**
    * 从字符串创建资产。
    * @param value 资产字符串，例如 `1.000 QI` 或 `12.112233 YANG`。
@@ -57,7 +68,7 @@ export class Asset implements FaiAssetObject {
    * @param value FaiAssetObject 实例。
    * @returns 创建的资产实例。
    */
-  public static fromObject(value: FaiAssetObject): Asset {
+  public static fromObject(value: SGTAsset): Asset {
     invariant(value.amount, 'amount must be provided')
     invariant(value.precision, 'precision must be provided')
     invariant(value.fai, 'fai must be provided')
@@ -65,10 +76,10 @@ export class Asset implements FaiAssetObject {
   }
 
   public static from(value: Asset): Asset
-  public static from(value: string | FaiAssetObject): Asset
+  public static from(value: string | SGTAsset): Asset
   public static from(value: number, symbol?: AssetSymbol): Asset
   public static from(
-    value: Asset | string | number | FaiAssetObject,
+    value: Asset | string | number | SGTAsset,
     symbol?: AssetSymbol,
   ) {
     if (value instanceof Asset) {
