@@ -567,6 +567,7 @@ const OperationSerializers = {
 
   narrate_log: OperationDataSerializer(45, [
     ['narrator', StringSerializer],
+    ['nfa', Int64Serializer],
     ['years', UInt32Serializer],
     ['months', UInt32Serializer],
     ['times', UInt32Serializer],
