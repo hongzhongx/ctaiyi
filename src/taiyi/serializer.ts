@@ -9,6 +9,8 @@ import { HexBuffer } from './misc'
 
 export type Serializer<Type = any> = (buffer: ByteBuffer, data: Type) => void
 
+type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {}
+
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never
 
 type CoverUnionSerializerToObject<S> = UnionToIntersection<S extends [infer K extends string, Serializer<infer V>]
@@ -146,8 +148,8 @@ function ArraySerializer<T>(itemSerializer: Serializer<T>) {
 
 function ObjectSerializer<
   const Definitions extends Array<[string, Serializer<any>]>,
->(keySerializers: [...Definitions]): Serializer<CoverUnionSerializerToObject<Definitions[number]>> {
-  return (buffer: ByteBuffer, data: CoverUnionSerializerToObject<Definitions[number]>) => {
+>(keySerializers: [...Definitions]): Serializer<Simplify<CoverUnionSerializerToObject<Definitions[number]>>> {
+  return (buffer: ByteBuffer, data: Simplify<CoverUnionSerializerToObject<Definitions[number]>>) => {
     for (const [key, serializer] of keySerializers) {
       try {
         serializer(buffer, (<any>data)[key])
