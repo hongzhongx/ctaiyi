@@ -1,6 +1,6 @@
 import type { PublicKey } from '../crypto'
 import type { AuthorityType } from './account'
-import type { Asset, FaiAssetObject } from './asset'
+import type { FaiAssetObject } from './asset'
 import type { ChainProperties, HexBuffer } from './misc'
 
 export type OperationName =
@@ -88,7 +88,7 @@ export interface AppliedOperation {
 export interface AccountCreateOperation extends Operation {
   0: 'account_create'
   1: {
-    fee: Asset | string
+    fee: FaiAssetObject | string
     creator: string
     new_account_name: string
     owner: AuthorityType
@@ -255,9 +255,9 @@ export interface ClaimRewardBalanceOperation extends Operation {
   0: 'claim_reward_balance'
   1: {
     account: string
-    reward_yang: Asset | string
-    reward_qi: Asset | string
-    reward_feigang: Asset | string
+    reward_yang: FaiAssetObject | string
+    reward_qi: FaiAssetObject | string
+    reward_feigang: FaiAssetObject | string
   }
 }
 
@@ -397,7 +397,7 @@ export interface ProducerRewardOperation extends Operation {
   0: 'producer_reward'
   1: {
     producer: string
-    qi: Asset | string
+    qi: FaiAssetObject | string
   }
 }
 
