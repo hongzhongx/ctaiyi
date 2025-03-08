@@ -692,6 +692,7 @@ runForBothTransports('serialize operations for transport $transport.type', (clie
         'narrate_log',
         {
           narrator: 'initminer',
+          nfa: 1,
           years: 1,
           months: 1,
           times: 1,

@@ -536,6 +536,7 @@ export interface NarrateLogOperation extends Operation {
   0: 'narrate_log'
   1: {
     narrator: string
+    nfa: number
     years: number
     months: number
     times: number
