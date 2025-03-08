@@ -1,4 +1,4 @@
-import type { SGTAsset } from './asset'
+import type { LegacyAsset } from './asset'
 
 export interface LuaBool {
   type: 'lua_bool'
@@ -50,19 +50,19 @@ export interface Nfa {
   debt_contract: string
   debt_value: number
 
-  qi: SGTAsset | string
+  qi: LegacyAsset
 
-  fabric: SGTAsset | string
-  food: SGTAsset | string
-  gold: SGTAsset | string
-  herb: SGTAsset | string
-  wood: SGTAsset | string
+  fabric: LegacyAsset
+  food: LegacyAsset
+  gold: LegacyAsset
+  herb: LegacyAsset
+  wood: LegacyAsset
 
-  material_fabric: SGTAsset | string
-  material_food: SGTAsset | string
-  material_gold: SGTAsset | string
-  material_herb: SGTAsset | string
-  material_wood: SGTAsset | string
+  material_fabric: LegacyAsset
+  material_food: LegacyAsset
+  material_gold: LegacyAsset
+  material_herb: LegacyAsset
+  material_wood: LegacyAsset
 
   five_phase: number
 }

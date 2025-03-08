@@ -14,6 +14,8 @@ export interface MaterialAssets {
   herb: Asset | string
 }
 
+export type LegacyAsset = `${number} ${AssetSymbol}`
+
 export interface SGTAsset {
   amount: bigint | string
   precision: number
@@ -64,8 +66,8 @@ export class Asset implements SGTAsset {
   }
 
   /**
-   * 从 FaiAssetObject 创建资产。
-   * @param value FaiAssetObject 实例。
+   * 从 SGTAsset 对象创建资产。
+   * @param value SGTAsset 实例。
    * @returns 创建的资产实例。
    */
   public static fromObject(value: SGTAsset): Asset {

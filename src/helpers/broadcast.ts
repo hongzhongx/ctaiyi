@@ -2,7 +2,7 @@
 import type { Client } from '../client'
 
 import type { AuthorityType } from '../taiyi/account'
-import type { SGTAsset } from '../taiyi/asset'
+import type { LegacyAsset, SGTAsset } from '../taiyi/asset'
 import type * as operations from '../taiyi/operation'
 import type { SignedTransaction, Transaction, TransactionConfirmation } from '../taiyi/transaction'
 
@@ -39,7 +39,7 @@ export interface CreateAccountOptions {
   /**
    * 账户创建费用。如果省略，费用将设置为最低可能值
    */
-  fee?: string | Asset | number | SGTAsset
+  fee?: LegacyAsset | Asset | number | SGTAsset
   /**
    * 可选的账户元数据
    */
@@ -262,7 +262,7 @@ export class BroadcastAPI {
       {
         active,
         creator,
-        fee,
+        fee: fee.toString() as LegacyAsset,
         json_metadata: metadata ? JSON.stringify(metadata) : '',
         memo_key,
         new_account_name: username,
