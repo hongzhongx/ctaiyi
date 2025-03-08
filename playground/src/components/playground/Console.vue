@@ -31,7 +31,7 @@ function onClick() {
         type="button"
         flex="inline items-center gap-1"
         h-8 px-2
-        bg="hover:dark-200 active:dark-300"
+        bg="hover:light-900 active:light-800 dark:hover:dark-200 dark:active:dark-300"
         @click="onClick"
       >
         <div class="i-carbon:play" size-3 />
