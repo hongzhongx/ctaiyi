@@ -24,8 +24,7 @@
     }
   ],
   "include": [
-    "**/*.ts",
-    "**/*.mjs",
+    "src/**/*.ts",
     "eslint.config.js"
   ],
   "exclude": [

@@ -22,7 +22,6 @@
     "skipLibCheck": true
   },
   "include": [
-    "src/**/*.ts",
     "test/common.ts",
     "test/fixture.ts",
     "test/test-env.d.ts",
