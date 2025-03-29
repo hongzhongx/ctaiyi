@@ -10,16 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ark-ui/vue": "^5.0.2",
-    "@babel/standalone": "^7.26.9",
+    "@ark-ui/vue": "^5.4.0",
+    "@babel/standalone": "^7.27.0",
     "@taiyinet/ctaiyi": "workspace:*",
-    "@unhead/vue": "^2.0.0-rc.8",
-    "@unocss/reset": "^66.1.0-beta.3",
+    "@unhead/vue": "^2.0.2",
+    "@unocss/reset": "^66.1.0-beta.7",
     "@vee-validate/zod": "^4.15.0",
-    "@vueuse/core": "^12.8.2",
+    "@vueuse/core": "^13.0.0",
     "comlink": "^4.4.2",
     "convert-source-map": "^2.0.0",
-    "esbuild-wasm": "^0.25.0",
+    "esbuild-wasm": "^0.25.1",
     "lodash-es": "^4.17.21",
     "magic-string": "^0.30.17",
     "monaco-editor": "^0.52.2",
@@ -31,17 +31,17 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@babel/types": "^7.26.9",
+    "@babel/types": "^7.27.0",
     "@iconify-json/carbon": "^1.2.8",
     "@types/babel__standalone": "^7.1.9",
     "@types/convert-source-map": "^2.0.3",
     "@types/lodash-es": "^4.17.12",
-    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitejs/plugin-vue": "^5.2.3",
     "@vue/tsconfig": "^0.7.0",
     "chobitsu": "^1.8.4",
     "typescript": "~5.8.2",
-    "unocss": "^66.1.0-beta.3",
-    "vite": "^6.2.1",
+    "unocss": "^66.1.0-beta.7",
+    "vite": "^6.2.3",
     "vue-tsc": "^2.2.8"
   }
 }
