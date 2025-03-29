@@ -1,4 +1,4 @@
-import type { ClientMessageError } from '../src/errors'
+import type { ClientWebSocketError } from '../src/errors'
 import { RPCError } from '../src/errors'
 import { waitForEvent } from './../src/utils'
 import { runForBothTransports } from './fixture'
@@ -51,12 +51,12 @@ runForBothTransports('client for transport $transport.type', (client) => {
 
       it('should handle garbled data from server', async () => {
         assert(client.transport.type === 'websocket')
-        const errorPromise = waitForEvent<CustomEvent<ClientMessageError>>(client.transport, 'error')
+        const errorPromise = waitForEvent<CustomEvent<ClientWebSocketError>>(client.transport, 'error')
         const e = new MessageEvent('message', { data: 'this}}is notJSON!' })
         // @ts-expect-error test usage
         client.transport.onMessage(e)
         const error = await errorPromise
-        expect(error.detail.name).toBe('MessageError')
+        expect(error.detail.name).toBe('WebSocketError')
       })
 
       it('should handle write errors', async () => {

@@ -1,11 +1,4 @@
 /**
- * 消息错误
- */
-export class ClientMessageError extends Error {
-  override name = 'MessageError'
-}
-
-/**
  * WebSocket 通用错误
  */
 export class ClientWebSocketError extends Error {

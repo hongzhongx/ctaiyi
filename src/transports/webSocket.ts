@@ -1,7 +1,7 @@
 import type { PendingRequest, RetryOptions, RPCRequest, RPCResponse, Transport, TransportConfig } from './transport'
 import { bytesToHex } from '@noble/hashes/utils'
 import defu from 'defu'
-import { ClientMessageError, ClientTimeoutError, ClientWebSocketError } from '../errors'
+import { ClientTimeoutError, ClientWebSocketError } from '../errors'
 import { normalizeRpcError, waitForEvent } from '../utils'
 
 export interface WebSocketTransportConfig extends TransportConfig {
@@ -208,7 +208,7 @@ export class WebSocketTransport extends EventTarget implements Transport {
         this.rpcHandler(response.id, error, response.result)
       }
       catch (cause) {
-        const error = new ClientMessageError('got invalid message', { cause })
+        const error = new ClientWebSocketError('WebSocket request error', { cause })
         this.dispatchEvent(new CustomEvent('error', { detail: error }))
       }
     }
